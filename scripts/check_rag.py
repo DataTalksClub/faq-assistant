@@ -6,8 +6,9 @@ import base64
 import zlib
 from typing import Any
 
+from zerosearch import Index
+
 from faq_assistant.config import load_config
-from faq_assistant.minsearch import Index
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.openai import OpenAIClient
 from faq_assistant.search_corpus import SEARCH_CORPUS_B64
@@ -56,7 +57,7 @@ def run_rag_case(
     course = case["course"]
 
     rewritten = rewrite_query(openai, config, question, scope, course)
-    results = minsearch_search(index, config, rewritten.query, scope, course)
+    results = zerosearch_search(index, config, rewritten.query, scope, course)
     answer = answer_question(openai, config, question, rewritten.query, scope, course, results)
 
     allowed_ids = {result.id for result in results}
@@ -113,7 +114,7 @@ def build_index() -> Index:
     ).fit(records)
 
 
-def minsearch_search(
+def zerosearch_search(
     index: Index,
     config: dict[str, Any],
     query: str,

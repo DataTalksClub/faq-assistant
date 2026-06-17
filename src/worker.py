@@ -14,8 +14,9 @@ from js import fetch
 from pyodide.ffi import create_proxy
 from workers import Response, WorkerEntrypoint, wait_until
 
+from zerosearch import Index
+
 from faq_assistant.generated_config import CONFIG
-from faq_assistant.minsearch import Index
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.search_corpus import SEARCH_CORPUS_B64
 from faq_assistant.structured import parse_structured_response

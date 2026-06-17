@@ -5,7 +5,7 @@ Simplified DataTalks.Club Slack FAQ assistant.
 Runtime flow:
 
 ```text
-Slack mention -> scope detection -> OpenAI query rewrite -> MinSearch -> OpenAI RAG answer -> Slack thread reply
+Slack mention -> scope detection -> OpenAI query rewrite -> zerosearch -> OpenAI RAG answer -> Slack thread reply
 ```
 
 Course channels use course-scoped FAQ plus course markdown. Other channels use the general
@@ -36,7 +36,7 @@ FAQ_ASSISTANT_SHARED_SECRET=...
 For local Worker testing, put the same value in `.dev.vars`; Wrangler reads that file
 and exposes it to the Worker.
 
-Build the local MinSearch corpus from the configured sources:
+Build the local zerosearch corpus from the configured sources:
 
 ```bash
 uv run --group ingest python scripts/build_search_corpus.py
@@ -152,7 +152,7 @@ uv run pywrangler dev --port 8792
 ```
 
 The Worker uses OpenAI for query rewrite and structured chat. Search runs in
-memory with the generated MinSearch corpus. `/ask` requires `OPENAI_API_KEY`
+memory with the generated zerosearch corpus. `/ask` requires `OPENAI_API_KEY`
 available to the Worker.
 
 ### Health payload
@@ -317,7 +317,7 @@ structured models:
 uv run --group ingest python scripts/check_structured_output.py
 ```
 
-Validate the full RAG path against the generated MinSearch corpus:
+Validate the full RAG path against the generated zerosearch corpus:
 
 ```bash
 uv run --group ingest python scripts/check_rag.py
