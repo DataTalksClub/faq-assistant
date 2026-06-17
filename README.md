@@ -28,13 +28,13 @@ GITHUB_TOKEN=...
 Create the Vectorize index:
 
 ```bash
-uv run faq-assistant index create
+uv run --group ingest faq-assistant index create
 ```
 
 Run a full rebuild:
 
 ```bash
-uv run faq-assistant ingest --mode rebuild
+uv run --group ingest faq-assistant ingest --mode rebuild
 ```
 
 The rebuild lists existing vector IDs before ingestion, upserts the current chunks, and deletes
@@ -216,7 +216,7 @@ Pydantic models:
 ```bash
 CLOUDFLARE_ACCOUNT_ID=... \
 CLOUDFLARE_API_TOKEN=... \
-uv run python scripts/check_structured_output.py
+uv run --group ingest python scripts/check_structured_output.py
 ```
 
 Validate the full RAG path against the populated Vectorize index:
@@ -224,7 +224,7 @@ Validate the full RAG path against the populated Vectorize index:
 ```bash
 CLOUDFLARE_ACCOUNT_ID=... \
 CLOUDFLARE_API_TOKEN=... \
-uv run python scripts/check_rag.py
+uv run --group ingest python scripts/check_rag.py
 ```
 
 Known course channel IDs:

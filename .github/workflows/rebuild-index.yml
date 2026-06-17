@@ -24,16 +24,16 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: uv sync --locked
+        run: uv sync --locked --group ingest
 
       - name: Ensure Vectorize index and metadata indexes exist
-        run: uv run faq-assistant index create
+        run: uv run --group ingest faq-assistant index create
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       - name: Rebuild Vectorize index
-        run: uv run faq-assistant ingest --mode rebuild
+        run: uv run --group ingest faq-assistant ingest --mode rebuild
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

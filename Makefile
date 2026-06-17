@@ -12,7 +12,7 @@ check:
 	uv run python -m compileall src scripts
 
 index-create:
-	uv run faq-assistant index create
+	uv run --group ingest faq-assistant index create
 
 ingest:
-	uv run faq-assistant ingest --mode rebuild
+	uv run --group ingest faq-assistant ingest --mode rebuild
