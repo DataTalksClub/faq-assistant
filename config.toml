@@ -1,0 +1,222 @@
+[app]
+name = "faq-assistant"
+environment = "dev"
+
+[cloudflare]
+account_id_env = "CLOUDFLARE_ACCOUNT_ID"
+api_token_env = "CLOUDFLARE_API_TOKEN"
+
+[cloudflare.worker]
+name = "faq-assistant"
+compatibility_date = "2026-06-17"
+compatibility_flags = ["python_workers"]
+
+[cloudflare.ai]
+binding = "AI"
+embedding_model = "@cf/baai/bge-base-en-v1.5"
+chat_model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+
+[cloudflare.vectorize]
+binding = "FAQ_INDEX"
+index_name = "faq-assistant-index"
+dimensions = 768
+metric = "cosine"
+
+[[cloudflare.vectorize.metadata_indexes]]
+property_name = "scope"
+type = "string"
+
+[[cloudflare.vectorize.metadata_indexes]]
+property_name = "course"
+type = "string"
+
+[slack]
+signing_secret_env = "SLACK_SIGNING_SECRET"
+bot_token_env = "SLACK_BOT_TOKEN"
+events_path = "/slack/events"
+default_scope = "docs"
+
+[slack.reply]
+thread = true
+unfurl_links = false
+unfurl_media = false
+
+[slack.channels.C_DATA_ENGINEERING]
+name = "course-data-engineering"
+scope = "course"
+course = "data-engineering-zoomcamp"
+
+[slack.channels.C_MLOPS]
+name = "course-mlops"
+scope = "course"
+course = "mlops-zoomcamp"
+
+[slack.channels.C_LLM]
+name = "course-llm"
+scope = "course"
+course = "llm-zoomcamp"
+
+[slack.channels.C_ML]
+name = "course-ml"
+scope = "course"
+course = "machine-learning-zoomcamp"
+
+[slack.channels.C_AI_DEV_TOOLS]
+name = "course-ai-dev-tools"
+scope = "course"
+course = "ai-dev-tools-zoomcamp"
+
+[courses."data-engineering-zoomcamp"]
+name = "Data Engineering Zoomcamp"
+slack_channels = ["C_DATA_ENGINEERING"]
+faq_enabled = true
+docs_prefix = "courses/data-engineering-zoomcamp/"
+
+[[courses."data-engineering-zoomcamp".github_repositories]]
+repo = "DataTalksClub/data-engineering-zoomcamp"
+ref = "main"
+
+[courses."mlops-zoomcamp"]
+name = "MLOps Zoomcamp"
+slack_channels = ["C_MLOPS"]
+faq_enabled = true
+docs_prefix = "courses/mlops-zoomcamp/"
+
+[[courses."mlops-zoomcamp".github_repositories]]
+repo = "DataTalksClub/mlops-zoomcamp"
+ref = "main"
+
+[courses."llm-zoomcamp"]
+name = "LLM Zoomcamp"
+slack_channels = ["C_LLM"]
+faq_enabled = true
+docs_prefix = "courses/llm-zoomcamp/"
+
+[[courses."llm-zoomcamp".github_repositories]]
+repo = "DataTalksClub/llm-zoomcamp"
+ref = "main"
+
+[courses."machine-learning-zoomcamp"]
+name = "Machine Learning Zoomcamp"
+slack_channels = ["C_ML"]
+faq_enabled = true
+docs_prefix = "courses/ml-zoomcamp/"
+
+[[courses."machine-learning-zoomcamp".github_repositories]]
+repo = "DataTalksClub/machine-learning-zoomcamp"
+ref = "main"
+
+[courses."ai-dev-tools-zoomcamp"]
+name = "AI Dev Tools Zoomcamp"
+slack_channels = ["C_AI_DEV_TOOLS"]
+faq_enabled = true
+docs_prefix = "courses/ai-dev-tools-zoomcamp/"
+
+[[courses."ai-dev-tools-zoomcamp".github_repositories]]
+repo = "DataTalksClub/ai-dev-tools-zoomcamp"
+ref = "main"
+
+[courses."stock-markets-analytics-zoomcamp"]
+name = "Stock Markets Analytics Zoomcamp"
+slack_channels = []
+faq_enabled = true
+docs_prefix = "courses/stock-markets-analytics-zoomcamp/"
+
+[[courses."stock-markets-analytics-zoomcamp".github_repositories]]
+repo = "DataTalksClub/stock-markets-analytics-zoomcamp"
+ref = "main"
+
+[sources.faq]
+enabled = true
+courses_url = "https://datatalks.club/faq/json/courses.json"
+item_id_prefix = "faq"
+
+[sources.docs]
+enabled = true
+item_id_prefix = "docs"
+scope = "docs"
+
+[sources.docs.github]
+repo = "DataTalksClub/docs"
+ref = "main"
+include = ["*.md", "**/*.md"]
+exclude = ["courses/**", "vendor/**", "node_modules/**", ".git/**"]
+
+[sources.course_markdown]
+enabled = true
+item_id_prefix = "course-md"
+scope = "course"
+course_definitions = "courses"
+
+[sources.course_markdown.github]
+repo = "DataTalksClub/docs"
+ref = "main"
+include_from_course_docs_prefix = true
+include = ["*.md", "**/*.md"]
+exclude = ["vendor/**", "node_modules/**", ".git/**"]
+
+[sources.course_repositories]
+enabled = true
+item_id_prefix = "repo"
+scope = "course"
+course_definitions = "courses"
+
+[sources.course_repositories.github]
+include = [
+  "README.md",
+  "cohorts/**/*.md",
+  "certificates.md",
+  "project.md",
+  "homework.md",
+  "**/*.md",
+]
+exclude = [
+  ".git/**",
+  "data/**",
+  "images/**",
+  "notebooks/**",
+  "node_modules/**",
+]
+
+[ingestion]
+batch_size = 100
+metadata_text_max_chars = 6000
+
+[ingestion.chunk]
+max_chars = 1800
+overlap_chars = 150
+
+[ingestion.github]
+token_env = "GITHUB_TOKEN"
+fetch_library = "gitsource"
+
+[retrieval]
+default_limit = 6
+max_limit = 10
+min_score = 0.2
+rewrite_query = true
+
+[retrieval.scopes.course.filter_fields]
+scope = "course"
+course = "required"
+
+[retrieval.scopes.docs.filter_fields]
+scope = "docs"
+
+[answering]
+temperature = 0.2
+max_output_tokens = 1200
+include_sources = true
+max_sources = 5
+
+[answering.prompts]
+course = """
+You are a DataTalks.Club teaching assistant. Answer using only the retrieved
+context for the detected course. If the context does not answer the question,
+say that you could not find the answer in the course materials.
+"""
+docs = """
+You are a DataTalks.Club assistant. Answer using only the retrieved
+DataTalks.Club documentation context. If the context does not answer the
+question, say that you could not find the answer in the docs.
+"""

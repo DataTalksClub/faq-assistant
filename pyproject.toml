@@ -1,0 +1,28 @@
+[project]
+name = "faq-assistant"
+version = "0.1.0"
+description = "Simplified DataTalks.Club Slack FAQ assistant on Cloudflare"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "gitsource>=0.0.5",
+  "pydantic>=2.0.0",
+  "requests>=2.32.0",
+]
+
+[project.scripts]
+faq-assistant = "faq_assistant.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+  "workers-py",
+  "workers-runtime-sdk",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

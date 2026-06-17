@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "faq-assistant",
+  "main": "src/worker.py",
+  "compatibility_date": "2026-06-17",
+  "compatibility_flags": ["python_workers"],
+  "workers_dev": true,
+  "ai": {
+    "binding": "AI",
+    "remote": true
+  },
+  "vectorize": [
+    {
+      "binding": "FAQ_INDEX",
+      "index_name": "faq-assistant-index",
+      "remote": true
+    }
+  ]
+}
