@@ -125,6 +125,7 @@ async def rewrite_query(env, question: str, scope: str, course: str | None) -> s
             "content": (
                 "Rewrite the user's Slack message into one concise keyword search query. "
                 "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
+                "Preserve exact error messages, tool names, commands, and file names verbatim. "
                 "Do not include the course name or DataTalks.Club when they are already provided "
                 "as scope metadata. Keep only the words useful for keyword search. "
                 "Return structured JSON matching the requested schema."

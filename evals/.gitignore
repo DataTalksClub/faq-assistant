@@ -1,0 +1,5 @@
+# Generated eval artifacts contain real (anonymized) student Slack questions.
+# The upstream ../faq repo keeps this raw data gitignored too; regenerate with
+# build_dataset.py / run_eval.py rather than committing it to this public repo.
+data/
+results/
