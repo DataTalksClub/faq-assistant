@@ -17,6 +17,7 @@ CONFIG = {'answering': {'include_sources': True,
                                    'question, say that you could not find the answer in the '
                                    'docs.\n'},
                'temperature': 0.2},
+ 'api': {'shared_secret_env': 'FAQ_ASSISTANT_SHARED_SECRET'},
  'app': {'environment': 'dev', 'name': 'faq-assistant'},
  'cloudflare': {'account_id_env': 'CLOUDFLARE_ACCOUNT_ID',
                 'ai': {'binding': 'AI',

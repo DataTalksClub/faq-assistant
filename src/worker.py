@@ -37,6 +37,9 @@ async def route_request(env, request) -> Response:
         return json_response({"ok": True, "app": CONFIG["app"]["name"]})
 
     if path == "/ask" and method == "POST":
+        if not verify_shared_secret(env, request):
+            return json_response({"error": "Unauthorized"}, 401)
+
         body = parse_json(str(await request.text()))
         question = clean_question(str(body.get("question", "")))
         if not question:
@@ -362,6 +365,16 @@ def verify_slack_signature(env, request, raw_body: str) -> bool:
     return hmac.compare_digest(expected, signature)
 
 
+def verify_shared_secret(env, request) -> bool:
+    secret_env = CONFIG.get("api", {}).get("shared_secret_env", "")
+    secret = env_value(env, secret_env)
+    if not secret:
+        return True
+
+    received = str(request.headers.get("x-faq-assistant-secret") or "")
+    return hmac.compare_digest(secret, received)
+
+
 def clean_question(text: str) -> str:
     text = re.sub(r"<@[A-Z0-9]+>", " ", text)
     text = re.sub(r"\s+", " ", text)
@@ -376,7 +389,7 @@ def json_response(data: object, status: int = 200) -> Response:
             "content-type": "application/json; charset=utf-8",
             "access-control-allow-origin": "*",
             "access-control-allow-methods": "GET,POST,OPTIONS",
-            "access-control-allow-headers": "content-type,x-slack-request-timestamp,x-slack-signature",
+            "access-control-allow-headers": "content-type,x-faq-assistant-secret,x-slack-request-timestamp,x-slack-signature",
         },
     )
 
@@ -388,6 +401,6 @@ def empty_response() -> Response:
         headers={
             "access-control-allow-origin": "*",
             "access-control-allow-methods": "GET,POST,OPTIONS",
-            "access-control-allow-headers": "content-type,x-slack-request-timestamp,x-slack-signature",
+            "access-control-allow-headers": "content-type,x-faq-assistant-secret,x-slack-request-timestamp,x-slack-signature",
         },
     )

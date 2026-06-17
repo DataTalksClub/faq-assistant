@@ -36,6 +36,9 @@ bot_token_env = "SLACK_BOT_TOKEN"
 events_path = "/slack/events"
 default_scope = "docs"
 
+[api]
+shared_secret_env = "FAQ_ASSISTANT_SHARED_SECRET"
+
 [slack.reply]
 thread = true
 unfurl_links = false

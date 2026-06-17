@@ -25,6 +25,16 @@ CLOUDFLARE_API_TOKEN=...
 GITHUB_TOKEN=...
 ```
 
+For the Lambda-to-Worker `/ask` endpoint, set the same shared secret in both
+Cloudflare and au-tomator:
+
+```bash
+FAQ_ASSISTANT_SHARED_SECRET=...
+```
+
+For local Worker testing, put the same value in `.dev.vars`; Wrangler reads that file
+and exposes it to the Worker.
+
 Create the Vectorize index:
 
 ```bash
@@ -39,6 +49,83 @@ uv run --group ingest faq-assistant ingest --mode rebuild
 
 The rebuild lists existing vector IDs before ingestion, upserts the current chunks, and deletes
 stale IDs that were not produced by the current run.
+
+## Deployment
+
+Compile `config.toml` before deploying. The Worker imports the generated Python config module:
+
+```bash
+uv run python scripts/compile_config.py
+```
+
+Deploy the Worker:
+
+```bash
+CLOUDFLARE_ACCOUNT_ID=... \
+CLOUDFLARE_API_TOKEN=... \
+uv run pywrangler deploy --keep-vars
+```
+
+The current production Worker URL is:
+
+```text
+https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev
+```
+
+The au-tomator Lambda calls the `/ask` endpoint:
+
+```text
+https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/ask
+```
+
+Set the shared secret in Cloudflare:
+
+```bash
+printf '%s' "$FAQ_ASSISTANT_SHARED_SECRET" |
+  CLOUDFLARE_ACCOUNT_ID=... \
+  CLOUDFLARE_API_TOKEN=... \
+  uv run pywrangler secret put FAQ_ASSISTANT_SHARED_SECRET
+```
+
+Set the same value in the au-tomator automator Lambda:
+
+```text
+FAQ_ASSISTANT_URL=https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/ask
+FAQ_ASSISTANT_SHARED_SECRET=...
+```
+
+Smoke-test the deployed Worker:
+
+```bash
+curl https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/health
+```
+
+`/ask` must reject requests without the shared secret:
+
+```bash
+curl -i -X POST https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/ask \
+  -H 'content-type: application/json' \
+  -d '{"question":"How do I join Slack?","scope":"docs"}'
+```
+
+Expected status:
+
+```text
+401 Unauthorized
+```
+
+Then test with the shared secret:
+
+```bash
+curl -i -X POST https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/ask \
+  -H 'content-type: application/json' \
+  -H "x-faq-assistant-secret: $FAQ_ASSISTANT_SHARED_SECRET" \
+  -d '{"question":"How do I join DataTalks.Club Slack?","scope":"docs"}'
+```
+
+If Workers AI quota is available, this should return a RAG answer. If the account has exhausted
+the daily Workers AI free allocation, the request passes authentication but returns the Cloudflare
+AI quota error.
 
 ## Local Worker testing
 
@@ -79,6 +166,7 @@ Use this when the bot is tagged outside a known course channel.
 ```bash
 curl -X POST http://localhost:8792/ask \
   -H 'content-type: application/json' \
+  -H "x-faq-assistant-secret: $FAQ_ASSISTANT_SHARED_SECRET" \
   -d '{
     "question": "How do I join DataTalks.Club Slack?",
     "scope": "docs"
@@ -92,6 +180,7 @@ Use this to simulate a mention in `#course-llm-zoomcamp`.
 ```bash
 curl -X POST http://localhost:8792/ask \
   -H 'content-type: application/json' \
+  -H "x-faq-assistant-secret: $FAQ_ASSISTANT_SHARED_SECRET" \
   -d '{
     "question": "Can I still join after the course started?",
     "scope": "course",
@@ -204,14 +293,14 @@ curl -X POST http://localhost:8792/slack/events \
 
 ### Structured output check
 
-Validate the local parser and Pydantic models:
+Validate the local parser and structured models:
 
 ```bash
 uv run python scripts/check_structured_parsing.py
 ```
 
 Validate that the configured Workers AI model returns JSON Mode output that parses into our
-Pydantic models:
+structured models:
 
 ```bash
 CLOUDFLARE_ACCOUNT_ID=... \
