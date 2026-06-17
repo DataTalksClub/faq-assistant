@@ -7,7 +7,9 @@ from typing import Any
 
 from faq_assistant.cloudflare import CloudflareClient
 from faq_assistant.config import load_config
+from faq_assistant.ingest import embedding_dimensions_parameter
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
+from faq_assistant.openai import OpenAIClient
 from faq_assistant.structured import parse_structured_response
 
 
@@ -20,7 +22,8 @@ def main() -> int:
         print(f"skipped: set {account_env} and {token_env} to test RAG")
         return 0
 
-    client = CloudflareClient(config)
+    cloudflare = CloudflareClient(config)
+    openai = OpenAIClient(config)
 
     cases = [
         {
@@ -39,7 +42,7 @@ def main() -> int:
 
     for case in cases:
         print(f"\n== {case['name']} ==")
-        result = run_rag_case(client, config, case)
+        result = run_rag_case(cloudflare, openai, config, case)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         assert result["answer"]["answer"].strip()
         assert result["answer"]["found_answer"] is True
@@ -48,14 +51,19 @@ def main() -> int:
     return 0
 
 
-def run_rag_case(client: CloudflareClient, config: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
+def run_rag_case(
+    cloudflare: CloudflareClient,
+    openai: OpenAIClient,
+    config: dict[str, Any],
+    case: dict[str, Any],
+) -> dict[str, Any]:
     question = case["question"]
     scope = case["scope"]
     course = case["course"]
 
-    rewritten = rewrite_query(client, config, question, scope, course)
-    results = vector_search(client, config, rewritten.query, scope, course)
-    answer = answer_question(client, config, question, rewritten.query, scope, course, results)
+    rewritten = rewrite_query(openai, config, question, scope, course)
+    results = vector_search(cloudflare, openai, config, rewritten.query, scope, course)
+    answer = answer_question(openai, config, question, rewritten.query, scope, course, results)
 
     allowed_ids = {result.id for result in results}
     cited_ids = {source.id for source in answer.sources}
@@ -71,54 +79,54 @@ def run_rag_case(client: CloudflareClient, config: dict[str, Any], case: dict[st
 
 
 def rewrite_query(
-    client: CloudflareClient,
+    openai: OpenAIClient,
     config: dict[str, Any],
     question: str,
     scope: str,
     course: str | None,
 ) -> QueryRewrite:
     course_name = config["courses"].get(course, {}).get("name", course or "")
-    response = client.run_ai(
-        config["cloudflare"]["ai"]["chat_model"],
-        {
-            "messages": [
-                {
-                    "role": "system",
-                    "content": (
-                        "Rewrite the user's Slack message into one concise semantic search query. "
-                        "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
-                        "Return structured JSON matching the requested schema."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": f"scope: {scope}\ncourse: {course_name}\nmessage: {question}",
-                },
-            ],
-            "temperature": 0,
-            "max_tokens": 120,
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": QueryRewrite.model_json_schema(),
+    response = openai.chat_structured(
+        config["chat"]["model"],
+        [
+            {
+                "role": "system",
+                "content": (
+                    "Rewrite the user's Slack message into one concise semantic search query. "
+                    "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
+                    "Return structured JSON matching the requested schema."
+                ),
             },
-        },
+            {
+                "role": "user",
+                "content": f"scope: {scope}\ncourse: {course_name}\nmessage: {question}",
+            },
+        ],
+        output_model=QueryRewrite,
+        temperature=0,
+        max_tokens=120,
     )
     return QueryRewrite.model_validate(parse_structured_response(response))
 
 
 def vector_search(
-    client: CloudflareClient,
+    cloudflare: CloudflareClient,
+    openai: OpenAIClient,
     config: dict[str, Any],
     query: str,
     scope: str,
     course: str | None,
 ) -> list[SearchResult]:
-    embedding = client.embed_texts(config["cloudflare"]["ai"]["embedding_model"], [query])[0]
+    embedding = openai.embed_texts(
+        config["embeddings"]["model"],
+        [query],
+        dimensions=embedding_dimensions_parameter(config["embeddings"]),
+    )[0]
     filter_data = {"scope": scope}
     if scope == "course" and course:
         filter_data["course"] = course
 
-    response = client.query_vectors(
+    response = cloudflare.query_vectors(
         embedding,
         {
             "topK": int(config["retrieval"]["default_limit"]),
@@ -137,7 +145,7 @@ def vector_search(
 
 
 def answer_question(
-    client: CloudflareClient,
+    openai: OpenAIClient,
     config: dict[str, Any],
     question: str,
     rewritten_query: str,
@@ -146,32 +154,27 @@ def answer_question(
     results: list[SearchResult],
 ) -> RagAnswer:
     prompt_key = "course" if scope == "course" else "docs"
-    response = client.run_ai(
-        config["cloudflare"]["ai"]["chat_model"],
-        {
-            "messages": [
-                {
-                    "role": "system",
-                    "content": config["answering"]["prompts"][prompt_key].strip(),
-                },
-                {
-                    "role": "user",
-                    "content": (
-                        f"QUESTION: {question}\n\n"
-                        f"SEARCH QUERY: {rewritten_query}\n\n"
-                        f"SCOPE: {scope}\n"
-                        f"COURSE: {course or ''}\n\n"
-                        f"CONTEXT:\n{build_context(results)}"
-                    ),
-                },
-            ],
-            "temperature": float(config["answering"]["temperature"]),
-            "max_tokens": int(config["answering"]["max_output_tokens"]),
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": RagAnswer.model_json_schema(),
+    response = openai.chat_structured(
+        config["chat"]["model"],
+        [
+            {
+                "role": "system",
+                "content": config["answering"]["prompts"][prompt_key].strip(),
             },
-        },
+            {
+                "role": "user",
+                "content": (
+                    f"QUESTION: {question}\n\n"
+                    f"SEARCH QUERY: {rewritten_query}\n\n"
+                    f"SCOPE: {scope}\n"
+                    f"COURSE: {course or ''}\n\n"
+                    f"CONTEXT:\n{build_context(results)}"
+                ),
+            },
+        ],
+        output_model=RagAnswer,
+        temperature=float(config["answering"]["temperature"]),
+        max_tokens=int(config["answering"]["max_output_tokens"]),
     )
     return RagAnswer.model_validate(parse_structured_response(response))
 

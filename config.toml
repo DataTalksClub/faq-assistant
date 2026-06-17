@@ -11,15 +11,10 @@ name = "faq-assistant"
 compatibility_date = "2026-06-17"
 compatibility_flags = ["python_workers"]
 
-[cloudflare.ai]
-binding = "AI"
-embedding_model = "@cf/baai/bge-base-en-v1.5"
-chat_model = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
-
 [cloudflare.vectorize]
 binding = "FAQ_INDEX"
-index_name = "faq-assistant-index"
-dimensions = 768
+index_name = "faq-assistant-openai-v2"
+dimensions = 1536
 metric = "cosine"
 
 [[cloudflare.vectorize.metadata_indexes]]
@@ -38,6 +33,26 @@ default_scope = "docs"
 
 [api]
 shared_secret_env = "FAQ_ASSISTANT_SHARED_SECRET"
+
+[openai]
+api_key_env = "OPENAI_API_KEY"
+base_url = "https://api.openai.com/v1"
+
+[embeddings]
+provider = "openai"
+model = "text-embedding-3-small"
+dimensions = 1536
+use_dimensions_parameter = false
+batch_enabled = true
+batch_completion_window = "24h"
+batch_poll_interval_seconds = 30
+
+[chat]
+provider = "openai"
+model = "gpt-5.4-mini"
+
+[artifacts]
+embeddings_dir = "artifacts/embeddings"
 
 [slack.reply]
 thread = true

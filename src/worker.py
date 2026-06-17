@@ -136,9 +136,8 @@ async def rewrite_query(env, question: str, scope: str, course: str | None) -> s
 
 
 async def search(env, query: str, scope: str, course: str | None) -> list[dict]:
-    ai_config = CONFIG["cloudflare"]["ai"]
     retrieval = CONFIG["retrieval"]
-    embedding = await embed_text(env, ai_config["embedding_model"], query)
+    embedding = await embed_text(env, query)
 
     filter_data = {"scope": scope}
     if scope == "course" and course:
@@ -164,12 +163,27 @@ async def search(env, query: str, scope: str, course: str | None) -> list[dict]:
     return [result for result in results if result["score"] >= min_score]
 
 
-async def embed_text(env, model: str, text: str) -> list[float]:
-    response = to_py(await env.AI.run(model, to_js({"text": [text[:1800]]})))
+async def embed_text(env, text: str) -> list[float]:
+    config = CONFIG["embeddings"]
+    if config["provider"] != "openai":
+        raise RuntimeError(f"Unsupported embedding provider: {config['provider']}")
+
+    payload: dict = {
+        "model": config["model"],
+        "input": text[:8000],
+        "encoding_format": "float",
+    }
+    if config.get("use_dimensions_parameter", False):
+        payload["dimensions"] = int(config["dimensions"])
+
+    response = await openai_fetch(env, "/embeddings", payload)
     data = response.get("data") if isinstance(response, dict) else None
     if not isinstance(data, list) or not data:
         raise RuntimeError("Embedding model returned an unexpected response")
-    return data[0]
+    embedding = data[0].get("embedding") if isinstance(data[0], dict) else None
+    if not isinstance(embedding, list):
+        raise RuntimeError("Embedding model returned an unexpected vector")
+    return embedding
 
 
 async def generate_answer(
@@ -231,41 +245,68 @@ def format_structured_answer(rag_answer: RagAnswer, results: list[dict]) -> str:
 
 
 async def run_chat(env, messages: list[dict], max_tokens: int, temperature: float) -> str:
-    model = CONFIG["cloudflare"]["ai"]["chat_model"]
-    response = to_py(
-        await env.AI.run(
-            model,
-            to_js(
-                {
-                    "messages": messages,
-                    "temperature": temperature,
-                    "max_tokens": max_tokens,
-                }
-            ),
-        )
-    )
+    response = await openai_chat(env, messages, None, max_tokens, temperature)
     return parse_chat_response(response)
 
 
 async def run_structured_chat(env, messages: list[dict], output_model, max_tokens: int, temperature: float):
-    model = CONFIG["cloudflare"]["ai"]["chat_model"]
-    response = to_py(
-        await env.AI.run(
-            model,
-            to_js(
-                {
-                    "messages": messages,
-                    "temperature": temperature,
-                    "max_tokens": max_tokens,
-                    "response_format": {
-                        "type": "json_schema",
-                        "json_schema": output_model.model_json_schema(),
-                    },
-                }
-            ),
-        )
-    )
+    response = await openai_chat(env, messages, output_model, max_tokens, temperature)
     return output_model.model_validate(parse_structured_response(response))
+
+
+async def openai_chat(
+    env,
+    messages: list[dict],
+    output_model,
+    max_tokens: int,
+    temperature: float,
+) -> dict:
+    config = CONFIG["chat"]
+    if config["provider"] != "openai":
+        raise RuntimeError(f"Unsupported chat provider: {config['provider']}")
+
+    payload: dict = {
+        "model": config["model"],
+        "messages": messages,
+        "temperature": temperature,
+        "max_completion_tokens": max_tokens,
+    }
+    if output_model is not None:
+        payload["response_format"] = {
+            "type": "json_schema",
+            "json_schema": {
+                "name": output_model.__name__,
+                "strict": True,
+                "schema": output_model.model_json_schema(),
+            },
+        }
+    return await openai_fetch(env, "/chat/completions", payload)
+
+
+async def openai_fetch(env, path: str, payload: dict) -> dict:
+    token = env_value(env, CONFIG["openai"]["api_key_env"])
+    if not token:
+        raise RuntimeError("Missing OpenAI API key")
+
+    base_url = str(CONFIG["openai"].get("base_url", "https://api.openai.com/v1")).rstrip("/")
+    response = await fetch(
+        f"{base_url}{path}",
+        to_js(
+            {
+                "method": "POST",
+                "headers": {
+                    "authorization": f"Bearer {token}",
+                    "content-type": "application/json; charset=utf-8",
+                },
+                "body": json.dumps(payload),
+            }
+        ),
+    )
+    text = str(await response.text())
+    data = parse_json(text)
+    if int(response.status) >= 400:
+        raise RuntimeError(f"OpenAI API request failed ({response.status}): {text[:1000]}")
+    return data
 
 
 def parse_chat_response(response) -> str:

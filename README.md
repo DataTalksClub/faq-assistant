@@ -5,7 +5,7 @@ Simplified DataTalks.Club Slack FAQ assistant.
 Runtime flow:
 
 ```text
-Slack mention -> scope detection -> LLM query rewrite -> Vectorize search -> RAG answer -> Slack thread reply
+Slack mention -> scope detection -> OpenAI query rewrite -> OpenAI embedding -> Vectorize search -> OpenAI RAG answer -> Slack thread reply
 ```
 
 Course channels use course-scoped FAQ plus course markdown. Other channels use the general
@@ -22,6 +22,7 @@ Required environment variables for ingestion:
 ```bash
 CLOUDFLARE_ACCOUNT_ID=...
 CLOUDFLARE_API_TOKEN=...
+OPENAI_API_KEY=...
 GITHUB_TOKEN=...
 ```
 
@@ -35,7 +36,14 @@ FAQ_ASSISTANT_SHARED_SECRET=...
 For local Worker testing, put the same value in `.dev.vars`; Wrangler reads that file
 and exposes it to the Worker.
 
-Create the Vectorize index:
+Create the Vectorize index. The current index is `faq-assistant-openai-v2`.
+It uses OpenAI `text-embedding-3-small` native embeddings, so it is `1536`
+dimensions. Vectorize index dimensions cannot be changed after creation, so
+switching from the old 768-dimension Cloudflare BGE embeddings requires a new
+index and a full rebuild.
+
+The originally intended name `faq-assistant-openai-index` returned a Cloudflare
+internal error during creation. Use the configured name from `config.toml`.
 
 ```bash
 uv run --group ingest faq-assistant index create
@@ -47,8 +55,10 @@ Run a full rebuild:
 uv run --group ingest faq-assistant ingest --mode rebuild
 ```
 
-The rebuild lists existing vector IDs before ingestion, upserts the current chunks, and deletes
-stale IDs that were not produced by the current run.
+The rebuild lists existing vector IDs, submits document embeddings through the OpenAI Batch API,
+upserts the returned vectors, and deletes stale IDs that were not produced by the current run.
+See [OpenAI Batch Processing](docs/openai-batch-processing.md) for the API flow,
+limits, and cost notes.
 
 ## Deployment
 
@@ -87,6 +97,15 @@ printf '%s' "$FAQ_ASSISTANT_SHARED_SECRET" |
   uv run pywrangler secret put FAQ_ASSISTANT_SHARED_SECRET
 ```
 
+Set the OpenAI key in Cloudflare:
+
+```bash
+printf '%s' "$OPENAI_API_KEY" |
+  CLOUDFLARE_ACCOUNT_ID=... \
+  CLOUDFLARE_API_TOKEN=... \
+  uv run pywrangler secret put OPENAI_API_KEY
+```
+
 Set the same value in the au-tomator automator Lambda:
 
 ```text
@@ -123,9 +142,8 @@ curl -i -X POST https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/ask
   -d '{"question":"How do I join DataTalks.Club Slack?","scope":"docs"}'
 ```
 
-If Workers AI quota is available, this should return a RAG answer. If the account has exhausted
-the daily Workers AI free allocation, the request passes authentication but returns the Cloudflare
-AI quota error.
+This should return a RAG answer when the Vectorize index has been rebuilt with the current
+OpenAI embeddings.
 
 ## Local Worker testing
 
@@ -141,8 +159,8 @@ Start the Worker locally:
 uv run pywrangler dev --port 8792
 ```
 
-The Worker uses real Cloudflare Workers AI and Vectorize bindings, so `/ask` requires a populated
-Vectorize index and Cloudflare credentials available to `pywrangler`.
+The Worker uses OpenAI for embeddings and structured chat, and Cloudflare Vectorize for search.
+`/ask` requires a populated Vectorize index and `OPENAI_API_KEY` available to the Worker.
 
 ### Health payload
 
