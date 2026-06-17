@@ -5,7 +5,7 @@ Simplified DataTalks.Club Slack FAQ assistant.
 Runtime flow:
 
 ```text
-Slack mention -> scope detection -> OpenAI query rewrite -> OpenAI embedding -> Vectorize search -> OpenAI RAG answer -> Slack thread reply
+Slack mention -> scope detection -> OpenAI query rewrite -> MinSearch -> OpenAI RAG answer -> Slack thread reply
 ```
 
 Course channels use course-scoped FAQ plus course markdown. Other channels use the general
@@ -17,7 +17,7 @@ DataTalks.Club docs corpus from `DataTalksClub/docs`.
 uv sync
 ```
 
-Required environment variables for ingestion:
+Required environment variables for corpus rebuilds and deployment:
 
 ```bash
 CLOUDFLARE_ACCOUNT_ID=...
@@ -36,35 +36,28 @@ FAQ_ASSISTANT_SHARED_SECRET=...
 For local Worker testing, put the same value in `.dev.vars`; Wrangler reads that file
 and exposes it to the Worker.
 
-Create the Vectorize index. The current index is `faq-assistant-openai-v2`.
-It uses OpenAI `text-embedding-3-small` native embeddings, so it is `1536`
-dimensions. Vectorize index dimensions cannot be changed after creation, so
-switching from the old 768-dimension Cloudflare BGE embeddings requires a new
-index and a full rebuild.
-
-The originally intended name `faq-assistant-openai-index` returned a Cloudflare
-internal error during creation. Use the configured name from `config.toml`.
+Build the local MinSearch corpus from the configured sources:
 
 ```bash
-uv run --group ingest faq-assistant index create
+uv run --group ingest python scripts/build_search_corpus.py
 ```
 
-Run a full rebuild:
+This writes:
 
-```bash
-uv run --group ingest faq-assistant ingest --mode rebuild
+```text
+src/faq_assistant/search_corpus.py
+artifacts/search/search-corpus.json
 ```
 
-The rebuild lists existing vector IDs, submits document embeddings through the OpenAI Batch API,
-upserts the returned vectors, and deletes stale IDs that were not produced by the current run.
-See [OpenAI Batch Processing](docs/openai-batch-processing.md) for the API flow,
-limits, and cost notes.
+The generated Python module is committed/deployed with the Worker. The JSON
+artifact is ignored by Git and is only for local inspection.
 
 ## Deployment
 
-Compile `config.toml` before deploying. The Worker imports the generated Python config module:
+Rebuild the corpus and compile `config.toml` before deploying:
 
 ```bash
+uv run --group ingest python scripts/build_search_corpus.py
 uv run python scripts/compile_config.py
 ```
 
@@ -142,8 +135,7 @@ curl -i -X POST https://faq-assistant.cloudflare-ai-agent-de9ca0.workers.dev/ask
   -d '{"question":"How do I join DataTalks.Club Slack?","scope":"docs"}'
 ```
 
-This should return a RAG answer when the Vectorize index has been rebuilt with the current
-OpenAI embeddings.
+This should return a RAG answer.
 
 ## Local Worker testing
 
@@ -159,8 +151,9 @@ Start the Worker locally:
 uv run pywrangler dev --port 8792
 ```
 
-The Worker uses OpenAI for embeddings and structured chat, and Cloudflare Vectorize for search.
-`/ask` requires a populated Vectorize index and `OPENAI_API_KEY` available to the Worker.
+The Worker uses OpenAI for query rewrite and structured chat. Search runs in
+memory with the generated MinSearch corpus. `/ask` requires `OPENAI_API_KEY`
+available to the Worker.
 
 ### Health payload
 
@@ -317,20 +310,16 @@ Validate the local parser and structured models:
 uv run python scripts/check_structured_parsing.py
 ```
 
-Validate that the configured Workers AI model returns JSON Mode output that parses into our
+Validate that the configured OpenAI model returns structured output that parses into our
 structured models:
 
 ```bash
-CLOUDFLARE_ACCOUNT_ID=... \
-CLOUDFLARE_API_TOKEN=... \
 uv run --group ingest python scripts/check_structured_output.py
 ```
 
-Validate the full RAG path against the populated Vectorize index:
+Validate the full RAG path against the generated MinSearch corpus:
 
 ```bash
-CLOUDFLARE_ACCOUNT_ID=... \
-CLOUDFLARE_API_TOKEN=... \
 uv run --group ingest python scripts/check_rag.py
 ```
 

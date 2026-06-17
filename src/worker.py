@@ -5,6 +5,8 @@ import hmac
 import json
 import re
 import time
+import base64
+import zlib
 from asyncio import create_task
 from urllib.parse import urlparse
 
@@ -13,9 +15,14 @@ from pyodide.ffi import create_proxy
 from workers import Response, WorkerEntrypoint, wait_until
 
 from faq_assistant.generated_config import CONFIG
+from faq_assistant.minsearch import Index
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
+from faq_assistant.search_corpus import SEARCH_CORPUS_B64
 from faq_assistant.structured import parse_structured_response
-from faq_assistant.worker_interop import env_value, parse_json, to_js, to_py
+from faq_assistant.worker_interop import env_value, parse_json, to_js
+
+
+SEARCH_INDEX: Index | None = None
 
 
 class Default(WorkerEntrypoint):
@@ -115,8 +122,10 @@ async def rewrite_query(env, question: str, scope: str, course: str | None) -> s
         {
             "role": "system",
             "content": (
-                "Rewrite the user's Slack message into one concise semantic search query. "
+                "Rewrite the user's Slack message into one concise keyword search query. "
                 "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
+                "Do not include the course name or DataTalks.Club when they are already provided "
+                "as scope metadata. Keep only the words useful for keyword search. "
                 "Return structured JSON matching the requested schema."
             ),
         },
@@ -137,53 +146,33 @@ async def rewrite_query(env, question: str, scope: str, course: str | None) -> s
 
 async def search(env, query: str, scope: str, course: str | None) -> list[dict]:
     retrieval = CONFIG["retrieval"]
-    embedding = await embed_text(env, query)
+    index = get_search_index()
 
     filter_data = {"scope": scope}
     if scope == "course" and course:
         filter_data["course"] = course
 
-    response = to_py(
-        await env.FAQ_INDEX.query(
-            to_js(embedding),
-            to_js(
-                {
-                    "topK": int(retrieval["default_limit"]),
-                    "returnMetadata": "all",
-                    "returnValues": False,
-                    "filter": filter_data,
-                }
-            ),
-        )
+    records = index.search(
+        query=query,
+        filter_dict=filter_data,
+        boost_dict=retrieval.get("boosts", {}),
+        num_results=int(retrieval["default_limit"]),
     )
 
     min_score = float(retrieval.get("min_score", 0))
-    matches = response.get("matches", []) if isinstance(response, dict) else []
-    results = [format_match(match).model_dump() for match in matches]
+    results = [format_search_record(record).model_dump() for record in records]
     return [result for result in results if result["score"] >= min_score]
 
 
-async def embed_text(env, text: str) -> list[float]:
-    config = CONFIG["embeddings"]
-    if config["provider"] != "openai":
-        raise RuntimeError(f"Unsupported embedding provider: {config['provider']}")
-
-    payload: dict = {
-        "model": config["model"],
-        "input": text[:8000],
-        "encoding_format": "float",
-    }
-    if config.get("use_dimensions_parameter", False):
-        payload["dimensions"] = int(config["dimensions"])
-
-    response = await openai_fetch(env, "/embeddings", payload)
-    data = response.get("data") if isinstance(response, dict) else None
-    if not isinstance(data, list) or not data:
-        raise RuntimeError("Embedding model returned an unexpected response")
-    embedding = data[0].get("embedding") if isinstance(data[0], dict) else None
-    if not isinstance(embedding, list):
-        raise RuntimeError("Embedding model returned an unexpected vector")
-    return embedding
+def get_search_index() -> Index:
+    global SEARCH_INDEX
+    if SEARCH_INDEX is None:
+        records = json.loads(zlib.decompress(base64.b64decode(SEARCH_CORPUS_B64)).decode("utf-8"))
+        SEARCH_INDEX = Index(
+            text_fields=["title", "section", "text"],
+            keyword_fields=["id", "source_type", "scope", "course", "url", "repo", "path"],
+        ).fit(records)
+    return SEARCH_INDEX
 
 
 async def generate_answer(
@@ -336,21 +325,19 @@ def build_context(results: list[dict]) -> str:
     return "\n".join(lines).strip()
 
 
-def format_match(match) -> SearchResult:
-    normalized = to_py(match)
-    metadata = normalized.get("metadata", {}) if isinstance(normalized, dict) else {}
+def format_search_record(record: dict) -> SearchResult:
     return SearchResult(
-        id=str(metadata.get("id") or normalized.get("id", "")),
-        score=float(normalized.get("score", 0)),
-        source_type=str(metadata.get("source_type", "")),
-        scope=str(metadata.get("scope", "")),
-        course=str(metadata.get("course", "")),
-        section=str(metadata.get("section", "")),
-        title=str(metadata.get("title", "")),
-        text=str(metadata.get("text", "")),
-        url=str(metadata.get("url", "")),
-        repo=str(metadata.get("repo", "")),
-        path=str(metadata.get("path", "")),
+        id=str(record.get("id", "")),
+        score=float(record.get("score", 0)),
+        source_type=str(record.get("source_type", "")),
+        scope=str(record.get("scope", "")),
+        course=str(record.get("course", "")),
+        section=str(record.get("section", "")),
+        title=str(record.get("title", "")),
+        text=str(record.get("text", "")),
+        url=str(record.get("url", "")),
+        repo=str(record.get("repo", "")),
+        path=str(record.get("path", "")),
     )
 
 

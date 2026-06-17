@@ -11,20 +11,6 @@ name = "faq-assistant"
 compatibility_date = "2026-06-17"
 compatibility_flags = ["python_workers"]
 
-[cloudflare.vectorize]
-binding = "FAQ_INDEX"
-index_name = "faq-assistant-openai-v2"
-dimensions = 1536
-metric = "cosine"
-
-[[cloudflare.vectorize.metadata_indexes]]
-property_name = "scope"
-type = "string"
-
-[[cloudflare.vectorize.metadata_indexes]]
-property_name = "course"
-type = "string"
-
 [slack]
 signing_secret_env = "SLACK_SIGNING_SECRET"
 bot_token_env = "SLACK_BOT_TOKEN"
@@ -38,21 +24,9 @@ shared_secret_env = "FAQ_ASSISTANT_SHARED_SECRET"
 api_key_env = "OPENAI_API_KEY"
 base_url = "https://api.openai.com/v1"
 
-[embeddings]
-provider = "openai"
-model = "text-embedding-3-small"
-dimensions = 1536
-use_dimensions_parameter = false
-batch_enabled = true
-batch_completion_window = "24h"
-batch_poll_interval_seconds = 30
-
 [chat]
 provider = "openai"
 model = "gpt-5.4-mini"
-
-[artifacts]
-embeddings_dir = "artifacts/embeddings"
 
 [slack.reply]
 thread = true
@@ -214,10 +188,16 @@ token_env = "GITHUB_TOKEN"
 fetch_library = "gitsource"
 
 [retrieval]
+backend = "minsearch"
 default_limit = 6
 max_limit = 10
 min_score = 0.2
 rewrite_query = true
+
+[retrieval.boosts]
+title = 3.0
+section = 1.5
+text = 1.0
 
 [retrieval.scopes.course.filter_fields]
 scope = "course"

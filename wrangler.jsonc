@@ -4,12 +4,5 @@
   "main": "src/worker.py",
   "compatibility_date": "2026-06-17",
   "compatibility_flags": ["python_workers"],
-  "workers_dev": true,
-  "vectorize": [
-    {
-      "binding": "FAQ_INDEX",
-      "index_name": "faq-assistant-openai-v2",
-      "remote": true
-    }
-  ]
+  "workers_dev": true
 }

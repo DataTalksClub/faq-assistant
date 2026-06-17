@@ -1,29 +1,23 @@
 from __future__ import annotations
 
 import json
-import os
 import sys
+import base64
+import zlib
 from typing import Any
 
-from faq_assistant.cloudflare import CloudflareClient
 from faq_assistant.config import load_config
-from faq_assistant.ingest import embedding_dimensions_parameter
+from faq_assistant.minsearch import Index
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.openai import OpenAIClient
+from faq_assistant.search_corpus import SEARCH_CORPUS_B64
 from faq_assistant.structured import parse_structured_response
 
 
 def main() -> int:
     config = load_config()
-    account_env = config["cloudflare"]["account_id_env"]
-    token_env = config["cloudflare"]["api_token_env"]
-
-    if not os.environ.get(account_env) or not os.environ.get(token_env):
-        print(f"skipped: set {account_env} and {token_env} to test RAG")
-        return 0
-
-    cloudflare = CloudflareClient(config)
     openai = OpenAIClient(config)
+    index = build_index()
 
     cases = [
         {
@@ -42,7 +36,7 @@ def main() -> int:
 
     for case in cases:
         print(f"\n== {case['name']} ==")
-        result = run_rag_case(cloudflare, openai, config, case)
+        result = run_rag_case(index, openai, config, case)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         assert result["answer"]["answer"].strip()
         assert result["answer"]["found_answer"] is True
@@ -52,7 +46,7 @@ def main() -> int:
 
 
 def run_rag_case(
-    cloudflare: CloudflareClient,
+    index: Index,
     openai: OpenAIClient,
     config: dict[str, Any],
     case: dict[str, Any],
@@ -62,7 +56,7 @@ def run_rag_case(
     course = case["course"]
 
     rewritten = rewrite_query(openai, config, question, scope, course)
-    results = vector_search(cloudflare, openai, config, rewritten.query, scope, course)
+    results = minsearch_search(index, config, rewritten.query, scope, course)
     answer = answer_question(openai, config, question, rewritten.query, scope, course, results)
 
     allowed_ids = {result.id for result in results}
@@ -92,8 +86,10 @@ def rewrite_query(
             {
                 "role": "system",
                 "content": (
-                    "Rewrite the user's Slack message into one concise semantic search query. "
+                    "Rewrite the user's Slack message into one concise keyword search query. "
                     "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
+                    "Do not include the course name or DataTalks.Club when they are already provided "
+                    "as scope metadata. Keep only the words useful for keyword search. "
                     "Return structured JSON matching the requested schema."
                 ),
             },
@@ -109,38 +105,36 @@ def rewrite_query(
     return QueryRewrite.model_validate(parse_structured_response(response))
 
 
-def vector_search(
-    cloudflare: CloudflareClient,
-    openai: OpenAIClient,
+def build_index() -> Index:
+    records = json.loads(zlib.decompress(base64.b64decode(SEARCH_CORPUS_B64)).decode("utf-8"))
+    return Index(
+        text_fields=["title", "section", "text"],
+        keyword_fields=["id", "source_type", "scope", "course", "url", "repo", "path"],
+    ).fit(records)
+
+
+def minsearch_search(
+    index: Index,
     config: dict[str, Any],
     query: str,
     scope: str,
     course: str | None,
 ) -> list[SearchResult]:
-    embedding = openai.embed_texts(
-        config["embeddings"]["model"],
-        [query],
-        dimensions=embedding_dimensions_parameter(config["embeddings"]),
-    )[0]
     filter_data = {"scope": scope}
     if scope == "course" and course:
         filter_data["course"] = course
 
-    response = cloudflare.query_vectors(
-        embedding,
-        {
-            "topK": int(config["retrieval"]["default_limit"]),
-            "returnMetadata": "all",
-            "returnValues": False,
-            "filter": filter_data,
-        },
+    records = index.search(
+        query=query,
+        filter_dict=filter_data,
+        boost_dict=config["retrieval"].get("boosts", {}),
+        num_results=int(config["retrieval"]["default_limit"]),
     )
     min_score = float(config["retrieval"]["min_score"])
-    matches = response.get("matches", [])
     return [
-        format_match(match)
-        for match in matches
-        if float(match.get("score", 0)) >= min_score
+        format_record(record)
+        for record in records
+        if float(record.get("score", 0)) >= min_score
     ]
 
 
@@ -193,20 +187,19 @@ def build_context(results: list[SearchResult]) -> str:
     return "\n".join(lines).strip()
 
 
-def format_match(match: dict[str, Any]) -> SearchResult:
-    metadata = match.get("metadata", {}) if isinstance(match, dict) else {}
+def format_record(record: dict[str, Any]) -> SearchResult:
     return SearchResult(
-        id=str(metadata.get("id") or match.get("id", "")),
-        score=float(match.get("score", 0)),
-        source_type=str(metadata.get("source_type", "")),
-        scope=str(metadata.get("scope", "")),
-        course=str(metadata.get("course", "")),
-        section=str(metadata.get("section", "")),
-        title=str(metadata.get("title", "")),
-        text=str(metadata.get("text", "")),
-        url=str(metadata.get("url", "")),
-        repo=str(metadata.get("repo", "")),
-        path=str(metadata.get("path", "")),
+        id=str(record.get("id", "")),
+        score=float(record.get("score", 0)),
+        source_type=str(record.get("source_type", "")),
+        scope=str(record.get("scope", "")),
+        course=str(record.get("course", "")),
+        section=str(record.get("section", "")),
+        title=str(record.get("title", "")),
+        text=str(record.get("text", "")),
+        url=str(record.get("url", "")),
+        repo=str(record.get("repo", "")),
+        path=str(record.get("path", "")),
     )
 
 

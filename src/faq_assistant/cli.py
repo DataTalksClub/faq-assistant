@@ -3,9 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from faq_assistant.cloudflare import CloudflareClient
-from faq_assistant.config import load_config
-from faq_assistant.ingest import rebuild_index
+from faq_assistant.corpus import build_search_corpus
 
 
 def main() -> None:
@@ -14,37 +12,13 @@ def main() -> None:
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    ingest_parser = subparsers.add_parser("ingest")
-    ingest_parser.add_argument("--mode", choices=["rebuild"], default="rebuild")
-    ingest_parser.add_argument("--dry-run", action="store_true")
-
-    index_parser = subparsers.add_parser("index")
-    index_subparsers = index_parser.add_subparsers(dest="index_command", required=True)
-    index_subparsers.add_parser("create")
+    corpus_parser = subparsers.add_parser("corpus")
+    corpus_subparsers = corpus_parser.add_subparsers(dest="corpus_command", required=True)
+    corpus_subparsers.add_parser("build")
 
     args = parser.parse_args()
-    config = load_config(args.config)
-
-    if args.command == "ingest":
-        result = rebuild_index(config, dry_run=args.dry_run)
-        print(json.dumps(result, indent=2, sort_keys=True))
-        return
-
-    if args.command == "index" and args.index_command == "create":
-        cloudflare = CloudflareClient(config)
-        vectorize = config["cloudflare"]["vectorize"]
-        result = {"index": cloudflare.create_vectorize_index(
-            dimensions=int(vectorize["dimensions"]),
-            metric=str(vectorize["metric"]),
-        )}
-        result["metadata_indexes"] = []
-        for metadata_index in vectorize.get("metadata_indexes", []):
-            result["metadata_indexes"].append(
-                cloudflare.create_metadata_index(
-                    property_name=metadata_index["property_name"],
-                    index_type=metadata_index["type"],
-                )
-            )
+    if args.command == "corpus" and args.corpus_command == "build":
+        result = build_search_corpus(args.config)
         print(json.dumps(result, indent=2, sort_keys=True))
         return
 
