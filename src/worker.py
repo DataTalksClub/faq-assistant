@@ -14,6 +14,7 @@ from workers import Response, WorkerEntrypoint, wait_until
 
 from faq_assistant.generated_config import CONFIG
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
+from faq_assistant.structured import parse_structured_response
 from faq_assistant.worker_interop import env_value, parse_json, to_js, to_py
 
 
@@ -275,34 +276,6 @@ def parse_chat_response(response) -> str:
             return str(message["content"])
 
     return str(response.get("response") or "")
-
-
-def parse_structured_response(response):
-    if not isinstance(response, dict):
-        raise RuntimeError("Model returned a non-object structured response")
-
-    direct = response.get("response")
-    if isinstance(direct, dict):
-        return direct
-    if isinstance(direct, str):
-        parsed = parse_json(direct)
-        if parsed:
-            return parsed
-
-    choices = response.get("choices")
-    if isinstance(choices, list) and choices:
-        message = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
-        if isinstance(message, dict):
-            parsed = message.get("parsed")
-            if isinstance(parsed, dict):
-                return parsed
-            content = message.get("content")
-            if isinstance(content, str):
-                parsed_content = parse_json(content)
-                if parsed_content:
-                    return parsed_content
-
-    raise RuntimeError("Model did not return valid structured JSON")
 
 
 def build_context(results: list[dict]) -> str:

@@ -41,34 +41,39 @@ thread = true
 unfurl_links = false
 unfurl_media = false
 
-[slack.channels.C_DATA_ENGINEERING]
+[slack.channels.C01FABYF2RG]
 name = "course-data-engineering"
 scope = "course"
 course = "data-engineering-zoomcamp"
 
-[slack.channels.C_MLOPS]
+[slack.channels.C02R98X7DS9]
 name = "course-mlops"
 scope = "course"
 course = "mlops-zoomcamp"
 
-[slack.channels.C_LLM]
+[slack.channels.C06TEGTGM3J]
 name = "course-llm"
 scope = "course"
 course = "llm-zoomcamp"
 
-[slack.channels.C_ML]
+[slack.channels.C0288NJ5XSA]
 name = "course-ml"
 scope = "course"
 course = "machine-learning-zoomcamp"
 
-[slack.channels.C_AI_DEV_TOOLS]
+[slack.channels.C09HWT76L95]
 name = "course-ai-dev-tools"
 scope = "course"
 course = "ai-dev-tools-zoomcamp"
 
+[slack.channels.C06L1RTF10F]
+name = "course-stocks-analytics"
+scope = "course"
+course = "stock-markets-analytics-zoomcamp"
+
 [courses."data-engineering-zoomcamp"]
 name = "Data Engineering Zoomcamp"
-slack_channels = ["C_DATA_ENGINEERING"]
+slack_channels = ["C01FABYF2RG"]
 faq_enabled = true
 docs_prefix = "courses/data-engineering-zoomcamp/"
 
@@ -78,7 +83,7 @@ ref = "main"
 
 [courses."mlops-zoomcamp"]
 name = "MLOps Zoomcamp"
-slack_channels = ["C_MLOPS"]
+slack_channels = ["C02R98X7DS9"]
 faq_enabled = true
 docs_prefix = "courses/mlops-zoomcamp/"
 
@@ -88,7 +93,7 @@ ref = "main"
 
 [courses."llm-zoomcamp"]
 name = "LLM Zoomcamp"
-slack_channels = ["C_LLM"]
+slack_channels = ["C06TEGTGM3J"]
 faq_enabled = true
 docs_prefix = "courses/llm-zoomcamp/"
 
@@ -98,7 +103,7 @@ ref = "main"
 
 [courses."machine-learning-zoomcamp"]
 name = "Machine Learning Zoomcamp"
-slack_channels = ["C_ML"]
+slack_channels = ["C0288NJ5XSA"]
 faq_enabled = true
 docs_prefix = "courses/ml-zoomcamp/"
 
@@ -108,7 +113,7 @@ ref = "main"
 
 [courses."ai-dev-tools-zoomcamp"]
 name = "AI Dev Tools Zoomcamp"
-slack_channels = ["C_AI_DEV_TOOLS"]
+slack_channels = ["C09HWT76L95"]
 faq_enabled = true
 docs_prefix = "courses/ai-dev-tools-zoomcamp/"
 
@@ -118,7 +123,7 @@ ref = "main"
 
 [courses."stock-markets-analytics-zoomcamp"]
 name = "Stock Markets Analytics Zoomcamp"
-slack_channels = []
+slack_channels = ["C06L1RTF10F"]
 faq_enabled = true
 docs_prefix = "courses/stock-markets-analytics-zoomcamp/"
 
