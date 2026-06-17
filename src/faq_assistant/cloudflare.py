@@ -37,18 +37,18 @@ class CloudflareClient:
             "config": {"dimensions": dimensions, "metric": metric},
         }
         response = self.session.post(f"{self.base_url}/vectorize/v2/indexes", json=payload, timeout=60)
-        if response.status_code == 409:
+        if response.status_code == 409 or is_cloudflare_duplicate(response, "duplicate_name"):
             return {"already_exists": True, "name": self.index_name}
         return unwrap_response(response)
 
     def create_metadata_index(self, property_name: str, index_type: str) -> dict[str, Any]:
-        payload = {"propertyName": property_name, "type": index_type}
+        payload = {"propertyName": property_name, "indexType": index_type}
         response = self.session.post(
             f"{self.base_url}/vectorize/v2/indexes/{self.index_name}/metadata_index/create",
             json=payload,
             timeout=60,
         )
-        if response.status_code == 409:
+        if response.status_code == 409 or is_cloudflare_duplicate(response, "already exists"):
             return {"already_exists": True, "property_name": property_name}
         return unwrap_response(response)
 
@@ -97,6 +97,15 @@ class CloudflareClient:
             merged["ids"].extend(result.get("ids") or batch)
         return merged
 
+    def query_vectors(self, vector: list[float], options: dict[str, Any]) -> dict[str, Any]:
+        payload = {"vector": vector, **options}
+        response = self.session.post(
+            f"{self.base_url}/vectorize/v2/indexes/{self.index_name}/query",
+            json=payload,
+            timeout=120,
+        )
+        return unwrap_response(response)
+
     def _upload_ndjson(self, operation: str, vectors: Iterable[dict[str, Any]]) -> dict[str, Any]:
         with tempfile.NamedTemporaryFile("w+b", suffix=".ndjson") as f:
             count = 0
@@ -109,7 +118,7 @@ class CloudflareClient:
 
             response = self.session.post(
                 f"{self.base_url}/vectorize/v2/indexes/{self.index_name}/{operation}",
-                files={"vectors": (Path(f.name).name, f, "application/x-ndjson")},
+                files={"vectors": (Path(f.name).name, f.read(), "application/x-ndjson")},
                 timeout=300,
             )
 
@@ -137,6 +146,20 @@ def unwrap_response(response: requests.Response) -> dict[str, Any]:
 
     result = data.get("result")
     return result if isinstance(result, dict) else {"result": result}
+
+
+def is_cloudflare_duplicate(response: requests.Response, marker: str) -> bool:
+    try:
+        data = response.json()
+    except ValueError:
+        return False
+
+    errors = data.get("errors") or []
+    marker = marker.lower()
+    for error in errors:
+        if marker in str(error.get("message", "")).lower():
+            return True
+    return False
 
 
 def batched[T](items: list[T], size: int) -> Iterable[list[T]]:

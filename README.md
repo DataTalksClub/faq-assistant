@@ -219,6 +219,14 @@ CLOUDFLARE_API_TOKEN=... \
 uv run python scripts/check_structured_output.py
 ```
 
+Validate the full RAG path against the populated Vectorize index:
+
+```bash
+CLOUDFLARE_ACCOUNT_ID=... \
+CLOUDFLARE_API_TOKEN=... \
+uv run python scripts/check_rag.py
+```
+
 Known course channel IDs:
 
 | Course | Slack channel | Channel ID |

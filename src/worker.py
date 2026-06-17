@@ -282,7 +282,9 @@ def build_context(results: list[dict]) -> str:
     lines: list[str] = []
     for index, result in enumerate(results, start=1):
         lines.append(f"[{index}]")
+        lines.append(f"id: {result['id']}")
         lines.append(f"source_type: {result['source_type']}")
+        lines.append(f"url: {result['url']}")
         lines.append(f"section: {result['section']}")
         lines.append(f"title: {result['title']}")
         lines.append(f"text: {result['text']}")
