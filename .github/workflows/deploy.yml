@@ -1,5 +1,8 @@
 name: Deploy
 
+# One job, three triggers. Every run rebuilds the corpus from the live sources,
+# builds the index, and deploys - so push and scheduled deploys are identical and
+# nothing (corpus/index) is committed to git.
 on:
   push:
     branches: [main]
@@ -11,8 +14,10 @@ on:
       - "pyproject.toml"
       - "uv.lock"
       - "Makefile"
-      - "scripts/build_search_index.py"
+      - "scripts/**"
       - ".github/workflows/deploy.yml"
+  schedule:
+    - cron: "0 8 * * *"   # daily: pick up new FAQ/docs/repo content
   workflow_dispatch:
 
 jobs:
@@ -39,8 +44,14 @@ jobs:
       - name: Unit tests
         run: uv run --group test python -m pytest tests -q
 
-      - name: Build the search index (from the committed embedded corpus)
-        run: uv run python scripts/build_search_index.py
+      - name: Rebuild corpus, config and index from the live sources
+        run: |
+          uv run --group ingest python scripts/build_search_corpus.py
+          uv run python scripts/compile_config.py
+          uv run python scripts/build_search_index.py
+
+      - name: Smoke-test the handler
+        run: uv run python scripts/check_handler.py
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4

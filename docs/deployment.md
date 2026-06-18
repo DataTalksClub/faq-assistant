@@ -1,13 +1,25 @@
 # Deployment
 
 The worker is an AWS Lambda (`python3.14`, arm64) behind a Function URL, defined
-in `template.yaml` and deployed with AWS SAM. Pushes to `main` deploy
-automatically via GitHub Actions (`.github/workflows/deploy.yml`) using a
-least-privilege role assumed through GitHub OIDC — no long-lived AWS keys.
+in `template.yaml` and deployed with AWS SAM. A single GitHub Actions workflow
+(`.github/workflows/deploy.yml`) deploys it, assuming a least-privilege role
+through GitHub OIDC — no long-lived AWS keys.
 
 ```
-push to main ─▶ unit tests ─▶ build search index ─▶ assume OIDC role ─▶ sam deploy
+push to main / daily cron / manual ─▶ unit tests ─▶ rebuild corpus + index ─▶ assume OIDC role ─▶ sam deploy
 ```
+
+Every run **rebuilds the corpus from the live sources** (FAQ + docs + course
+repos), so a push deploy and a scheduled deploy are identical and the corpus/index
+is never committed to git. Triggers:
+
+- **push to `main`** (code/config paths) — ship code changes.
+- **daily cron** (`0 8 * * *`) — pick up new FAQ/docs/repo content.
+- **manual** (`workflow_dispatch`) — on demand.
+
+The committed `src/faq_assistant/search_corpus.py` is the *frozen corpus the evals
+score against* (its chunk ids are referenced by the eval ground truth); it is not
+what production deploys.
 
 ## Prerequisites (one-time per AWS account)
 
@@ -69,9 +81,8 @@ aws cloudformation describe-stacks --stack-name faq-assistant --region eu-west-1
   --query "Stacks[0].Outputs[?OutputKey=='DeployRoleArn'].OutputValue" --output text
 ```
 
-After this, **pushes to `main` deploy automatically** and no one runs `sam deploy`
-by hand. The daily `rebuild-index` workflow uses the same secrets to refresh the
-corpus + index and redeploy.
+After this, the **Deploy workflow runs automatically** — on push to `main`, on the
+daily cron, and on demand — and no one runs `sam deploy` by hand.
 
 ## The deploy role (least privilege)
 
