@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: FAQ assistant worker Lambda - HTTP endpoint with shared-secret auth.
+
+Parameters:
+  OpenAIApiKey:
+    Type: String
+    NoEcho: true
+    Description: OpenAI API key, exposed to the function as OPENAI_API_KEY.
+  SharedSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >-
+      Shared secret callers send in the x-faq-assistant-secret header.
+      Empty leaves the endpoint open (not recommended).
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Architectures:
+      - arm64
+
+Resources:
+  FaqWorkerFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: makefile
+    Properties:
+      FunctionName: faq-assistant
+      CodeUri: .
+      Handler: faq_assistant.handler.lambda_handler
+      Runtime: python3.14
+      Environment:
+        Variables:
+          OPENAI_API_KEY: !Ref OpenAIApiKey
+          FAQ_ASSISTANT_SHARED_SECRET: !Ref SharedSecret
+          SEARCH_INDEX_PATH: search-index.zsx
+      FunctionUrlConfig:
+        AuthType: NONE
+
+Outputs:
+  FunctionUrl:
+    Description: Public HTTPS endpoint. Auth is the x-faq-assistant-secret header.
+    Value: !GetAtt FaqWorkerFunctionUrl.FunctionUrl

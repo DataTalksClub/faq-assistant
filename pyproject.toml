@@ -1,10 +1,12 @@
 [project]
 name = "faq-assistant"
 version = "0.1.0"
-description = "Simplified DataTalks.Club Slack FAQ assistant on Cloudflare"
+description = "Simplified DataTalks.Club Slack FAQ assistant on AWS Lambda"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+  "zerosearch>=0.2.0",
+]
 
 [project.scripts]
 faq-assistant = "faq_assistant.cli:main"
@@ -14,17 +16,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-# faq_assistant is the app; zerosearch is vendored (see src/zerosearch/VENDOR.md).
-packages = ["src/faq_assistant", "src/zerosearch"]
+packages = ["src/faq_assistant"]
 
 [dependency-groups]
 ingest = [
   "gitsource>=0.0.5",
   "requests>=2.32.0",
-]
-dev = [
-  "workers-py",
-  "workers-runtime-sdk",
 ]
 
 [tool.ruff]

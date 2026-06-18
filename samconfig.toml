@@ -1,0 +1,10 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "faq-assistant"
+region = "eu-west-1"
+resolve_s3 = true
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+# Secrets are NOT stored here. Pass them at deploy time:
+#   sam deploy --parameter-overrides OpenAIApiKey=... SharedSecret=...

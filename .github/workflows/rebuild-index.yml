@@ -1,4 +1,4 @@
-name: Rebuild FAQ Assistant Corpus
+name: Rebuild index and deploy
 
 on:
   schedule:
@@ -6,8 +6,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  rebuild-corpus:
+  rebuild-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC for AWS credentials
+      contents: read
 
     steps:
       - name: Check out repository
@@ -21,20 +24,39 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.14"  # must match the Lambda runtime (index format is Python-version-tagged)
 
-      - name: Install dependencies
-        run: uv sync --locked --group ingest
-
-      - name: Rebuild search corpus
+      - name: Rebuild corpus, config and index
         run: |
           uv run --group ingest python scripts/build_search_corpus.py
           uv run python scripts/compile_config.py
+          uv run python scripts/build_search_index.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy Worker
-        run: uv run pywrangler deploy --keep-vars
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Smoke-test the handler
+        run: uv run python scripts/check_handler.py
+
+      - name: Set up AWS SAM
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy with SAM
+        run: |
+          sam build
+          sam deploy \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name faq-assistant \
+            --resolve-s3 \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides \
+              OpenAIApiKey=${{ secrets.OPENAI_API_KEY }} \
+              SharedSecret=${{ secrets.FAQ_ASSISTANT_SHARED_SECRET }}
