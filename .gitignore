@@ -10,3 +10,4 @@ dist/
 tmp/
 *.ndjson
 artifacts/
+.aws-sam/

@@ -19,6 +19,9 @@ build-backend = "hatchling.build"
 packages = ["src/faq_assistant"]
 
 [dependency-groups]
+dev = [
+    "aws-sam-cli>=1.162.1",
+]
 ingest = [
   "gitsource>=0.0.5",
   "requests>=2.32.0",

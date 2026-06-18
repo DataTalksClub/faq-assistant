@@ -37,11 +37,6 @@ jobs:
       - name: Smoke-test the handler
         run: uv run python scripts/check_handler.py
 
-      - name: Set up AWS SAM
-        uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -50,8 +45,8 @@ jobs:
 
       - name: Deploy with SAM
         run: |
-          sam build
-          sam deploy \
+          uv run sam build
+          uv run sam deploy \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset \
             --stack-name faq-assistant \

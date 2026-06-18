@@ -3,6 +3,11 @@
 Simplified DataTalks.Club Slack FAQ assistant, deployed as an AWS Lambda behind a
 Function URL.
 
+A lightweight redesign of [aaalexlit/faq-slack-bot](https://github.com/aaalexlit/faq-slack-bot):
+it swaps vector search for keyword text search ([`zerosearch`](https://github.com/alexeygrigorev/zerosearch),
+a zero-dependency BM25-lite index) and runs on super-minimal infrastructure — a single Lambda
+with a prebuilt in-memory index, no vector database, no servers, and effectively no fixed cost.
+
 Runtime flow:
 
 ```text
@@ -12,11 +17,46 @@ Slack mention -> ack Lambda (acks in <3s, maps channel -> scope/course)
 ```
 
 This service is just the `/ask` worker: it takes `{question, scope, course}` over HTTP
-(authenticated with a shared-secret header) and returns the answer JSON. Slack signature
-verification and posting live in the separate ack Lambda.
+(authenticated with a shared-secret header) and returns the answer JSON. It is wired into
+Slack by the [DataTalksClub/au-tomator-lambda](https://github.com/DataTalksClub/au-tomator-lambda)
+bot (the "ack Lambda"), which receives the Slack event, acks within Slack's 3-second window,
+maps the channel to a scope/course, calls this endpoint, and posts the answer back to the thread.
 
 Course channels use course-scoped FAQ plus course markdown. Other channels use the general
 DataTalks.Club docs corpus from `DataTalksClub/docs`.
+
+## Architecture
+
+Deliberately minimal — no servers, no vector database, effectively no fixed cost:
+
+- **One AWS Lambda** (`python3.14`, arm64) behind a **Function URL** (`AuthType: NONE`);
+  requests are authenticated by the `x-faq-assistant-secret` shared-secret header.
+- **No runtime dependencies beyond `zerosearch`** — the OpenAI call uses stdlib `urllib`,
+  and structured models are hand-rolled (no `pydantic`, no `requests`).
+- **Prebuilt search index** baked into the deployment package and loaded into memory on cold
+  start in ~15 ms (see below), so there is no database to run or query.
+- **Observability** via a structured JSON usage/cost log line per request, captured by
+  CloudWatch Logs.
+- **Infra as code** with AWS SAM (`template.yaml`); pay-per-request, so an idle bot costs
+  nothing.
+
+### How the index is created
+
+The retrieval index is fitted offline and shipped as a packed artifact rather than rebuilt at
+runtime:
+
+1. `make corpus` ingests the configured sources (`DataTalksClub/docs`, course FAQ + markdown),
+   chunks them, and writes `artifacts/search/search-corpus.json`.
+2. `make index` fits a [`zerosearch`](https://github.com/alexeygrigorev/zerosearch) `Index` over
+   that corpus and saves the packed, flat-buffer form to `artifacts/search/search-index.zsx`
+   (~9 MB).
+3. `sam build` bundles that `.zsx` into the Lambda zip; at cold start the handler calls
+   `Index.load(...)`, which `memcpy`s the postings arrays instead of re-tokenizing the corpus —
+   ~15 ms versus ~520 ms for a fresh `fit()`.
+
+The packed index is tagged with the Python version it was built on and must match the Lambda
+runtime (3.14), so CI builds the index and deploys on the same Python. The artifacts are
+git-ignored and rebuilt daily by CI.
 
 ## Local setup
 
@@ -34,18 +74,12 @@ GITHUB_TOKEN=...                  # only for corpus rebuilds (the `ingest` group
 
 ## Search corpus and index
 
-The corpus is built from the configured sources, then fitted into a packed
-[`zerosearch`](https://github.com/alexeygrigorev/zerosearch) index that the Lambda loads
-in ~15 ms (instead of re-tokenizing on every cold start).
+See [How the index is created](#how-the-index-is-created) above for the design. The commands:
 
 ```bash
 make corpus   # build the corpus     -> artifacts/search/search-corpus.json (+ search_corpus.py)
 make index    # fit + save the index -> artifacts/search/search-index.zsx
 ```
-
-Both artifacts are git-ignored and rebuilt in CI before each deploy. The packed index is
-tagged with the build Python version; it must be built on the same Python as the Lambda
-runtime (**3.14**), or loading fails loudly. CI pins both.
 
 ## Local testing
 
