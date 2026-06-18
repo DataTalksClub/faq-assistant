@@ -56,7 +56,11 @@ def load_faq_documents(config: dict[str, Any]) -> list[SourceDocument]:
             question = clean_text(faq.get("question", ""))
             answer = clean_text(faq.get("answer", ""))
             section = clean_text(faq.get("section", "FAQ"))
-            source_id = str(faq.get("id") or stable_hash(f"{course}:{section}:{question}"))
+            faq_id = str(faq.get("id") or "")
+            source_id = faq_id or stable_hash(f"{course}:{section}:{question}")
+            # Deep link to the specific question on the rendered FAQ page, e.g.
+            # https://datatalks.club/faq/data-engineering-zoomcamp.html#9e508f2212
+            url = f"{FAQ_BASE_URL}{course}.html#{faq_id}" if faq_id else FAQ_BASE_URL
             text = f"section: {section}\nquestion: {question}\nanswer: {answer}".strip()
             documents.append(
                 SourceDocument(
@@ -67,7 +71,7 @@ def load_faq_documents(config: dict[str, Any]) -> list[SourceDocument]:
                     section=section,
                     title=question,
                     text=text,
-                    url=FAQ_BASE_URL,
+                    url=url,
                     repo=None,
                     path=None,
                     source_id=source_id,
