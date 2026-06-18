@@ -104,6 +104,11 @@ echo '{"requestContext":{"http":{"method":"POST","path":"/ask"}},"headers":{"x-f
 
 ## Deployment (AWS SAM)
 
+See [docs/deployment.md](docs/deployment.md) for the full setup — the one-time
+prerequisites (GitHub OIDC provider, bootstrap deploy, repo secrets), the
+least-privilege deploy role, and how to port it to a new/production account.
+Pushes to `main` then deploy automatically via GitHub Actions.
+
 Install the [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html),
 then first-time deploy interactively (writes `samconfig.toml`):
 
