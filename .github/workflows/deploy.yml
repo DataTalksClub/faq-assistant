@@ -1,0 +1,62 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "config.toml"
+      - "template.yaml"
+      - "samconfig.toml"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "Makefile"
+      - "scripts/build_search_index.py"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC for AWS credentials
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"  # must match the Lambda runtime (index is Python-version-tagged)
+
+      - name: Unit tests
+        run: uv run --group test python -m pytest tests -q
+
+      - name: Build the search index (from the committed embedded corpus)
+        run: uv run python scripts/build_search_index.py
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy with SAM
+        run: |
+          uv run sam build
+          uv run sam deploy \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name faq-assistant \
+            --resolve-s3 \
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides \
+              OpenAIApiKey=${{ secrets.OPENAI_API_KEY }} \
+              SharedSecret=${{ secrets.FAQ_ASSISTANT_SHARED_SECRET }}
