@@ -26,7 +26,7 @@ def _assert_answered(response):
 # --- llm-zoomcamp ----------------------------------------------------------
 
 def test_llm_answer_in_docs(ask):
-    r = ask("How does the course leaderboard work and how are points awarded?", "course", LLM)
+    r = ask("What are the prerequisites for the LLM Zoomcamp?", "course", LLM)
     _assert_answered(r)
     assert "docs" in source_labels(r), source_labels(r)
 
@@ -61,6 +61,15 @@ def test_de_answer_in_faq(ask):
     r = ask("Course: Can I still join the course after the start date?", "course", DE)
     _assert_answered(r)
     assert "faq" in source_labels(r), source_labels(r)
+
+
+def test_de_retrieval_spans_docs_and_course_repo(retrieve):
+    # Syllabus lives in the docs page, homework in the course repo, so this single
+    # natural question retrieves from both source kinds. Asserted on retrieval (not
+    # the LLM's citations) so it's deterministic.
+    labels = retrieve("Where do I find the syllabus and the homework for the Data Engineering Zoomcamp?", "course", DE)
+    assert "docs" in labels
+    assert "course-repo" in labels
 
 
 # --- outside a course channel ----------------------------------------------
