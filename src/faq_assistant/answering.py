@@ -157,8 +157,7 @@ def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str |
 SOURCE_LABELS = {
     "faq": "faq",
     "github": "course-repo",
-    "course_docs": "docs",      # course-specific pages, served from the docs repo
-    "course_markdown": "docs",  # legacy name for course_docs (pre-rename corpora)
+    "course_docs": "docs",  # course-specific pages, served from the docs repo
     "docs": "docs",
 }
 

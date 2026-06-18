@@ -26,6 +26,9 @@ ingest = [
   "gitsource>=0.0.5",
   "requests>=2.32.0",
 ]
+test = [
+  "pytest>=8",
+]
 
 [tool.ruff]
 line-length = 100
