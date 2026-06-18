@@ -14,6 +14,10 @@ Parameters:
     Description: >-
       Shared secret callers send in the x-faq-assistant-secret header.
       Empty leaves the endpoint open (not recommended).
+  GitHubRepo:
+    Type: String
+    Default: "DataTalksClub/faq-assistant"
+    Description: owner/repo allowed to assume the deploy role via GitHub OIDC.
 
 Globals:
   Function:
@@ -40,7 +44,32 @@ Resources:
       FunctionUrlConfig:
         AuthType: NONE
 
+  # Role GitHub Actions assumes (via OIDC) to deploy this stack. Bootstrap: the
+  # first deploy is done with other credentials; afterwards CI uses this role.
+  # The OIDC provider (token.actions.githubusercontent.com) must already exist.
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+              StringLike:
+                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubRepo}:*"
+      # Broad for a sandbox; tighten to CloudFormation/Lambda/IAM/S3/logs for prod.
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
 Outputs:
   FunctionUrl:
     Description: Public HTTPS endpoint. Auth is the x-faq-assistant-secret header.
     Value: !GetAtt FaqWorkerFunctionUrl.FunctionUrl
+  DeployRoleArn:
+    Description: Set this as the AWS_DEPLOY_ROLE_ARN GitHub secret.
+    Value: !GetAtt GitHubDeployRole.Arn
