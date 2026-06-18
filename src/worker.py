@@ -54,7 +54,7 @@ async def route_request(env, request) -> Response:
             return json_response({"error": "`question` is required"}, 400)
         scope = str(body.get("scope") or "docs")
         course = body.get("course")
-        result = await answer_question(env, question, scope, course)
+        result = await answer_question(env, question, scope, course, source="api")
         return json_response(result)
 
     if path == CONFIG["slack"]["events_path"] and method == "POST":
@@ -86,7 +86,7 @@ async def handle_app_mention(env, event: dict) -> None:
         return
 
     scope, course = scope_for_channel(channel_id)
-    result = await answer_question(env, question, scope, course)
+    result = await answer_question(env, question, scope, course, source="slack")
     await post_slack_message(env, channel_id, thread_ts, result["answer"])
 
 
@@ -97,10 +97,17 @@ def scope_for_channel(channel_id: str) -> tuple[str, str | None]:
     return str(CONFIG["slack"].get("default_scope", "docs")), None
 
 
-async def answer_question(env, question: str, scope: str, course: str | None) -> dict:
-    rewritten_query = await rewrite_query(env, question, scope, course)
+async def answer_question(env, question: str, scope: str, course: str | None, source: str = "api") -> dict:
+    started = time.time()
+    usage: list[dict] = []
+    rewritten_query = await rewrite_query(env, question, scope, course, usage)
     results = await search(env, rewritten_query, scope, course)
-    answer = await generate_answer(env, question, rewritten_query, scope, course, results)
+    answer = await generate_answer(env, question, rewritten_query, scope, course, results, usage)
+    latency_ms = (time.time() - started) * 1000.0
+    try:
+        summary = record_usage(env, source, scope, course, usage, latency_ms, len(results))
+    except Exception:  # observability must never break answering
+        summary = {}
     return {
         "question": question,
         "rewritten_query": rewritten_query,
@@ -108,10 +115,11 @@ async def answer_question(env, question: str, scope: str, course: str | None) ->
         "course": course,
         "results": results,
         "answer": answer,
+        "usage": summary,
     }
 
 
-async def rewrite_query(env, question: str, scope: str, course: str | None) -> str:
+async def rewrite_query(env, question: str, scope: str, course: str | None, usage: list | None = None) -> str:
     if not CONFIG["retrieval"].get("rewrite_query", True):
         return question
 
@@ -142,6 +150,8 @@ async def rewrite_query(env, question: str, scope: str, course: str | None) -> s
         output_model=QueryRewrite,
         max_tokens=120,
         temperature=0.0,
+        usage=usage,
+        model=CONFIG["chat"].get("rewrite_model") or CONFIG["chat"]["model"],
     )
     return rewritten.query.strip() or question
 
@@ -184,6 +194,7 @@ async def generate_answer(
     scope: str,
     course: str | None,
     results: list[dict],
+    usage: list | None = None,
 ) -> str:
     prompt_key = "course" if scope == "course" else "docs"
     instructions = CONFIG["answering"]["prompts"][prompt_key].strip()
@@ -213,6 +224,7 @@ async def generate_answer(
         output_model=RagAnswer,
         max_tokens=int(CONFIG["answering"]["max_output_tokens"]),
         temperature=float(CONFIG["answering"]["temperature"]),
+        usage=usage,
     )
     return format_structured_answer(rag_answer, results)
 
@@ -235,13 +247,13 @@ def format_structured_answer(rag_answer: RagAnswer, results: list[dict]) -> str:
     return f"{answer}\n\nSources:\n" + "\n".join(source_lines)
 
 
-async def run_chat(env, messages: list[dict], max_tokens: int, temperature: float) -> str:
-    response = await openai_chat(env, messages, None, max_tokens, temperature)
+async def run_chat(env, messages: list[dict], max_tokens: int, temperature: float, usage=None, model=None) -> str:
+    response = await openai_chat(env, messages, None, max_tokens, temperature, model, usage)
     return parse_chat_response(response)
 
 
-async def run_structured_chat(env, messages: list[dict], output_model, max_tokens: int, temperature: float):
-    response = await openai_chat(env, messages, output_model, max_tokens, temperature)
+async def run_structured_chat(env, messages: list[dict], output_model, max_tokens: int, temperature: float, usage=None, model=None):
+    response = await openai_chat(env, messages, output_model, max_tokens, temperature, model, usage)
     return output_model.model_validate(parse_structured_response(response))
 
 
@@ -251,13 +263,16 @@ async def openai_chat(
     output_model,
     max_tokens: int,
     temperature: float,
+    model: str | None = None,
+    usage: list | None = None,
 ) -> dict:
     config = CONFIG["chat"]
     if config["provider"] != "openai":
         raise RuntimeError(f"Unsupported chat provider: {config['provider']}")
 
+    model = model or config["model"]
     payload: dict = {
-        "model": config["model"],
+        "model": model,
         "messages": messages,
         "temperature": temperature,
         "max_completion_tokens": max_tokens,
@@ -271,7 +286,17 @@ async def openai_chat(
                 "schema": output_model.model_json_schema(),
             },
         }
-    return await openai_fetch(env, "/chat/completions", payload)
+    data = await openai_fetch(env, "/chat/completions", payload)
+    if usage is not None:
+        tokens = data.get("usage") or {}
+        usage.append(
+            {
+                "model": model,
+                "prompt_tokens": int(tokens.get("prompt_tokens", 0) or 0),
+                "completion_tokens": int(tokens.get("completion_tokens", 0) or 0),
+            }
+        )
+    return data
 
 
 async def openai_fetch(env, path: str, payload: dict) -> dict:
@@ -298,6 +323,63 @@ async def openai_fetch(env, path: str, payload: dict) -> dict:
     if int(response.status) >= 400:
         raise RuntimeError(f"OpenAI API request failed ({response.status}): {text[:1000]}")
     return data
+
+
+def call_cost(call: dict) -> float:
+    prices = CONFIG.get("observability", {}).get("prices", {})
+    price = prices.get(call.get("model"))
+    if not price:
+        return 0.0
+    return (
+        call["prompt_tokens"] * float(price["input"])
+        + call["completion_tokens"] * float(price["output"])
+    ) / 1_000_000.0
+
+
+def record_usage(env, source, scope, course, usage, latency_ms, num_results) -> dict:
+    """Aggregate token usage + cost for one request, log it and emit a data point."""
+    prompt_tokens = sum(c["prompt_tokens"] for c in usage)
+    completion_tokens = sum(c["completion_tokens"] for c in usage)
+    cost = sum(call_cost(c) for c in usage)
+    summary = {
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+        "total_tokens": prompt_tokens + completion_tokens,
+        "cost_usd": round(cost, 6),
+    }
+
+    obs = CONFIG.get("observability", {})
+    if not obs.get("enabled", False) or not usage:
+        return summary
+
+    models = ",".join(sorted({c["model"] for c in usage}))
+    # Structured log line (captured by Workers Logs / observability).
+    try:
+        print(json.dumps({
+            "type": "usage", "source": source, "scope": scope, "course": course or "",
+            "models": models, "calls": len(usage), "num_results": num_results,
+            "latency_ms": round(latency_ms, 1), **summary,
+        }))
+    except Exception:
+        pass
+
+    # Structured data point for Workers Analytics Engine (query with SQL later).
+    try:
+        dataset = getattr(env, "USAGE", None)
+        if dataset is not None:
+            dataset.writeDataPoint(to_js({
+                "indexes": [course or scope or "unknown"],
+                "blobs": [source, scope, course or "", models],
+                "doubles": [
+                    float(prompt_tokens), float(completion_tokens),
+                    float(summary["total_tokens"]), round(cost, 6),
+                    round(latency_ms, 1), float(num_results), float(len(usage)),
+                ],
+            }))
+    except Exception:
+        pass
+
+    return summary
 
 
 def parse_chat_response(response) -> str:

@@ -27,6 +27,22 @@ base_url = "https://api.openai.com/v1"
 [chat]
 provider = "openai"
 model = "gpt-5.4-mini"
+# Cheaper model for the query-rewrite step (validated in evals/).
+rewrite_model = "gpt-4o-mini"
+
+[observability]
+# Structured per-request usage/cost capture -> Workers Analytics Engine + logs.
+enabled = true
+dataset = "faq_usage"
+
+# USD per 1,000,000 tokens. Update when OpenAI changes prices.
+[observability.prices."gpt-4o-mini"]
+input = 0.15
+output = 0.60
+
+[observability.prices."gpt-5.4-mini"]
+input = 0.75
+output = 4.50
 
 [slack.reply]
 thread = true

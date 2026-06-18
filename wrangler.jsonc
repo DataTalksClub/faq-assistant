@@ -4,5 +4,14 @@
   "main": "src/worker.py",
   "compatibility_date": "2026-06-17",
   "compatibility_flags": ["python_workers"],
-  "workers_dev": true
+  "workers_dev": true,
+
+  // Capture console.log output in the dashboard Logs view + `wrangler tail`.
+  "observability": { "enabled": true },
+
+  // Structured per-request usage/cost data points, queryable via SQL.
+  // (Analytics Engine requires the Workers Paid plan.)
+  "analytics_engine_datasets": [
+    { "binding": "USAGE", "dataset": "faq_usage" }
+  ]
 }
