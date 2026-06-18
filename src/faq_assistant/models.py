@@ -87,15 +87,6 @@ class SearchResult(StructuredModel):
 
 
 @dataclass
-class AnswerSource(StructuredModel):
-    id: str = ""
-    title: str = ""
-    source_type: str = ""
-    section: str = ""
-    url: str = ""
-
-
-@dataclass
 class QueryRewrite(StructuredModel):
     query: str = ""
 
@@ -104,7 +95,9 @@ class QueryRewrite(StructuredModel):
 class RagAnswer(StructuredModel):
     answer: str = ""
     found_answer: bool = False
-    sources: list[AnswerSource] = field(default_factory=list)
+    # ids of the retrieved context entries the answer relied on; the worker
+    # resolves these against the actual results into structured sources.
+    source_ids: list[str] = field(default_factory=list)
 
 
 def coerce_value(value: Any, target_type):

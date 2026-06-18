@@ -61,7 +61,7 @@ def run_rag_case(
     answer = answer_question(openai, config, question, rewritten.query, scope, course, results)
 
     allowed_ids = {result.id for result in results}
-    cited_ids = {source.id for source in answer.sources}
+    cited_ids = set(answer.source_ids)
     assert cited_ids <= allowed_ids, f"model cited unknown IDs: {cited_ids - allowed_ids}"
 
     return {

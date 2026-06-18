@@ -118,7 +118,7 @@ def load_course_markdown_documents(config: dict[str, Any]) -> list[SourceDocumen
             title = extract_title(file.content) or file.filename
             documents.append(
                 SourceDocument(
-                    source_type="course_markdown",
+                    source_type="course_docs",
                     scope="course",
                     course=course,
                     course_name=course_config["name"],

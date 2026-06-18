@@ -4,18 +4,30 @@
 CONFIG = {'answering': {'include_sources': True,
                'max_output_tokens': 1200,
                'max_sources': 5,
-               'prompts': {'course': 'You are a DataTalks.Club teaching assistant. Answer using '
-                                     'only the retrieved\n'
-                                     'context for the detected course. If the context does not '
-                                     'answer the question,\n'
-                                     'say that you could not find the answer in the course '
-                                     'materials.\n',
-                           'docs': 'You are a DataTalks.Club assistant. Answer using only the '
+               'prompts': {'course': 'You are a DataTalks.Club teaching assistant replying to a '
+                                     'student in Slack.\n'
+                                     'Answer their question directly and practically, using only '
+                                     'the retrieved course\n'
+                                     'context. Tell them what to do in your own words - do NOT '
+                                     'describe what "the\n'
+                                     'context" or "the docs" say. Be concise. If the context does '
+                                     'not answer the\n'
+                                     'question, set found_answer to false and say you could not '
+                                     'find it in the course\n'
+                                     'materials. In source_ids, list the ids of the CONTEXT '
+                                     'entries you actually used.\n',
+                           'docs': 'You are a DataTalks.Club assistant replying to a community '
+                                   'member in Slack.\n'
+                                   'Answer their question directly and practically, using only the '
                                    'retrieved\n'
-                                   'DataTalks.Club documentation context. If the context does not '
-                                   'answer the\n'
-                                   'question, say that you could not find the answer in the '
-                                   'docs.\n'},
+                                   'DataTalks.Club documentation. Give the concrete steps in your '
+                                   'own words - do NOT\n'
+                                   'describe what "the docs" or "the context" say. Be concise. If '
+                                   'the context does\n'
+                                   'not answer the question, set found_answer to false and say you '
+                                   'could not find it\n'
+                                   'in the docs. In source_ids, list the ids of the CONTEXT '
+                                   'entries you actually used.\n'},
                'temperature': 0.2},
  'api': {'shared_secret_env': 'FAQ_ASSISTANT_SHARED_SECRET'},
  'app': {'environment': 'dev', 'name': 'faq-assistant'},

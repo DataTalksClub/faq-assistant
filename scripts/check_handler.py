@@ -21,7 +21,7 @@ def stub_chat(messages, output_model, max_tokens, temperature, model=None):
     if output_model is QueryRewrite:
         content = {"query": "docker compose"}
     else:
-        content = {"answer": "Use docker compose up.", "found_answer": True, "sources": []}
+        content = {"answer": "Use docker compose up.", "found_answer": True, "source_ids": []}
     return {
         "choices": [{"message": {"content": json.dumps(content)}}],
         "usage": {"prompt_tokens": 10, "completion_tokens": 5},
@@ -51,6 +51,8 @@ def main() -> int:
     assert payload["rewritten_query"] == "docker compose", payload["rewritten_query"]
     assert payload["results"], "expected retrieved results"
     assert payload["answer"].startswith("Use docker compose"), payload["answer"]
+    assert payload["found_answer"] is True, payload["found_answer"]
+    assert isinstance(payload["sources"], list), "expected structured sources list"
 
     print(f"OK: handler routing/auth/pipeline ({len(payload['results'])} results retrieved)")
     return 0

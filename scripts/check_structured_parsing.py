@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from faq_assistant.models import AnswerSource, QueryRewrite, RagAnswer
+from faq_assistant.models import QueryRewrite, RagAnswer
 from faq_assistant.structured import parse_structured_response
 
 
@@ -20,8 +18,7 @@ def main() -> None:
                     "content": (
                         '{"answer": "Yes, you can still join.", '
                         '"found_answer": true, '
-                        '"sources": [{"id": "faq:1", "title": "Can I still join?", '
-                        '"source_type": "faq", "section": "General", "url": ""}]}'
+                        '"source_ids": ["faq:1", "faq:2"]}'
                     )
                 }
             }
@@ -29,15 +26,7 @@ def main() -> None:
     }
     answer = RagAnswer.model_validate(parse_structured_response(answer_response))
     assert answer.found_answer is True
-    assert answer.sources == [
-        AnswerSource(
-            id="faq:1",
-            title="Can I still join?",
-            source_type="faq",
-            section="General",
-            url="",
-        )
-    ]
+    assert answer.source_ids == ["faq:1", "faq:2"]
     print("structured parsing ok")
 
 

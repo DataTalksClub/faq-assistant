@@ -566,7 +566,7 @@ ingest = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "zerosearch", specifier = ">=0.2.0" }]
+requires-dist = [{ name = "zerosearch", specifier = ">=0.3.0" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "aws-sam-cli", specifier = ">=1.162.1" }]
@@ -1597,9 +1597,9 @@ wheels = [
 
 [[package]]
 name = "zerosearch"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/1a/cb/15e697052c8549f16051645f8a66b982627f984d69c40229b5539726774f/zerosearch-0.2.0.tar.gz", hash = "sha256:89c8240344545931544268ccedddc1ac2556a74c75a928da53da9dd57b00c748", size = 62248, upload-time = "2026-06-18T09:03:20.004Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/ab/964a7e2bd5e88b5a0230bb19234223feabfe020d2953792919e3c21f4d0b/zerosearch-0.3.0.tar.gz", hash = "sha256:67026b01562edbebb44bc6ad788d967572ad6eec7120041beec122fd1e3b85c6", size = 62761, upload-time = "2026-06-18T10:22:04.644Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/75/499f68025e2d24129d06f6fe872e48efed078f6b2e2ab8fa18b81de7b28a/zerosearch-0.2.0-py3-none-any.whl", hash = "sha256:dfa248306456077450b68e730ea6566d22d8a26b7dfe6f94c1d715ad1a5d9d24", size = 8993, upload-time = "2026-06-18T09:03:19.069Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/61/09464c703e88d56e2c8b6ff0c810c4e612b411d93431ae4ec930befb449d/zerosearch-0.3.0-py3-none-any.whl", hash = "sha256:5b9a3dc4acbbd4578ee2c6f1d35cb51e34b7bb6891b9084f11523767ea7781d2", size = 9384, upload-time = "2026-06-18T10:22:03.53Z" },
 ]

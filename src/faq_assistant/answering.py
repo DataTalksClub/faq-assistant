@@ -100,7 +100,9 @@ def answer_question(
 
     rewritten_query = rewrite_query(config, chat, question, scope, course)
     results = search(config, index, rewritten_query, scope, course)
-    answer = generate_answer(config, chat, question, rewritten_query, scope, course, results)
+    answer, found_answer, sources = generate_answer(
+        config, chat, question, rewritten_query, scope, course, results
+    )
 
     latency_ms = (time.time() - started) * 1000.0
     try:
@@ -113,8 +115,10 @@ def answer_question(
         "rewritten_query": rewritten_query,
         "scope": scope,
         "course": course,
-        "results": [result.model_dump() for result in results],
+        "found_answer": found_answer,
         "answer": answer,
+        "sources": sources,
+        "results": [result.model_dump() for result in results],
         "usage": summary,
     }
 
@@ -149,11 +153,24 @@ def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str |
     return rewritten.query.strip() or question
 
 
+# Raw corpus source_type -> the source label returned to the automator.
+SOURCE_LABELS = {
+    "faq": "faq",
+    "github": "course-repo",
+    "course_docs": "docs",      # course-specific pages, served from the docs repo
+    "course_markdown": "docs",  # legacy name for course_docs (pre-rename corpora)
+    "docs": "docs",
+}
+
+
 def search(config, index, query: str, scope: str, course: str | None) -> list[SearchResult]:
     retrieval = config["retrieval"]
-    filter_data = {"scope": scope}
+    # Course channel: the course's own materials (course == X) plus the
+    # course-agnostic general docs (course == ""). Elsewhere: general docs only.
     if scope == "course" and course:
-        filter_data["course"] = course
+        filter_data = {"course": [course, ""]}
+    else:
+        filter_data = {"course": ""}
 
     records = index.search(
         query=query,
@@ -165,15 +182,21 @@ def search(config, index, query: str, scope: str, course: str | None) -> list[Se
     return [_format_record(record) for record in records if float(record.get("score", 0)) >= min_score]
 
 
-def generate_answer(config, chat: ChatFn, question, rewritten_query, scope, course, results) -> str:
+def generate_answer(
+    config, chat: ChatFn, question, rewritten_query, scope, course, results
+) -> tuple[str, bool, list[dict]]:
+    """Return (answer_text, found_answer, structured_sources)."""
     prompt_key = "course" if scope == "course" else "docs"
     instructions = config["answering"]["prompts"][prompt_key].strip()
 
     context = build_context(results)
     if not context:
-        if scope == "course":
-            return "I couldn't find the answer in the course materials."
-        return "I couldn't find the answer in the docs."
+        message = (
+            "I couldn't find the answer in the course materials."
+            if scope == "course"
+            else "I couldn't find the answer in the docs."
+        )
+        return message, False, []
 
     messages = [
         {"role": "system", "content": instructions},
@@ -196,25 +219,32 @@ def generate_answer(config, chat: ChatFn, question, rewritten_query, scope, cour
         None,
     )
     rag_answer = RagAnswer.model_validate(parse_structured_response(response))
-    return format_structured_answer(config, rag_answer, results)
+    sources = resolve_sources(config, rag_answer, results)
+    return rag_answer.answer.strip(), bool(rag_answer.found_answer), sources
 
 
-def format_structured_answer(config, rag_answer: RagAnswer, results: list[SearchResult]) -> str:
-    answer = rag_answer.answer.strip()
-    if not config["answering"].get("include_sources", True):
-        return answer
+def resolve_sources(config, rag_answer: RagAnswer, results: list[SearchResult]) -> list[dict]:
+    """Map the model's cited ids to authoritative source metadata from results."""
+    if not config["answering"].get("include_sources", True) or not rag_answer.found_answer:
+        return []
 
-    allowed_ids = {result.id for result in results}
-    valid_sources = [source for source in rag_answer.sources if source.id in allowed_ids]
-    if not rag_answer.found_answer or not valid_sources:
-        return answer
-
-    source_lines = []
-    for source in valid_sources[: int(config["answering"]["max_sources"])]:
-        parts = [source.source_type, source.section, source.title]
-        source_lines.append("- " + " > ".join(part for part in parts if part))
-
-    return f"{answer}\n\nSources:\n" + "\n".join(source_lines)
+    by_id = {result.id: result for result in results}
+    seen: set[str] = set()
+    sources: list[dict] = []
+    for source_id in rag_answer.source_ids:
+        result = by_id.get(source_id)
+        if result is None or result.id in seen:
+            continue
+        seen.add(result.id)
+        sources.append(
+            {
+                "id": result.id,
+                "source": SOURCE_LABELS.get(result.source_type, result.source_type),
+                "title": result.title,
+                "url": result.url,
+            }
+        )
+    return sources[: int(config["answering"]["max_sources"])]
 
 
 def build_context(results: list[SearchResult]) -> str:
