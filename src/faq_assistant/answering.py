@@ -118,7 +118,6 @@ def answer_question(
         "found_answer": found_answer,
         "answer": answer,
         "sources": sources,
-        "results": [result.model_dump() for result in results],
         "usage": summary,
     }
 

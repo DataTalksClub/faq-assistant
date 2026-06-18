@@ -49,12 +49,11 @@ def main() -> int:
     assert response["statusCode"] == 200, f"happy path failed: {response['body']}"
     payload = json.loads(response["body"])
     assert payload["rewritten_query"] == "docker compose", payload["rewritten_query"]
-    assert payload["results"], "expected retrieved results"
     assert payload["answer"].startswith("Use docker compose"), payload["answer"]
     assert payload["found_answer"] is True, payload["found_answer"]
     assert isinstance(payload["sources"], list), "expected structured sources list"
 
-    print(f"OK: handler routing/auth/pipeline ({len(payload['results'])} results retrieved)")
+    print("OK: handler routing/auth/pipeline")
     return 0
 
 
