@@ -1,12 +1,12 @@
 {
   "metrics": {
-    "hit@1": 0.25,
-    "hit@3": 0.3594,
-    "hit@5": 0.4922,
-    "mrr@1": 0.25,
-    "mrr@3": 0.2982,
-    "mrr@5": 0.3271,
-    "n": 128
+    "hit@1": 0.2154,
+    "hit@3": 0.3231,
+    "hit@5": 0.4615,
+    "mrr@1": 0.2154,
+    "mrr@3": 0.2641,
+    "mrr@5": 0.2949,
+    "n": 130
   },
   "rows": [
     {
@@ -123,12 +123,12 @@
     },
     {
       "query": "@user I saw the deadline for attempt 2 has been extended till April 19. I haven't got the change to submit Homeworks &amp; project 1 attempt. If I submit Attempt 2 and pass, will I get the chance to get a certificate?",
-      "rewritten": "data engineering zoomcamp attempt 2 deadline extension April 19 homework project 1 submission certificate eligibility",
+      "rewritten": "data engineering zoomcamp deadline attempt 2 extended April 19 submit homework project 1 certificate eligibility",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:4a507d33ebe46b346eda:0000",
         "faq:a6554bbb1509d01634fe:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:20b9738afecb8dd9a88f:0000",
         "faq:0ee68f84cef8944c0e7f:0000"
       ],
@@ -163,9 +163,9 @@
       "rewritten": "data engineering zoomcamp week 2 github update finalized",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:c4edd66d3de4285fcda7:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0001",
         "github:c4edd66d3de4285fcda7:0001",
         "github:15fd8993d4c83da0175b:0000"
       ],
@@ -182,7 +182,7 @@
       "ranked": [
         "faq:68efe811077b7ab26ab0:0000",
         "faq:8b29ecfb0d9d2120079b:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:94c2990621651d4b1589:0000",
         "faq:24e9fc00f9ff970dea8b:0000"
       ],
@@ -216,7 +216,7 @@
         "faq:21513decdaf2305cf58e:0000",
         "faq:a6554bbb1509d01634fe:0000",
         "github:e8420f759611441143eb:0004",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:a1c82ae63a78fc5a9790:0000"
       ],
       "relevant": [
@@ -230,7 +230,7 @@
       "rewritten": "prerequisites for data engineering Zoomcamp, requirements for data engineering course, background needed for data engineering training",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:e8420f759611441143eb:0004",
         "github:e8420f759611441143eb:0000",
         "github:e8420f759611441143eb:0003",
@@ -261,14 +261,14 @@
     },
     {
       "query": "@user I am learning mage in week 2 of the course. How do I load partitioned parquet data from gogle cloud storage and load it into bigquery ? The data files are partitioned on date in gcs",
-      "rewritten": "load partitioned parquet data from Google Cloud Storage into BigQuery, partitioned data, date partitioning, GCS to BigQuery",
+      "rewritten": "load partitioned parquet data from Google Cloud Storage into BigQuery, partitioned data, date partitioning",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:cb9e25a35c2f3ab7f749:0000",
         "faq:98ff50bcd669ac8b6818:0000",
-        "faq:833f8ecdd0cd6041d9e8:0000",
+        "faq:0da59e07ddc23624021f:0000",
         "faq:567c6a2c8af16edbc5a0:0000",
-        "faq:f6f998673bd255c89e8a:0000"
+        "faq:548824ff64f9d07aab2d:0000"
       ],
       "relevant": [
         "github:98ae3eaa3a381905eb37:0002",
@@ -317,7 +317,7 @@
       "ranked": [
         "github:e8420f759611441143eb:0004",
         "github:e8420f759611441143eb:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:e8420f759611441143eb:0002",
         "github:e8420f759611441143eb:0003"
       ],
@@ -330,7 +330,7 @@
     },
     {
       "query": "Hello friends. I’ve come to the last material in the Docker + Postgres section. Next, I want to proceed to GCP + Terraform, but I don’t have a credit card to sign up for GCP. Is there a solution I can do? Can I do it locally?",
-      "rewritten": "GCP Terraform credit card alternative local setup solution",
+      "rewritten": "GCP Terraform credit card solution local setup",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "github:c7da9f3440d2aa214400:0000",
@@ -349,8 +349,8 @@
       "rewritten": "data engineering zoomcamp course late for fourth session",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "faq:df18042ca0ad4b877253:0000",
         "github:dfa90ce1cd0a2a17231a:0000"
@@ -368,9 +368,9 @@
       "rewritten": "data engineering zoomcamp VS Code dropdown extension",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:523c079d343079250fd3:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000"
       ],
@@ -399,14 +399,14 @@
     },
     {
       "query": "@user where can i watch week1 lectures?",
-      "rewritten": "watch week 1 lectures data engineering video resources",
+      "rewritten": "watch week 1 lectures data engineering zoomcamp video recordings",
       "course": "data-engineering-zoomcamp",
       "ranked": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:c4edd66d3de4285fcda7:0000",
         "github:9377b4e2c4fd705fb835:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0001",
-        "course_markdown:01c0d5b08a2f45563c1e:0003",
-        "course_markdown:01c0d5b08a2f45563c1e:0002"
+        "github:c4edd66d3de4285fcda7:0001",
+        "course_docs:a231472470e3a07272da:0001"
       ],
       "relevant": [
         "github:2cdc17e7ece87cdd717a:0000",
@@ -433,14 +433,14 @@
     },
     {
       "query": "Hv a question on course syllabus: 1. I see the course covers Spark, will it cover PySpark as well? 2. will the course cover relational DB &amp; NoSQL? (e.g. normalisations, rules of thumbs for designing db schema, how to optimise db performance, tips for writing performant SQL query … etc)",
-      "rewritten": "data engineering syllabus Spark PySpark relational database NoSQL normalization database schema optimization SQL query performance tips",
+      "rewritten": "data engineering course syllabus Spark PySpark relational database NoSQL normalization database schema optimization database performance SQL query performance tips",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "faq:1bb256efe30ff28800cb:0000",
         "faq:1e2b20c4a9884aa02f16:0000",
-        "faq:c963f6e89b75337a20ea:0000",
-        "faq:9f07b9f1efda296d4ca6:0000",
-        "faq:a25214382f8d1dc466a9:0000"
+        "faq:1bb256efe30ff28800cb:0000",
+        "github:021cffe31536ac2ff2ae:0000",
+        "faq:567c6a2c8af16edbc5a0:0000",
+        "github:021cffe31536ac2ff2ae:0001"
       ],
       "relevant": [
         "faq:51d0ca188aee71d1caba:0000",
@@ -450,14 +450,14 @@
     },
     {
       "query": "Hello Zoomcamp community:wave:, I just joined the course and have a few questions: 1. How many hours per week or month are typically needed to complete the challenge? 2. Has the challenge ever been extended before? 3. Has anyone participated in Google Summer of Code as a data engineer?",
-      "rewritten": "data engineering Zoomcamp challenge hours per week month completion extension Google Summer of Code participation",
+      "rewritten": "data engineering Zoomcamp challenge hours per week month completion, data engineering Zoomcamp challenge extension history, Google Summer of Code participation data engineer",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "faq:b6f31d097f9f82a0efb1:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "faq:1f57afa0bb8482296e50:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:c4edd66d3de4285fcda7:0000",
-        "github:c4edd66d3de4285fcda7:0001"
+        "course_docs:a231472470e3a07272da:0001",
+        "github:e8420f759611441143eb:0004",
+        "github:15fd8993d4c83da0175b:0000"
       ],
       "relevant": [
         "faq:b6f31d097f9f82a0efb1:0000",
@@ -488,8 +488,8 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:4a507d33ebe46b346eda:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:a346def14b3f9e85afa3:0000",
         "github:15fd8993d4c83da0175b:0000"
       ],
@@ -523,7 +523,7 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:a6554bbb1509d01634fe:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:20b9738afecb8dd9a88f:0000",
         "github:3105a500821b20e8ca6e:0000",
         "faq:7c53dc6a70cb43df4d27:0000"
@@ -538,10 +538,10 @@
       "rewritten": "minimum score final project certificate data engineering zoomcamp",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:709ac87966a02499fb40:0001",
         "faq:a6554bbb1509d01634fe:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:20b9738afecb8dd9a88f:0000"
       ],
       "relevant": [
@@ -577,8 +577,8 @@
       "rewritten": "python version data engineering zoomcamp",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000"
@@ -589,14 +589,14 @@
     },
     {
       "query": "I ran this command successfully but no internal files were found in the ny_taxi_postgres_data like I could see in the video lecture. Am I missing something? @user docker run -it \\ -e POSTGRES_USER=\"root\" \\ -e POSTGRES_PASSWORD=\"root\" \\ -e POSTGRES_DB=\"ny_taxi\" \\ -v /workspaces/DataEngineering/Docker/ny_taxi_postgres_data:/var/lib/postgresql/data \\ -p 5432:5432 \\ postgres:13",
-      "rewritten": "docker run command no internal files found ny_taxi_postgres_data missing data engineering",
+      "rewritten": "data engineering internal files not found ny_taxi_postgres_data docker command issue",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "faq:c7c469a2858c6fca27fb:0000",
         "faq:c4acb4c251dacf73ef65:0000",
-        "faq:6ed8d3b36a7edd64dcbe:0000",
-        "faq:b2cd9dce33a72c65a379:0000",
-        "faq:935032000f3ba574dc15:0000"
+        "faq:c7c469a2858c6fca27fb:0000",
+        "faq:8a318ed96ece58798bfd:0000",
+        "faq:721872b9f13369279cf9:0000",
+        "faq:d48c6afd070aea8dd6e3:0000"
       ],
       "relevant": [
         "faq:c7c469a2858c6fca27fb:0000",
@@ -654,14 +654,14 @@
     },
     {
       "query": "@user I just started the SQL Refresher video. The teacher starts by saying “I downloaded the zone table and ingested it into postgres”. I am trying to follow along. Can you give me code to download and ingest the zones table? I’m on a mac.",
-      "rewritten": "download ingest zones table Postgres Mac SQL code",
+      "rewritten": "download ingest zones table Postgres Mac code",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:bb4de4ab975e4f04ba7b:0000",
-        "faq:1bb256efe30ff28800cb:0000",
-        "github:21a73c1537bc16ad7b0e:0001",
         "faq:93acffca922fd70232b0:0000",
-        "faq:fb2f15a4e52ab4757294:0000"
+        "faq:fb2f15a4e52ab4757294:0000",
+        "faq:b421befbfd6211358d4d:0000",
+        "faq:5e118973ffbc360973eb:0000"
       ],
       "relevant": [
         "faq:21d5b8bb0f3697eaa4b0:0000",
@@ -674,10 +674,10 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:f050153612758007988f:0000",
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:709ac87966a02499fb40:0001",
         "faq:42976f4b7ae5fa5da488:0000",
-        "course_markdown:71edc44a7864c724ba0b:0002"
+        "course_docs:709ac87966a02499fb40:0002"
       ],
       "relevant": [
         "faq:0d66982ba3f1745988d6:0000",
@@ -686,14 +686,14 @@
     },
     {
       "query": "Should I clone the course repo and make changes to scripts inside it? Are there dependencies built into the repo which should be there in order to move through the different software tools and processes across the weeks?",
-      "rewritten": "clone course repository dependencies software tools processes",
+      "rewritten": "clone course repository modify scripts dependencies software tools processes",
       "course": "data-engineering-zoomcamp",
       "ranked": [
+        "github:a3a23b88831a609470bf:0000",
         "faq:2b14c6b8059e4e75fabd:0000",
         "faq:19408e6a6305f870b4db:0000",
         "faq:a1c82ae63a78fc5a9790:0000",
-        "faq:a1aa00c5cc16a2afd9e6:0000",
-        "faq:51d0ca188aee71d1caba:0000"
+        "faq:a1aa00c5cc16a2afd9e6:0000"
       ],
       "relevant": [
         "faq:e900d75cca670294e789:0000",
@@ -724,11 +724,11 @@
       "rewritten": "advanced SQL optimization learning resources recommendations",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:01c0d5b08a2f45563c1e:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0001",
-        "course_markdown:01c0d5b08a2f45563c1e:0002",
-        "course_markdown:01c0d5b08a2f45563c1e:0003",
-        "course_markdown:01c0d5b08a2f45563c1e:0004"
+        "course_docs:de413183ac52ef7fb268:0000",
+        "course_docs:de413183ac52ef7fb268:0001",
+        "course_docs:de413183ac52ef7fb268:0002",
+        "course_docs:de413183ac52ef7fb268:0003",
+        "course_docs:de413183ac52ef7fb268:0004"
       ],
       "relevant": [
         "github:e8420f759611441143eb:0000",
@@ -739,11 +739,11 @@
     },
     {
       "query": "Please, how long does this take? It's been 4 hours now. Thanks",
-      "rewritten": "data engineering zoomcamp duration time taken",
+      "rewritten": "data engineering zoomcamp duration time taken length",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000"
@@ -772,7 +772,7 @@
     },
     {
       "query": "Is there any advantage to installing Docker as a VS Code extension?",
-      "rewritten": "advantage installing Docker VS Code extension benefits",
+      "rewritten": "advantages of installing Docker as a Visual Studio Code extension, benefits of Docker integration with VS Code",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:523c079d343079250fd3:0000",
@@ -803,13 +803,13 @@
     },
     {
       "query": "@user Can we have all services like Kestra, a postgres for Kestra metadata, a postgress for NYC data and PgAdmin from a single docker compose file? Would it be best practice to run Kestra, and postgres for Kestra metadata together while isolating the other postgress container for NYC data and PGAdmin into another docker compose file?",
-      "rewritten": "data engineering docker compose file multiple services Kestra Postgres metadata PgAdmin best practices isolation",
+      "rewritten": "data engineering docker compose file services Kestra Postgres metadata PgAdmin best practices isolation",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:bb4de4ab975e4f04ba7b:0000",
         "faq:50efae2ad6a9b7ad3a74:0000",
-        "github:f7a65b85a6fe722e7bf8:0000",
         "faq:3920947d68877b42dfa3:0000",
+        "github:f7a65b85a6fe722e7bf8:0000",
         "faq:a3e42228e7b1065f2ef9:0000"
       ],
       "relevant": [
@@ -936,10 +936,10 @@
       "rewritten": "final submit form overwrite replace commit id modifications data engineering",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:709ac87966a02499fb40:0001",
         "github:e8420f759611441143eb:0004",
-        "course_markdown:71edc44a7864c724ba0b:0002",
+        "course_docs:709ac87966a02499fb40:0002",
         "github:e8420f759611441143eb:0000"
       ],
       "relevant": [
@@ -949,7 +949,7 @@
     },
     {
       "query": "@user is it too late to join current cohort?",
-      "rewritten": "data engineering zoomcamp join current cohort late enrollment",
+      "rewritten": "data engineering zoomcamp join current cohort late registration",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:d6240b94273aecd2c71b:0000",
@@ -965,14 +965,14 @@
     },
     {
       "query": "```pip3 install pgcli``` Worked for me on mac instead of ```pip install pgcli``` Is that correct?",
-      "rewritten": "pip3 install pgcli mac correct",
+      "rewritten": "\"pip3 install pgcli mac vs pip install pgcli\"",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:3b364decccd9789728d6:0000",
         "faq:721872b9f13369279cf9:0000",
         "faq:33259533d27a4f08990e:0000",
         "faq:22c2c80753e7e9efff15:0000",
-        "faq:fb2f15a4e52ab4757294:0000"
+        "faq:5e7a3886d49e968a3270:0000"
       ],
       "relevant": [
         "github:556dc1aacfe8a2de71ff:0001"
@@ -987,7 +987,7 @@
         "github:e8420f759611441143eb:0004",
         "github:e8420f759611441143eb:0000",
         "faq:4a507d33ebe46b346eda:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000"
+        "course_docs:a231472470e3a07272da:0000"
       ],
       "relevant": [
         "github:0c5d046412e2a18f9855:0001",
@@ -1036,7 +1036,7 @@
         "faq:e237ddf81034a389040e:0000",
         "github:acd3d6cd824f6ccee514:0000",
         "faq:90c4c883afcff610f4c7:0000",
-        "course_markdown:40633aff3027c6ce47e6:0000"
+        "course_docs:068b4d26038618d923cf:0000"
       ],
       "relevant": [
         "faq:4ee8367abb45f84e200b:0000",
@@ -1052,7 +1052,7 @@
       "rewritten": "recording methods for AI development tools in Zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:2fc5ee97bd54348e9f9a:0002",
         "github:7fb3d748da668b090b73:0000",
         "github:4432a28bdfb7c183bc09:0002",
@@ -1064,14 +1064,14 @@
     },
     {
       "query": "Has anyone had problems while using OpenAI where you can't select codex models, e.g. 'gpt-5.1-codex'? Other models seem to work fine (e.g. 5.2), but get timeout when select the codex models.",
-      "rewritten": "OpenAI codex model selection issues, timeout errors with codex models, problems using OpenAI codex models",
+      "rewritten": "OpenAI codex model selection issues timeout error",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:e237ddf81034a389040e:0000",
-        "github:acd3d6cd824f6ccee514:0000",
-        "faq:4ee8367abb45f84e200b:0000",
-        "faq:e9c490091e221a5b6063:0000",
-        "faq:5a45c33f3823f6206ac7:0000"
+        "faq:3c4862263aee375141d7:0000",
+        "github:867340e4193ffb8a9b3a:0000",
+        "github:867340e4193ffb8a9b3a:0001",
+        "github:867340e4193ffb8a9b3a:0002"
       ],
       "relevant": [
         "faq:e237ddf81034a389040e:0000"
@@ -1082,7 +1082,7 @@
       "rewritten": "project evaluation criteria review, project assessment interface, deadline validity, due date format",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "github:9ad98a1fd55f40f87266:0001",
         "github:9ad98a1fd55f40f87266:0002",
@@ -1098,12 +1098,12 @@
     },
     {
       "query": "Hey @user Quick Question - I am joining the course today. So, is it mandatory to submit all the homeworks plus the final project for the certification (I might miss the 1st homework) or just the final project plus 3 peer reviews are enough for certification? Thanks",
-      "rewritten": "ai-dev-tools-zoomcamp certification requirements homework final project peer reviews submission policy",
+      "rewritten": "ai-dev-tools-zoomcamp certification requirements homework final project peer reviews",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:7d0b1559c2eb847ac3ee:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
+        "course_docs:64e63fbb0be2aef573c9:0001",
         "faq:dc595bd47f2d4b696a6d:0000",
         "faq:0b3d86363694603db83b:0000"
       ],
@@ -1118,7 +1118,7 @@
       "rewritten": "AI development tools project requirements details, final project expectations, Alexey video sufficiency",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:6b6ca3ed7e624a5a1153:0000",
         "faq:dc595bd47f2d4b696a6d:0000",
         "faq:0b3d86363694603db83b:0000",
@@ -1155,7 +1155,7 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:d5307d2c5d443f5bd7c9:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:dc595bd47f2d4b696a6d:0000",
         "faq:909e01ce29bc36d1c3e1:0000",
         "faq:7d0b1559c2eb847ac3ee:0000"
@@ -1170,7 +1170,7 @@
       "rewritten": "prompts documentation AI development tools Zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
         "github:4432a28bdfb7c183bc09:0002",
         "github:2fc5ee97bd54348e9f9a:0002",
@@ -1185,10 +1185,10 @@
       "rewritten": "AI course tutorials, YouTube resources, learning materials for AI development tools",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:6fe7aea7238522ffa863:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
         "faq:91613626c1fe97e66721:0000",
         "github:4432a28bdfb7c183bc09:0002",
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "faq:a94dff494eda5f5d0d33:0000"
       ],
       "relevant": [
@@ -1233,7 +1233,7 @@
       "rewritten": "course start date ai development tools zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
         "github:4432a28bdfb7c183bc09:0002",
         "faq:a94dff494eda5f5d0d33:0000",
@@ -1251,7 +1251,7 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:3d39ff9f5c06e3496978:0000",
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "faq:91613626c1fe97e66721:0000",
         "faq:a5c30c130954951ee3c9:0000",
         "github:7fb3d748da668b090b73:0000"
@@ -1281,14 +1281,14 @@
     },
     {
       "query": "@user When I tried to push the evaluation peer's project attempt 1 report to GitHub, there was an issue with missing files and improper configuration, along with missing submodule files in the project. Now it's fixed, but the commit ID is different. Should I make it in project attempt 2? @user",
-      "rewritten": "GitHub push issue missing files improper configuration submodule files project attempt 1 commit ID different project attempt 2",
+      "rewritten": "GitHub push issue missing files improper configuration submodule files commit ID project attempt 2",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "github:acd3d6cd824f6ccee514:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
         "faq:01cf6ced8a2d7ca1b64c:0000",
-        "github:9ad98a1fd55f40f87266:0000",
-        "faq:444d3ec794a73fbcf2f0:0000"
+        "faq:444d3ec794a73fbcf2f0:0000",
+        "course_docs:627999670d4245bda6ce:0000",
+        "github:9ad98a1fd55f40f87266:0000"
       ],
       "relevant": [
         "course_markdown:0b3ab7eaf58a65fc62b9:0000",
@@ -1302,7 +1302,7 @@
       "rewritten": "AI development tools Zoomcamp similarity ML Zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
         "github:4432a28bdfb7c183bc09:0002",
         "github:2fc5ee97bd54348e9f9a:0002",
@@ -1318,7 +1318,7 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:91613626c1fe97e66721:0000",
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "faq:4ee8367abb45f84e200b:0000",
         "faq:a94dff494eda5f5d0d33:0000",
         "github:7fb3d748da668b090b73:0000"
@@ -1348,14 +1348,14 @@
     },
     {
       "query": "Module 3 mcp hw Q4, ```Count how many times the word \"data\" appears on Use available MCP tools for that``` were the answers matching the option ? I manually counted the word \"data\" in the website and I am close to the answer that AI gives me .But that answer doesn't match with the options . Anyone facing similar issue ? I am not sure if I am doing it wrongly or not !!",
-      "rewritten": "Module 3 MCP homework question 4 count occurrences of the word \"data\" using available MCP tools, answer options mismatch, troubleshooting issues with AI response",
+      "rewritten": "Module 3 MCP homework question 4 count occurrences of the word \"data\" using MCP tools, answer options mismatch, troubleshooting issues",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "github:e5cc0e6eb4c1ee36a825:0002",
-        "github:867340e4193ffb8a9b3a:0001",
         "faq:3c4862263aee375141d7:0000",
-        "github:867340e4193ffb8a9b3a:0002",
-        "github:e5cc0e6eb4c1ee36a825:0000"
+        "github:e5cc0e6eb4c1ee36a825:0000",
+        "github:867340e4193ffb8a9b3a:0001",
+        "github:867340e4193ffb8a9b3a:0002"
       ],
       "relevant": [
         "github:867340e4193ffb8a9b3a:0001",
@@ -1365,14 +1365,14 @@
     },
     {
       "query": "Is the live streaming for module 1 already ended? Im not sure with my google calendar date.",
-      "rewritten": "live streaming module 1 schedule date confirmation",
+      "rewritten": "live streaming module 1 schedule date google calendar",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:3d39ff9f5c06e3496978:0000",
+        "faq:feb3b2424b6753e805eb:0000",
         "faq:c0e2e4e5c7f330c6e61f:0000",
-        "github:e5cc0e6eb4c1ee36a825:0000",
-        "github:0b5d2b9c8aa8279eec68:0001",
-        "github:f52d7bed7650ee28ccee:0000"
+        "github:86e1ec29beae0ac53aa3:0000",
+        "github:86e1ec29beae0ac53aa3:0001"
       ],
       "relevant": [
         "faq:3d39ff9f5c06e3496978:0000"
@@ -1383,7 +1383,7 @@
       "rewritten": "join session ai development tools zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
         "github:4432a28bdfb7c183bc09:0002",
         "github:2fc5ee97bd54348e9f9a:0002",
@@ -1413,14 +1413,14 @@
     },
     {
       "query": "Am I too late for the course?",
-      "rewritten": "course enrollment deadline ai development tools zoomcamp late registration",
+      "rewritten": "course enrollment deadline ai development tools zoom camp late registration",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:19530e73974110df510f:0000",
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
-        "github:7fb3d748da668b090b73:0000",
         "github:4432a28bdfb7c183bc09:0002",
-        "faq:a94dff494eda5f5d0d33:0000"
+        "faq:a94dff494eda5f5d0d33:0000",
+        "github:2fc5ee97bd54348e9f9a:0002",
+        "github:2fc5ee97bd54348e9f9a:0003"
       ],
       "relevant": [
         "faq:19530e73974110df510f:0000"
@@ -1428,14 +1428,14 @@
     },
     {
       "query": "My TODO app ( has a spoons theme and a read only \"demo mode\"!",
-      "rewritten": "TODO app demo mode spoons theme",
+      "rewritten": "TODO app demo mode, read-only mode, AI development tools",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:10f9261b4197e68b7747:0000",
-        "faq:b91a4880208a93b84e0e:0000",
         "github:4432a28bdfb7c183bc09:0000",
         "github:4432a28bdfb7c183bc09:0002",
-        "github:e5cc0e6eb4c1ee36a825:0002"
+        "faq:b91a4880208a93b84e0e:0000",
+        "github:2fc5ee97bd54348e9f9a:0002"
       ],
       "relevant": [
         "github:4432a28bdfb7c183bc09:0000",
@@ -1446,13 +1446,13 @@
     },
     {
       "query": "The deadline for reviewing projects for attempt 2 is February 2 @user ? That is super tight to properly review 3 projects",
-      "rewritten": "project review deadline February 2 AI development tools Zoomcamp attempt 2",
+      "rewritten": "project review deadline February 2 attempt 2 AI development tools",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
-        "github:7fb3d748da668b090b73:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:4432a28bdfb7c183bc09:0002",
+        "github:4432a28bdfb7c183bc09:0000",
+        "github:4432a28bdfb7c183bc09:0001",
         "github:2fc5ee97bd54348e9f9a:0002"
       ],
       "relevant": [
@@ -1479,14 +1479,14 @@
     },
     {
       "query": "Hi is there a certificate for this course as for the other courses? I did not see any mention of it on Github or the FAQ document.",
-      "rewritten": "certificate availability ai-dev-tools-zoomcamp, certification for ai development tools course, course completion certificate",
+      "rewritten": "certificate availability ai-dev-tools-zoomcamp, certification for ai development tools course, certificate information GitHub FAQ",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "faq:a94dff494eda5f5d0d33:0000",
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
-        "faq:188661039c9657ea6667:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
+        "github:4432a28bdfb7c183bc09:0002",
         "github:2fc5ee97bd54348e9f9a:0003",
-        "faq:19530e73974110df510f:0000"
+        "faq:a94dff494eda5f5d0d33:0000",
+        "course_docs:627999670d4245bda6ce:0000"
       ],
       "relevant": [
         "faq:19530e73974110df510f:0000",
@@ -1498,7 +1498,7 @@
       "rewritten": "capstone project submission results certificate timeline",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "github:9ad98a1fd55f40f87266:0001",
         "github:9ad98a1fd55f40f87266:0002",
@@ -1545,12 +1545,12 @@
     },
     {
       "query": "is it possible to sign up and earn a certificate?",
-      "rewritten": "sign up certificate stock markets analytics zoomcamp, earn credential, obtain certification",
+      "rewritten": "sign up certificate stock markets analytics zoomcamp enrollment completion",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
+        "faq:7fa7254856401546d684:0000",
         "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0001",
-        "github:a856c67b5bc1fb391b3e:0000",
         "github:a6f4b4790dbe4ecc03b0:0003",
         "github:a6f4b4790dbe4ecc03b0:0004"
       ],
@@ -1664,14 +1664,14 @@
     },
     {
       "query": "Hi @user, I am struggling with Pandas (data wrangling) here and and feel I need to learn more on this to follow up. Can you please suggest some good path to improve Pandas skills?",
-      "rewritten": "Pandas data wrangling skills improvement resources suggestions",
+      "rewritten": "Pandas data wrangling improvement resources, learning path for Pandas skills, enhance Pandas proficiency",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "faq:38da5709a3604370ab29:0000",
         "github:870b1af63006b109ef47:0000",
-        "faq:00bb62946a92a0428b33:0000",
-        "faq:2d642c1830d68b2e8bd6:0000",
-        "github:5a6380ea229a9ab84cdf:0000"
+        "faq:99dedb2d9920aacdbec7:0000",
+        "faq:576056c3c07de5eb914b:0000",
+        "faq:00bb62946a92a0428b33:0000"
       ],
       "relevant": [
         "faq:38da5709a3604370ab29:0000",
@@ -1731,7 +1731,7 @@
     },
     {
       "query": "Also, to make the trading simulation more realistic, wouldn't it be better to calculate the revenue based on the purchase being made at the open the following day? The model classifies \"is future growth\" by calculating the difference in the adjusted closing prices, but in real life it would not be possible to make the purchase at the exact closing price.",
-      "rewritten": "trading simulation revenue calculation purchase open next day adjusted closing prices real life execution accuracy",
+      "rewritten": "trading simulation revenue calculation purchase open next day adjusted closing prices real life execution limitations",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "faq:e40956bbba85ca49e680:0000",
@@ -1748,14 +1748,14 @@
     },
     {
       "query": "Hi, regarding HW2/Q2: I have 2 dataframes: IPOs and history data. To generate 30 columns in IPO dataframe i need to make \"lookup\" into history data dataframe. Is the numpy.select way to go or may I use something else?",
-      "rewritten": "stock markets analytics homework 2 question 2 dataframes IPOs history data lookup numpy select alternative methods",
+      "rewritten": "stock markets analytics homework 2 question 2 dataframes IPOs history data lookup numpy select alternatives",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0003",
         "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0001",
         "github:a6f4b4790dbe4ecc03b0:0004",
-        "faq:576056c3c07de5eb914b:0000"
+        "github:a6f4b4790dbe4ecc03b0:0005"
       ],
       "relevant": [
         "github:fd971ea3f2c8c009e272:0000",
@@ -1767,14 +1767,14 @@
     },
     {
       "query": "Hello everyone, regarding question 2 have you been able to get the data for all ipos? I have scraped all ticker symbols and mapped them to the ones for yahoo. Afterwards when trying to fetch all data from yahoo I am missing out on three. ['JVSA']: Exception(\"%ticker%: Data doesn't exist for startDate = 1705640400, endDate = 1709269200\") Any hints would be much appreciated. Cheers!",
-      "rewritten": "stock markets analytics IPO data scraping Yahoo Finance missing data exception",
+      "rewritten": "stock markets analytics course IPO data missing ticker symbols Yahoo data fetching exception",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
+        "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0003",
         "github:a6f4b4790dbe4ecc03b0:0001",
-        "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0004",
-        "github:a6f4b4790dbe4ecc03b0:0005"
+        "faq:fee12090d112a347da62:0000"
       ],
       "relevant": [
         "faq:c56b397b9a6ff6f476f9:0000",
@@ -1816,14 +1816,14 @@
     },
     {
       "query": "@user is there a timeline for this course? e.g. when the project starts/finishes, when different modules start...",
-      "rewritten": "stock markets analytics zoomcamp course timeline project start finish module schedule",
+      "rewritten": "stock markets analytics zoomcamp course timeline project start finish module start dates",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0000",
-        "github:a6f4b4790dbe4ecc03b0:0001",
         "github:a6f4b4790dbe4ecc03b0:0002",
-        "github:a6f4b4790dbe4ecc03b0:0005",
-        "github:a6f4b4790dbe4ecc03b0:0004"
+        "github:a6f4b4790dbe4ecc03b0:0001",
+        "github:a6f4b4790dbe4ecc03b0:0004",
+        "github:a6f4b4790dbe4ecc03b0:0005"
       ],
       "relevant": [
         "faq:3679658cf6907597ede5:0000",
@@ -1865,7 +1865,7 @@
     },
     {
       "query": "I doubt that I will be able to finish homework 3 by the deadline. Is it possible to get an extension for the submission?",
-      "rewritten": "stock markets analytics zoomcamp homework 3 extension submission deadline",
+      "rewritten": "stock markets analytics homework 3 extension submission deadline",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0000",
@@ -1996,14 +1996,14 @@
     },
     {
       "query": "Would there perhaps be an attempt 2 ? Thanks",
-      "rewritten": "stock markets analytics attempt 2, second attempt, resubmission",
+      "rewritten": "attempt 2 stock markets analytics zoomcamp",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0001",
-        "github:3453a6ca42ce7c182d42:0004",
         "github:a6f4b4790dbe4ecc03b0:0004",
-        "github:a6f4b4790dbe4ecc03b0:0002"
+        "github:a6f4b4790dbe4ecc03b0:0002",
+        "github:a6f4b4790dbe4ecc03b0:0003"
       ],
       "relevant": [
         "github:3453a6ca42ce7c182d42:0005"
@@ -2032,7 +2032,7 @@
     },
     {
       "query": "Hi, when is the next livestream for module 5 ?",
-      "rewritten": "next livestream module 5 stock markets analytics zoomcamp",
+      "rewritten": "next livestream module 5 stock markets analytics",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0000",
@@ -2063,14 +2063,14 @@
     },
     {
       "query": "Does anyone have notes of the lectures so far? The Zoom recordings are helpful, yes, but it would be great to have an open document of notes to refer back to learn the concepts. :grinning: @user",
-      "rewritten": "stock markets analytics lecture notes, stock markets analytics class notes, stock markets analytics Zoom recordings",
+      "rewritten": "stock markets analytics course lecture notes document recordings",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0001",
-        "github:a6f4b4790dbe4ecc03b0:0004",
         "github:a6f4b4790dbe4ecc03b0:0002",
-        "github:a6f4b4790dbe4ecc03b0:0003"
+        "faq:fee12090d112a347da62:0000",
+        "github:a6f4b4790dbe4ecc03b0:0004"
       ],
       "relevant": [
         "faq:a6b13fb6ac87b626e3a5:0000"
@@ -2162,6 +2162,37 @@
       ],
       "relevant": [
         "github:3453a6ca42ce7c182d42:0005"
+      ]
+    },
+    {
+      "query": "where can i get hw can someone help?",
+      "rewritten": "LLM Zoomcamp homework location assistance",
+      "course": "llm-zoomcamp",
+      "ranked": [
+        "course_docs:26715af90e4affdebb1d:0000",
+        "faq:8dea410c6d6b8d306941:0000",
+        "github:bd71dcbe8135d74a1622:0000",
+        "github:6224ed610ab718f50aae:0000",
+        "github:3b2cc907e946ed59caa4:0000"
+      ],
+      "relevant": [
+        "faq:62de0d848de3e822f80b:0000"
+      ]
+    },
+    {
+      "query": "Where do I find the syllabus and the homework for the Data Engineering Zoomcamp?",
+      "rewritten": "syllabus homework Data Engineering Zoomcamp",
+      "course": "data-engineering-zoomcamp",
+      "ranked": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:15fd8993d4c83da0175b:0000",
+        "github:dfa90ce1cd0a2a17231a:0000",
+        "github:a346def14b3f9e85afa3:0000",
+        "github:c4edd66d3de4285fcda7:0000"
+      ],
+      "relevant": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:15fd8993d4c83da0175b:0000"
       ]
     }
   ]

@@ -1,12 +1,12 @@
 {
   "metrics": {
-    "hit@1": 0.2188,
-    "hit@3": 0.3438,
-    "hit@5": 0.4375,
-    "mrr@1": 0.2188,
-    "mrr@3": 0.2682,
-    "mrr@5": 0.2889,
-    "n": 128
+    "hit@1": 0.2231,
+    "hit@3": 0.3154,
+    "hit@5": 0.3923,
+    "mrr@1": 0.2231,
+    "mrr@3": 0.2577,
+    "mrr@5": 0.2754,
+    "n": 130
   },
   "rows": [
     {
@@ -17,7 +17,7 @@
         "github:6fa6663fa04f9550898d:0000",
         "github:6fa6663fa04f9550898d:0001",
         "github:6dbd7efb2fa1bdb036b3:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:1a2945f02abc813b8c2f:0000"
       ],
       "relevant": [
@@ -29,8 +29,8 @@
       "rewritten": "data engineering zoomcamp taxi_ingest container permissions issue",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "faq:0c5e4572677ca99d5de3:0000",
         "faq:69c667180e3d2482abde:0000",
         "github:15fd8993d4c83da0175b:0000"
@@ -42,7 +42,7 @@
     },
     {
       "query": "I want dbt cloud to output datasets to `dbt_traffic_data` instead of `dbt_kanewilliams` (default behaviour, it appears to use my name). I've tried changing my `dbt_project.yml` by adding: ```models: my_project_name: schema: dbt_traffic_data``` But then it will output to `dbt_kanewilliams_dbt_traffic_data` :dizzy_face: Any advice?",
-      "rewritten": "dbt cloud output datasets schema change issue",
+      "rewritten": "dbt cloud output datasets schema change dbt_traffic_data",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "github:f9b531f1331e1ba0ba25:0000",
@@ -61,7 +61,7 @@
       "rewritten": "data engineering zoomcamp homework github repo September 2019",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000",
@@ -129,7 +129,7 @@
         "faq:4a507d33ebe46b346eda:0000",
         "faq:a6554bbb1509d01634fe:0000",
         "faq:20b9738afecb8dd9a88f:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:3105a500821b20e8ca6e:0000"
       ],
       "relevant": [
@@ -148,11 +148,11 @@
       "rewritten": "data engineering zoomcamp cloud resources cost responsibility",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0001",
-        "course_markdown:01c0d5b08a2f45563c1e:0003",
-        "course_markdown:01c0d5b08a2f45563c1e:0002"
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:de413183ac52ef7fb268:0000",
+        "course_docs:de413183ac52ef7fb268:0001",
+        "course_docs:de413183ac52ef7fb268:0003",
+        "course_docs:de413183ac52ef7fb268:0002"
       ],
       "relevant": [
         "github:0c5d046412e2a18f9855:0000"
@@ -163,9 +163,9 @@
       "rewritten": "data engineering zoomcamp week 2 github update",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:c4edd66d3de4285fcda7:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0001",
         "github:c4edd66d3de4285fcda7:0001",
         "github:15fd8993d4c83da0175b:0000"
       ],
@@ -177,7 +177,7 @@
     },
     {
       "query": "Question on Week 5 (de zoomcamp 05 03): Was VSCode merely used to perform port forwarding for Jupyter Notebook? I am guessing that in the past when we set up Airflow, that was not necessary because we defined the port in airflow-webserver. Trying to understand the process here, thanks! Edit: Or is it because Alex was working on a remote server? I'm using Windows on WSL, btw",
-      "rewritten": "VSCode port forwarding Jupyter Notebook Week 5 Zoomcamp Airflow remote server WSL",
+      "rewritten": "VSCode port forwarding Jupyter Notebook Airflow remote server WSL",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:68efe811077b7ab26ab0:0000",
@@ -194,7 +194,7 @@
     },
     {
       "query": "GCP cloud: I'm looking for ways to lower my expenses on GCP platform as I plan to keep my project active for an extended period. Specifically, I'm interested in starting my GCP machine at a specific time, running a Prefect worker at a scheduled time, and then shutting down the machine when it's not required for deployment. Can you suggest some options for achieving this?",
-      "rewritten": "GCP cost reduction scheduled machine Prefect worker automation",
+      "rewritten": "GCP cost reduction schedule machine Prefect worker automation",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:b0735bee5949966f7fdc:0000",
@@ -210,11 +210,11 @@
     },
     {
       "query": "Hi, guys! If I start the Self-paced version now, will I have my task’s review by any mentor or smth like that? How can I check if I do everything correctly? Thank you in advance",
-      "rewritten": "data engineering zoomcamp self-paced task review mentor feedback",
+      "rewritten": "data engineering zoomcamp self-paced task review mentor",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "faq:a6554bbb1509d01634fe:0000",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000"
@@ -230,9 +230,9 @@
       "rewritten": "data engineering zoomcamp prerequisites web analytics background",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:a1fe1290c9d289e62e42:0000",
-        "course_markdown:a1fe1290c9d289e62e42:0001",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:594058ba6e1d5fa14d13:0000",
+        "course_docs:594058ba6e1d5fa14d13:0001",
+        "course_docs:a231472470e3a07272da:0000",
         "github:73ac0c6b0634c3ac1b5f:0000",
         "github:73ac0c6b0634c3ac1b5f:0001"
       ],
@@ -249,9 +249,9 @@
       "rewritten": "data engineering zoomcamp week 2 assignment",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:c4edd66d3de4285fcda7:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0001",
         "github:c4edd66d3de4285fcda7:0001",
         "github:15fd8993d4c83da0175b:0000"
       ],
@@ -299,8 +299,8 @@
       "rewritten": "data engineering zoomcamp review deadline 3 projects",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:a346def14b3f9e85afa3:0000",
         "github:e8420f759611441143eb:0004",
         "github:15fd8993d4c83da0175b:0000"
@@ -312,11 +312,11 @@
     },
     {
       "query": "please help error not resolve anyone ??",
-      "rewritten": "data engineering zoomcamp error help",
+      "rewritten": "data engineering zoomcamp error resolution",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000"
@@ -349,8 +349,8 @@
       "rewritten": "data engineering zoomcamp 4th session join late",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "faq:df18042ca0ad4b877253:0000",
         "github:dfa90ce1cd0a2a17231a:0000"
@@ -365,14 +365,14 @@
     },
     {
       "query": "Hi, I am following the de-zoomcamp on Youtube. I am wondering what kind of extension you used to have the dropdown on VS code?",
-      "rewritten": "VS Code dropdown extension for data engineering Zoomcamp",
+      "rewritten": "VS Code dropdown extension de-zoomcamp",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
         "faq:523c079d343079250fd3:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
-        "github:15fd8993d4c83da0175b:0000",
-        "github:dfa90ce1cd0a2a17231a:0000"
+        "faq:64110d744209b9a6a3fb:0000",
+        "faq:4f22bea01fe30e85d85c:0000",
+        "faq:773f631d992a79ba3bc1:0000",
+        "faq:60d190e86bb48c2d0df3:0000"
       ],
       "relevant": [
         "faq:523c079d343079250fd3:0000",
@@ -402,11 +402,11 @@
       "rewritten": "data engineering zoomcamp week 1 lectures watch",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:c4edd66d3de4285fcda7:0000",
         "github:c4edd66d3de4285fcda7:0001",
         "github:9377b4e2c4fd705fb835:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001"
+        "course_docs:a231472470e3a07272da:0001"
       ],
       "relevant": [
         "github:2cdc17e7ece87cdd717a:0000",
@@ -419,9 +419,9 @@
       "rewritten": "data engineering zoomcamp project commit review deadline code mismatch",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:0ee68f84cef8944c0e7f:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0001",
         "github:a346def14b3f9e85afa3:0000",
         "github:e8420f759611441143eb:0004"
       ],
@@ -438,7 +438,7 @@
       "ranked": [
         "faq:1bb256efe30ff28800cb:0000",
         "faq:f050153612758007988f:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:c963f6e89b75337a20ea:0000",
         "faq:9f07b9f1efda296d4ca6:0000"
       ],
@@ -453,11 +453,11 @@
       "rewritten": "data engineering zoomcamp course hours challenge extension Google Summer of Code",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:1f57afa0bb8482296e50:0000",
         "faq:b6f31d097f9f82a0efb1:0000",
         "github:c4edd66d3de4285fcda7:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001"
+        "course_docs:a231472470e3a07272da:0001"
       ],
       "relevant": [
         "faq:b6f31d097f9f82a0efb1:0000",
@@ -488,8 +488,8 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:4a507d33ebe46b346eda:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:a346def14b3f9e85afa3:0000",
         "github:15fd8993d4c83da0175b:0000"
       ],
@@ -524,7 +524,7 @@
       "ranked": [
         "faq:a6554bbb1509d01634fe:0000",
         "faq:20b9738afecb8dd9a88f:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "github:3105a500821b20e8ca6e:0000",
         "faq:7c53dc6a70cb43df4d27:0000"
       ],
@@ -538,10 +538,10 @@
       "rewritten": "minimum score final project certificate data engineering zoomcamp",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:709ac87966a02499fb40:0001",
         "faq:a6554bbb1509d01634fe:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:20b9738afecb8dd9a88f:0000"
       ],
       "relevant": [
@@ -577,8 +577,8 @@
       "rewritten": "python version data engineering zoomcamp",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000"
@@ -589,14 +589,14 @@
     },
     {
       "query": "I ran this command successfully but no internal files were found in the ny_taxi_postgres_data like I could see in the video lecture. Am I missing something? @user docker run -it \\ -e POSTGRES_USER=\"root\" \\ -e POSTGRES_PASSWORD=\"root\" \\ -e POSTGRES_DB=\"ny_taxi\" \\ -v /workspaces/DataEngineering/Docker/ny_taxi_postgres_data:/var/lib/postgresql/data \\ -p 5432:5432 \\ postgres:13",
-      "rewritten": "data engineering zoomcamp ny taxi postgres data internal files missing",
+      "rewritten": "ny_taxi_postgres_data internal files missing docker command issue",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "faq:f95f159e24502f3814dd:0000",
-        "faq:b9c8c9997af81cbda9e9:0000",
-        "github:9780656cf35fc1edc552:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "faq:bb4de4ab975e4f04ba7b:0000"
+        "faq:c7c469a2858c6fca27fb:0000",
+        "faq:c4acb4c251dacf73ef65:0000",
+        "faq:935032000f3ba574dc15:0000",
+        "faq:fb2f15a4e52ab4757294:0000",
+        "faq:b2cd9dce33a72c65a379:0000"
       ],
       "relevant": [
         "faq:c7c469a2858c6fca27fb:0000",
@@ -623,14 +623,14 @@
     },
     {
       "query": "Hello, When I run this command docker run -it -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -e POSTGRES_DB=\"ny_taxi\" -v C:\\data-engineering-zoomcamp\\2_docker_sql -p 5432:5432 postgres:13 it works fine as in the video but the ny_taxi_postgres_data folder I created in VS is empty unlike in the video. What seems to be the problem? Thanks a lot",
-      "rewritten": "docker run postgres empty volume issue",
+      "rewritten": "docker run postgres empty folder issue",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:bb4de4ab975e4f04ba7b:0000",
-        "faq:c7c469a2858c6fca27fb:0000",
-        "faq:457474aae701ee82d907:0000",
-        "faq:cfdd4058f0fe5ff22033:0000",
-        "faq:b2cd9dce33a72c65a379:0000"
+        "faq:b2cd9dce33a72c65a379:0000",
+        "faq:6ed8d3b36a7edd64dcbe:0000",
+        "faq:935032000f3ba574dc15:0000",
+        "faq:8fa39e47d5d32ff92bc3:0000"
       ],
       "relevant": [
         "faq:c7c469a2858c6fca27fb:0000",
@@ -639,14 +639,14 @@
     },
     {
       "query": "Hello all, I am very new to codespaces and got a little confused after watching the first (2) videos and the \"using github codespaces for the course\" video. Is Github codespaces an alternative to using using cli/git bash to ingest the data and create docker file? @user In other words, can I do use codespaces to work through all of Module 1's videos? Any help would be appreciated!",
-      "rewritten": "Github Codespaces alternative CLI Git Bash Module 1",
+      "rewritten": "Github Codespaces data engineering course Module 1",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:d3e9ba2a14e4e00c4cbf:0000",
-        "faq:4eb5fe1b472ec981c890:0000",
         "faq:5ec231e47003e3d60d35:0000",
-        "faq:e900d75cca670294e789:0000",
-        "faq:1dd1cb78cb2b6fd752d7:0000"
+        "faq:1dd1cb78cb2b6fd752d7:0000",
+        "faq:1749a60003fb7b7d367c:0000",
+        "faq:fd0d9d1cf7bd9953487d:0000"
       ],
       "relevant": [
         "faq:1dd1cb78cb2b6fd752d7:0000"
@@ -674,10 +674,10 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:f050153612758007988f:0000",
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:709ac87966a02499fb40:0001",
         "faq:42976f4b7ae5fa5da488:0000",
-        "course_markdown:71edc44a7864c724ba0b:0002"
+        "course_docs:709ac87966a02499fb40:0002"
       ],
       "relevant": [
         "faq:0d66982ba3f1745988d6:0000",
@@ -691,8 +691,8 @@
       "ranked": [
         "github:a3a23b88831a609470bf:0000",
         "faq:2b14c6b8059e4e75fabd:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000"
       ],
       "relevant": [
@@ -703,12 +703,12 @@
     },
     {
       "query": "@user course timeline and dates please for 2025?",
-      "rewritten": "data engineering zoomcamp course timeline dates 2025",
+      "rewritten": "data engineering zoomcamp 2025 course timeline dates",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "github:dfa90ce1cd0a2a17231a:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:a346def14b3f9e85afa3:0000"
       ],
@@ -724,11 +724,11 @@
       "rewritten": "advanced SQL learning resources",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:01c0d5b08a2f45563c1e:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0001",
-        "course_markdown:01c0d5b08a2f45563c1e:0002",
-        "course_markdown:01c0d5b08a2f45563c1e:0003",
-        "course_markdown:01c0d5b08a2f45563c1e:0004"
+        "course_docs:de413183ac52ef7fb268:0000",
+        "course_docs:de413183ac52ef7fb268:0001",
+        "course_docs:de413183ac52ef7fb268:0002",
+        "course_docs:de413183ac52ef7fb268:0003",
+        "course_docs:de413183ac52ef7fb268:0004"
       ],
       "relevant": [
         "github:e8420f759611441143eb:0000",
@@ -742,8 +742,8 @@
       "rewritten": "data engineering zoomcamp duration",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000"
@@ -755,7 +755,7 @@
     },
     {
       "query": "Does anyone have any information on installing docker + Postgres on MacBook ?",
-      "rewritten": "install docker postgres MacBook",
+      "rewritten": "install docker Postgres MacBook",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:bb4de4ab975e4f04ba7b:0000",
@@ -823,8 +823,8 @@
       "rewritten": "data engineering zoomcamp root password issue",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0000",
+        "course_docs:a231472470e3a07272da:0001",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000"
@@ -836,7 +836,7 @@
     },
     {
       "query": "just completed the env gcp setup video, ( WOW ) do we need to apply the terraform since it's not being done? or we can just pause this portion. my terraform, docker, postgres etc are all verified working.. tks",
-      "rewritten": "GCP setup Terraform pause data engineering",
+      "rewritten": "GCP setup terraform pause data engineering",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "github:c7da9f3440d2aa214400:0000",
@@ -878,9 +878,9 @@
       "rewritten": "data engineering zoomcamp project deadline presentation",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:1293dbd54237f4ddeee6:0000",
+        "course_docs:a231472470e3a07272da:0000",
         "faq:0ee68f84cef8944c0e7f:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0001",
+        "course_docs:a231472470e3a07272da:0001",
         "github:a346def14b3f9e85afa3:0000",
         "github:e8420f759611441143eb:0004"
       ],
@@ -897,14 +897,14 @@
     },
     {
       "query": "Hi everyone, I just joined the Data Engineering zoomcamp and got to know that it started in January. I'm excited to be here, but since I joined late, I’m wondering if I can still catch up and be eligible for the certificate if I complete everything now. Also, will there be another cohort after this one in case I want to join from the start next time? Thanks a lot",
-      "rewritten": "data engineering zoomcamp catch up eligibility certificate next cohort",
+      "rewritten": "data engineering zoomcamp late join eligibility certificate next cohort",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
         "github:a346def14b3f9e85afa3:0000",
-        "github:c4edd66d3de4285fcda7:0000",
-        "faq:a6554bbb1509d01634fe:0000"
+        "faq:20b9738afecb8dd9a88f:0000",
+        "github:c4edd66d3de4285fcda7:0000"
       ],
       "relevant": [
         "faq:254eec3a633795627379:0000",
@@ -936,11 +936,11 @@
       "rewritten": "overwrite final submit form data-engineering-zoomcamp",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:71edc44a7864c724ba0b:0002",
-        "course_markdown:71edc44a7864c724ba0b:0001",
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:04750021c1f219e67f0d:0001",
-        "course_markdown:01c0d5b08a2f45563c1e:0001"
+        "course_docs:709ac87966a02499fb40:0002",
+        "course_docs:709ac87966a02499fb40:0001",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:bee0aa698bb1132784b0:0001",
+        "course_docs:de413183ac52ef7fb268:0001"
       ],
       "relevant": [
         "github:b165b40a063514657dee:0000",
@@ -949,13 +949,13 @@
     },
     {
       "query": "@user is it too late to join current cohort?",
-      "rewritten": "data engineering zoomcamp join current cohort deadline",
+      "rewritten": "data engineering zoomcamp join current cohort late",
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:d6240b94273aecd2c71b:0000",
-        "github:a346def14b3f9e85afa3:0000",
         "github:15fd8993d4c83da0175b:0000",
         "github:dfa90ce1cd0a2a17231a:0000",
+        "github:a346def14b3f9e85afa3:0000",
         "github:c4edd66d3de4285fcda7:0000"
       ],
       "relevant": [
@@ -1036,7 +1036,7 @@
         "faq:e237ddf81034a389040e:0000",
         "github:acd3d6cd824f6ccee514:0000",
         "faq:90c4c883afcff610f4c7:0000",
-        "course_markdown:40633aff3027c6ce47e6:0000"
+        "course_docs:068b4d26038618d923cf:0000"
       ],
       "relevant": [
         "faq:4ee8367abb45f84e200b:0000",
@@ -1052,11 +1052,11 @@
       "rewritten": "ai-dev-tools-zoomcamp recording methods",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:f8541e0bb2076aa6613b:0000"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
+        "course_docs:053a276ae7369e53cbe8:0000"
       ],
       "relevant": [
         "faq:b91a4880208a93b84e0e:0000"
@@ -1064,14 +1064,14 @@
     },
     {
       "query": "Has anyone had problems while using OpenAI where you can't select codex models, e.g. 'gpt-5.1-codex'? Other models seem to work fine (e.g. 5.2), but get timeout when select the codex models.",
-      "rewritten": "OpenAI codex models timeout issue",
+      "rewritten": "OpenAI codex model selection issues timeout",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:e237ddf81034a389040e:0000",
-        "github:acd3d6cd824f6ccee514:0000",
-        "faq:e9c490091e221a5b6063:0000",
-        "faq:4ee8367abb45f84e200b:0000",
-        "github:4432a28bdfb7c183bc09:0000"
+        "github:867340e4193ffb8a9b3a:0000",
+        "github:867340e4193ffb8a9b3a:0001",
+        "github:867340e4193ffb8a9b3a:0002",
+        "github:acd3d6cd824f6ccee514:0000"
       ],
       "relevant": [
         "faq:e237ddf81034a389040e:0000"
@@ -1082,9 +1082,9 @@
       "rewritten": "AI Dev Tools Zoomcamp project review criteria deadline issue",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "faq:a94dff494eda5f5d0d33:0000"
       ],
@@ -1101,9 +1101,9 @@
       "rewritten": "ai-dev-tools-zoomcamp certification requirements homework final project peer reviews",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:7d0b1559c2eb847ac3ee:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
+        "course_docs:64e63fbb0be2aef573c9:0001",
         "faq:dc595bd47f2d4b696a6d:0000",
         "faq:0b3d86363694603db83b:0000"
       ],
@@ -1118,11 +1118,11 @@
       "rewritten": "ai-dev-tools-zoomcamp project details Alexey video",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:6b6ca3ed7e624a5a1153:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000"
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:c7895cd76da176721d92:0000"
       ],
       "relevant": [
         "github:9ad98a1fd55f40f87266:0000",
@@ -1135,14 +1135,14 @@
     },
     {
       "query": "Just arrived! What’d I miss?",
-      "rewritten": "ai-dev-tools-zoomcamp missed session recap",
+      "rewritten": "ai-dev-tools-zoomcamp missed content",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:f8541e0bb2076aa6613b:0000"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:053a276ae7369e53cbe8:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:79f60e9e9e73212772c5:0000"
       ],
       "relevant": [
         "github:0b5d2b9c8aa8279eec68:0001",
@@ -1151,12 +1151,12 @@
     },
     {
       "query": "I want to develop a patrol monitoring system using front end and backend fast api . this system will classify the images from the cameras installed in the city based on the image classifier (trained with images) and send warnings to control system for any suspicious activity. Is this okay for the project as I am also mixing ML into it, is that fine ?",
-      "rewritten": "patrol monitoring system front end backend FastAPI image classification ML project",
+      "rewritten": "patrol monitoring system front end backend FastAPI image classification machine learning project",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
-        "faq:dc595bd47f2d4b696a6d:0000",
         "faq:d5307d2c5d443f5bd7c9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
+        "faq:dc595bd47f2d4b696a6d:0000",
         "faq:909e01ce29bc36d1c3e1:0000",
         "faq:7d0b1559c2eb847ac3ee:0000"
       ],
@@ -1173,8 +1173,8 @@
         "faq:6b6ca3ed7e624a5a1153:0000",
         "faq:90c4c883afcff610f4c7:0000",
         "faq:444d3ec794a73fbcf2f0:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001"
       ],
       "relevant": [
         "faq:6b6ca3ed7e624a5a1153:0000"
@@ -1197,12 +1197,12 @@
     },
     {
       "query": "Hello, the project evaluation page mentions evaluating 3 or more peer projects. How do we do that and how do we share the reviews? What should we look for while reviewing? Please share more details on that.",
-      "rewritten": "AI Dev Tools Zoomcamp project evaluation peer review process",
+      "rewritten": "\"AI Dev Tools Zoomcamp project evaluation peer review process\"",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "faq:a94dff494eda5f5d0d33:0000"
       ],
@@ -1233,11 +1233,11 @@
       "rewritten": "ai-dev-tools-zoomcamp course start date",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:f8541e0bb2076aa6613b:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:6fe7aea7238522ffa863:0000"
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:053a276ae7369e53cbe8:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:79f60e9e9e73212772c5:0000"
       ],
       "relevant": [
         "course_markdown:f8541e0bb2076aa6613b:0000",
@@ -1253,8 +1253,8 @@
         "faq:3d39ff9f5c06e3496978:0000",
         "faq:91613626c1fe97e66721:0000",
         "faq:a5c30c130954951ee3c9:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001"
       ],
       "relevant": [
         "faq:3d39ff9f5c06e3496978:0000"
@@ -1268,8 +1268,8 @@
         "faq:3d39ff9f5c06e3496978:0000",
         "faq:91613626c1fe97e66721:0000",
         "faq:a5c30c130954951ee3c9:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:4678338b0d70d17c8eeb:0000"
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:64e63fbb0be2aef573c9:0000"
       ],
       "relevant": [
         "faq:3d39ff9f5c06e3496978:0000",
@@ -1285,7 +1285,7 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:01cf6ced8a2d7ca1b64c:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "github:9ad98a1fd55f40f87266:0001",
         "faq:90c4c883afcff610f4c7:0000"
@@ -1299,14 +1299,14 @@
     },
     {
       "query": "yea I wonder too. is it similar with ml zoomcamp?",
-      "rewritten": "ai-dev-tools-zoomcamp vs ml zoomcamp comparison",
+      "rewritten": "ai-dev-tools-zoomcamp similar to ml zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
-        "faq:e9c490091e221a5b6063:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:d72033710ce5010c2a33:0000"
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:6ab0746963a803232d6a:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
+        "course_docs:c7895cd76da176721d92:0000"
       ],
       "relevant": [
         "faq:d5307d2c5d443f5bd7c9:0000"
@@ -1319,9 +1319,9 @@
       "ranked": [
         "faq:4ee8367abb45f84e200b:0000",
         "faq:90c4c883afcff610f4c7:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:40633aff3027c6ce47e6:0000"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
+        "course_docs:068b4d26038618d923cf:0000"
       ],
       "relevant": [
         "faq:a94dff494eda5f5d0d33:0000",
@@ -1348,7 +1348,7 @@
     },
     {
       "query": "Module 3 mcp hw Q4, ```Count how many times the word \"data\" appears on Use available MCP tools for that``` were the answers matching the option ? I manually counted the word \"data\" in the website and I am close to the answer that AI gives me .But that answer doesn't match with the options . Anyone facing similar issue ? I am not sure if I am doing it wrongly or not !!",
-      "rewritten": "\"ai-dev-tools-zoomcamp Module 3 mcp hw Q4 count word data discrepancy\"",
+      "rewritten": "\"ai-dev-tools-zoomcamp Module 3 mcp hw Q4 count word data\"",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "github:e5cc0e6eb4c1ee36a825:0002",
@@ -1365,14 +1365,14 @@
     },
     {
       "query": "Is the live streaming for module 1 already ended? Im not sure with my google calendar date.",
-      "rewritten": "\"ai-dev-tools-zoomcamp module 1 live streaming schedule\"",
+      "rewritten": "ai-dev-tools-zoomcamp module 1 live streaming date",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:3d39ff9f5c06e3496978:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:053a276ae7369e53cbe8:0000",
+        "course_docs:79f60e9e9e73212772c5:0000"
       ],
       "relevant": [
         "faq:3d39ff9f5c06e3496978:0000"
@@ -1384,10 +1384,10 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:19530e73974110df510f:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:6fe7aea7238522ffa863:0000"
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:79f60e9e9e73212772c5:0000"
       ],
       "relevant": [
         "faq:3d39ff9f5c06e3496978:0000"
@@ -1399,10 +1399,10 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "faq:7d0b1559c2eb847ac3ee:0000",
-        "course_markdown:d72033710ce5010c2a33:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:1d78cacc49ce4458bc5b:0000"
+        "course_docs:6ab0746963a803232d6a:0000",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:c7895cd76da176721d92:0000"
       ],
       "relevant": [
         "faq:7d0b1559c2eb847ac3ee:0000",
@@ -1416,11 +1416,11 @@
       "rewritten": "\"ai-dev-tools-zoomcamp enrollment deadline\"",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:f8541e0bb2076aa6613b:0000"
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
+        "course_docs:053a276ae7369e53cbe8:0000"
       ],
       "relevant": [
         "faq:19530e73974110df510f:0000"
@@ -1449,9 +1449,9 @@
       "rewritten": "AI Dev Tools Zoomcamp project review deadline February 2",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "faq:a94dff494eda5f5d0d33:0000"
       ],
@@ -1465,7 +1465,7 @@
       "rewritten": "Module 2 recording AI Dev Tools Zoomcamp Lovable frontend video",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
         "faq:909e01ce29bc36d1c3e1:0000",
         "github:86e1ec29beae0ac53aa3:0000",
@@ -1482,11 +1482,11 @@
       "rewritten": "ai-dev-tools-zoomcamp certificate availability",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:f8541e0bb2076aa6613b:0000"
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
+        "course_docs:053a276ae7369e53cbe8:0000"
       ],
       "relevant": [
         "faq:19530e73974110df510f:0000",
@@ -1498,11 +1498,11 @@
       "rewritten": "capstone project submission results certificate ai-dev-tools-zoomcamp",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
-        "course_markdown:4678338b0d70d17c8eeb:0001",
-        "course_markdown:4678338b0d70d17c8eeb:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000"
+        "course_docs:627999670d4245bda6ce:0000",
+        "course_docs:64e63fbb0be2aef573c9:0001",
+        "course_docs:64e63fbb0be2aef573c9:0000",
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:79f60e9e9e73212772c5:0000"
       ],
       "relevant": [
         "faq:19530e73974110df510f:0000",
@@ -1646,7 +1646,7 @@
     },
     {
       "query": "Hi All, I have absolutely no knowledge on financial analysis. But with an intent to learn about investing in stocks and bonds, I joined the course. Will I make it through the course? :grin::worried:",
-      "rewritten": "stock market analytics beginner financial analysis investing stocks bonds course success",
+      "rewritten": "stock market analytics course beginner financial analysis investing stocks bonds",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0001",
@@ -1767,7 +1767,7 @@
     },
     {
       "query": "Hello everyone, regarding question 2 have you been able to get the data for all ipos? I have scraped all ticker symbols and mapped them to the ones for yahoo. Afterwards when trying to fetch all data from yahoo I am missing out on three. ['JVSA']: Exception(\"%ticker%: Data doesn't exist for startDate = 1705640400, endDate = 1709269200\") Any hints would be much appreciated. Cheers!",
-      "rewritten": "stock market analytics IPO data Yahoo ticker symbols scraping issue",
+      "rewritten": "stock market analytics IPO data Yahoo ticker symbols issue",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0001",
@@ -1783,14 +1783,14 @@
     },
     {
       "query": "Hi, is anyone managing to achieve valid results for H4 Q2? I do not get any prediction with CAGR ≥ 1.1 and Avg. daily investments ≈ 5... The best I can get is 1.08 and 5.07 respectively, but miss the answers threshold's scope by .01.",
-      "rewritten": "H4 Q2 stock market analytics CAGR prediction results",
+      "rewritten": "stock markets analytics H4 Q2 CAGR prediction results",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0001",
         "github:a6f4b4790dbe4ecc03b0:0004",
-        "github:a6f4b4790dbe4ecc03b0:0002",
-        "github:a6f4b4790dbe4ecc03b0:0005"
+        "github:a6f4b4790dbe4ecc03b0:0005",
+        "github:a6f4b4790dbe4ecc03b0:0002"
       ],
       "relevant": [
         "github:f5acca194517c317d6be:0004",
@@ -1847,7 +1847,7 @@
     },
     {
       "query": "Does anyone know what “find dividends impact on Close vs. Adj.Close… Open/Close for 06-25 diff is close to divs = 1.845 (~1.58 for Open and 1.3 for Close)” mean under \"2.2 OHLCV data daily – ETFs\"?",
-      "rewritten": "dividends impact Close Adj.Close Open Close 06-25 OHLCV ETFs",
+      "rewritten": "dividends impact Close vs Adj.Close Open Close 06-25 OHLCV data ETFs",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "faq:7b86942c9a16dfa49095:0000",
@@ -1880,12 +1880,12 @@
     },
     {
       "query": "@user, the selected_df filtered as specified in HW2, using a freshly generated by week 2 Colab's parquet file (m16), gives me 1566 entries, 2 less than the number of trades you indicate. Won't this impact the result?",
-      "rewritten": "stock markets analytics HW2 filtered dataframe parquet file discrepancy",
+      "rewritten": "stock markets analytics HW2 filtered dataframe discrepancy trades",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
-        "faq:08577f379873383559b6:0000",
         "github:a6f4b4790dbe4ecc03b0:0000",
         "github:a6f4b4790dbe4ecc03b0:0001",
+        "github:a6f4b4790dbe4ecc03b0:0005",
         "github:a6f4b4790dbe4ecc03b0:0004",
         "github:a6f4b4790dbe4ecc03b0:0002"
       ],
@@ -2135,14 +2135,14 @@
     },
     {
       "query": "yf.Ticker methods, such as “calendar” and “financials” return “no summary info” for several stocks I tried. Is it only the case for me or anyone else has experienced it? Any solution? @user",
-      "rewritten": "yf.Ticker calendar financials no summary info issue",
+      "rewritten": "yf.Ticker methods calendar financials no summary info issue",
       "course": "stock-markets-analytics-zoomcamp",
       "ranked": [
         "faq:1dcf7dc93f8d8a2d6f2f:0000",
         "github:653d41deac677abd77d4:0000",
+        "faq:576056c3c07de5eb914b:0000",
         "faq:c56b397b9a6ff6f476f9:0000",
-        "github:436537d6e481ac665c34:0002",
-        "github:f5acca194517c317d6be:0001"
+        "github:436537d6e481ac665c34:0002"
       ],
       "relevant": [
         "faq:1dcf7dc93f8d8a2d6f2f:0000",
@@ -2162,6 +2162,37 @@
       ],
       "relevant": [
         "github:3453a6ca42ce7c182d42:0005"
+      ]
+    },
+    {
+      "query": "where can i get hw can someone help?",
+      "rewritten": "llm-zoomcamp homework help",
+      "course": "llm-zoomcamp",
+      "ranked": [
+        "faq:62de0d848de3e822f80b:0000",
+        "faq:c410560b7350f8796bd0:0000",
+        "faq:a1aabdb5a87e71dc1807:0000",
+        "faq:23a9c9dab417e8ee9a89:0000",
+        "github:b37e25fdd02116f0b3c7:0005"
+      ],
+      "relevant": [
+        "faq:62de0d848de3e822f80b:0000"
+      ]
+    },
+    {
+      "query": "Where do I find the syllabus and the homework for the Data Engineering Zoomcamp?",
+      "rewritten": "data engineering zoomcamp syllabus homework",
+      "course": "data-engineering-zoomcamp",
+      "ranked": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:15fd8993d4c83da0175b:0000",
+        "github:dfa90ce1cd0a2a17231a:0000",
+        "github:a346def14b3f9e85afa3:0000",
+        "github:c4edd66d3de4285fcda7:0000"
+      ],
+      "relevant": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:15fd8993d4c83da0175b:0000"
       ]
     }
   ]

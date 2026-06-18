@@ -1,12 +1,12 @@
 {
   "metrics": {
-    "hit@1": 0.2422,
-    "hit@3": 0.4688,
-    "hit@5": 0.5547,
-    "mrr@1": 0.2422,
-    "mrr@3": 0.3424,
-    "mrr@5": 0.3624,
-    "n": 128
+    "hit@1": 0.2385,
+    "hit@3": 0.4692,
+    "hit@5": 0.5538,
+    "mrr@1": 0.2385,
+    "mrr@3": 0.3397,
+    "mrr@5": 0.3594,
+    "n": 130
   },
   "rows": [
     {
@@ -97,8 +97,8 @@
       "ranked": [
         "faq:2f084c0aae570a07823f:0000",
         "faq:8eca61c7bea6d51af879:0000",
-        "course_markdown:04750021c1f219e67f0d:0000",
-        "course_markdown:04750021c1f219e67f0d:0001",
+        "course_docs:bee0aa698bb1132784b0:0000",
+        "course_docs:bee0aa698bb1132784b0:0001",
         "faq:15e608ad71f1d9ed223a:0000"
       ],
       "relevant": [
@@ -148,10 +148,10 @@
       "rewritten": "Anyone from DTC staff or not who knows the answer to this? \" when evaluating/running the three other projects from our peers, who is responsible/taking care of the cost for the cloud resources? \"",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:01c0d5b08a2f45563c1e:0000",
-        "course_markdown:01c0d5b08a2f45563c1e:0002",
-        "course_markdown:01c0d5b08a2f45563c1e:0001",
-        "course_markdown:01c0d5b08a2f45563c1e:0004",
+        "course_docs:de413183ac52ef7fb268:0000",
+        "course_docs:de413183ac52ef7fb268:0002",
+        "course_docs:de413183ac52ef7fb268:0001",
+        "course_docs:de413183ac52ef7fb268:0004",
         "faq:ceb97a82afd064526ffa:0000"
       ],
       "relevant": [
@@ -230,11 +230,11 @@
       "rewritten": "Hello everybody, I hope you're doing well :slightly_smiling_face: I was wondering what are the prerequisites for the Zoomcamp? I am very interested as my employer will open a new branch for data engineering, but coming from a webanalytics background, i'm not so sure I can follow up ? I am looking forward to hearing from you",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:a1fe1290c9d289e62e42:0000",
-        "course_markdown:a1fe1290c9d289e62e42:0001",
+        "course_docs:594058ba6e1d5fa14d13:0000",
+        "course_docs:594058ba6e1d5fa14d13:0001",
         "faq:c75272fb838622c63861:0000",
         "faq:fab0fb1bfcdfeff0da42:0000",
-        "course_markdown:1293dbd54237f4ddeee6:0000"
+        "course_docs:a231472470e3a07272da:0000"
       ],
       "relevant": [
         "course_markdown:a1fe1290c9d289e62e42:0000",
@@ -539,10 +539,10 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:a6554bbb1509d01634fe:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
-        "course_markdown:71edc44a7864c724ba0b:0000",
+        "course_docs:709ac87966a02499fb40:0001",
+        "course_docs:709ac87966a02499fb40:0000",
         "faq:20b9738afecb8dd9a88f:0000",
-        "course_markdown:71edc44a7864c724ba0b:0002"
+        "course_docs:709ac87966a02499fb40:0002"
       ],
       "relevant": [
         "faq:20b9738afecb8dd9a88f:0000",
@@ -674,9 +674,9 @@
       "course": "data-engineering-zoomcamp",
       "ranked": [
         "faq:f050153612758007988f:0000",
-        "course_markdown:71edc44a7864c724ba0b:0000",
+        "course_docs:709ac87966a02499fb40:0000",
         "faq:42976f4b7ae5fa5da488:0000",
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0001",
         "faq:0ee68f84cef8944c0e7f:0000"
       ],
       "relevant": [
@@ -924,7 +924,7 @@
         "faq:0a42a177fcb480bee4a8:0000",
         "faq:72ba114b5cab17e950d3:0000",
         "faq:8eca61c7bea6d51af879:0000",
-        "course_markdown:04750021c1f219e67f0d:0000"
+        "course_docs:bee0aa698bb1132784b0:0000"
       ],
       "relevant": [
         "faq:f283244c81c2f8ee23ef:0000",
@@ -936,10 +936,10 @@
       "rewritten": "Hi guys, regarding the final submit form... I submitted the form but I had to make some modifications afterwards. Is there a way to overwrite the submit I did in order to replace the commit id?",
       "course": "data-engineering-zoomcamp",
       "ranked": [
-        "course_markdown:71edc44a7864c724ba0b:0001",
+        "course_docs:709ac87966a02499fb40:0001",
         "faq:9dfea5d795bd9990e1c0:0000",
-        "course_markdown:71edc44a7864c724ba0b:0000",
-        "course_markdown:71edc44a7864c724ba0b:0002",
+        "course_docs:709ac87966a02499fb40:0000",
+        "course_docs:709ac87966a02499fb40:0002",
         "faq:257a9ec436d53483a670:0000"
       ],
       "relevant": [
@@ -1101,7 +1101,7 @@
       "rewritten": "Hey @user Quick Question - I am joining the course today. So, is it mandatory to submit all the homeworks plus the final project for the certification (I might miss the 1st homework) or just the final project plus 3 peer reviews are enough for certification? Thanks",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:19530e73974110df510f:0000",
         "github:0b5d2b9c8aa8279eec68:0003",
         "faq:dc595bd47f2d4b696a6d:0000",
@@ -1121,7 +1121,7 @@
         "faq:6b6ca3ed7e624a5a1153:0000",
         "faq:72d0aba4c850e7609b8d:0000",
         "github:9ad98a1fd55f40f87266:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "faq:19382026e631d6c30b9a:0000"
       ],
       "relevant": [
@@ -1157,7 +1157,7 @@
         "faq:7d0b1559c2eb847ac3ee:0000",
         "faq:19530e73974110df510f:0000",
         "faq:d5307d2c5d443f5bd7c9:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000"
       ],
       "relevant": [
@@ -1285,7 +1285,7 @@
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
         "github:acd3d6cd824f6ccee514:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:9ad98a1fd55f40f87266:0000",
         "faq:444d3ec794a73fbcf2f0:0000",
         "faq:01cf6ced8a2d7ca1b64c:0000"
@@ -1302,11 +1302,11 @@
       "rewritten": "yea I wonder too. is it similar with ml zoomcamp?",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "github:7fb3d748da668b090b73:0000",
-        "course_markdown:d72033710ce5010c2a33:0000",
+        "course_docs:6ab0746963a803232d6a:0000",
         "faq:d5307d2c5d443f5bd7c9:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000"
+        "course_docs:79f60e9e9e73212772c5:0000"
       ],
       "relevant": [
         "faq:d5307d2c5d443f5bd7c9:0000"
@@ -1482,10 +1482,10 @@
       "rewritten": "Hi is there a certificate for this course as for the other courses? I did not see any mention of it on Github or the FAQ document.",
       "course": "ai-dev-tools-zoomcamp",
       "ranked": [
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
-        "course_markdown:6fe7aea7238522ffa863:0000",
-        "course_markdown:1d78cacc49ce4458bc5b:0000",
-        "course_markdown:2fe6dfe53383b0e9bfdf:0000",
+        "course_docs:627999670d4245bda6ce:0000",
+        "course_docs:79f60e9e9e73212772c5:0000",
+        "course_docs:c7895cd76da176721d92:0000",
+        "course_docs:4c97d0ef7bb2a6a3d199:0000",
         "faq:7d0b1559c2eb847ac3ee:0000"
       ],
       "relevant": [
@@ -1500,7 +1500,7 @@
       "ranked": [
         "faq:19382026e631d6c30b9a:0000",
         "faq:fe314c674907e6762b66:0000",
-        "course_markdown:0b3ab7eaf58a65fc62b9:0000",
+        "course_docs:627999670d4245bda6ce:0000",
         "github:4432a28bdfb7c183bc09:0000",
         "faq:4cffc8205655046df2ac:0000"
       ],
@@ -2162,6 +2162,37 @@
       ],
       "relevant": [
         "github:3453a6ca42ce7c182d42:0005"
+      ]
+    },
+    {
+      "query": "where can i get hw can someone help?",
+      "rewritten": "where can i get hw can someone help?",
+      "course": "llm-zoomcamp",
+      "ranked": [
+        "faq:a1228141a62c33b0492c:0000",
+        "faq:62de0d848de3e822f80b:0000",
+        "faq:c8f56e94c200058df36a:0000",
+        "faq:a3c2c70a48dfbb968116:0000",
+        "faq:db8bbebfc67160da7f77:0000"
+      ],
+      "relevant": [
+        "faq:62de0d848de3e822f80b:0000"
+      ]
+    },
+    {
+      "query": "Where do I find the syllabus and the homework for the Data Engineering Zoomcamp?",
+      "rewritten": "Where do I find the syllabus and the homework for the Data Engineering Zoomcamp?",
+      "course": "data-engineering-zoomcamp",
+      "ranked": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:15fd8993d4c83da0175b:0000",
+        "github:dfa90ce1cd0a2a17231a:0000",
+        "github:a346def14b3f9e85afa3:0000",
+        "course_docs:a231472470e3a07272da:0001"
+      ],
+      "relevant": [
+        "course_docs:a231472470e3a07272da:0000",
+        "github:15fd8993d4c83da0175b:0000"
       ]
     }
   ]

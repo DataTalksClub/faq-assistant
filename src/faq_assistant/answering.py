@@ -141,7 +141,10 @@ def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str |
             "role": "system",
             "content": (
                 "Rewrite the user's Slack message into a concise keyword search query. "
-                "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
+                "Focus on the underlying problem or topic the user needs information about, and "
+                "drop conversational meta such as 'can someone help', 'any ideas', 'please help', "
+                "or 'I'm stuck' - keep the words that describe what they actually want to find. "
+                "Fix typos, preserve technical terms, and do not answer. "
                 "Expand common abbreviations to their full words (e.g. 'hw' -> 'homework', "
                 "'q' -> 'question', 'env' -> 'environment'). "
                 "Capture the user's intent in a few keywords - do not reduce the query to a single "

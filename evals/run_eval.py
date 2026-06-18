@@ -61,6 +61,17 @@ VARIANTS: dict[str, str | None] = {
         "the course name when provided as metadata. Preserve exact error messages, tool names, "
         "commands, and file names verbatim. Return only the query."
     ),
+    # Mirrors the production rewrite prompt in faq_assistant/answering.py.
+    "production": (
+        "Rewrite the user's Slack message into a concise keyword search query. "
+        "Focus on the underlying problem or topic the user needs information about, and drop "
+        "conversational meta such as 'can someone help', 'any ideas', 'please help', or "
+        "'I'm stuck'. Fix typos, preserve technical terms, and do not answer. Expand common "
+        "abbreviations (e.g. 'hw' -> 'homework', 'q' -> 'question', 'env' -> 'environment'). "
+        "Capture the intent in a few keywords - do not reduce the query to a single vague token. "
+        "Preserve exact error messages, tool names, commands, and file names verbatim. Do not "
+        "include the course name when provided as metadata. Return only the query."
+    ),
 }
 
 
