@@ -80,6 +80,18 @@ def test_non_course_uses_docs_only(ask):
     assert source_labels(r) == {"docs"}, source_labels(r)
 
 
+def test_answer_surfaces_concrete_links_not_vague_pointers(ask):
+    # The Slack doc contains real links (invite page, the how-to video, channel
+    # links); the answer must include one of them, not say "linked there".
+    r = ask("How do I join a Slack channel?", "docs")
+    _assert_answered(r)
+    answer = r["answer"].lower()
+    real_links = ("loom.com", "slack.com/help", "datatalks.club/slack", "app.slack.com")
+    assert any(link in answer for link in real_links), r["answer"]
+    assert "linked there" not in answer
+    assert "see the page" not in answer
+
+
 # --- prompt behaviour ------------------------------------------------------
 
 def test_answer_is_direct_and_cites_sources(ask):
