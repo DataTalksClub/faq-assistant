@@ -201,7 +201,9 @@ def read_github_files(github_config: dict[str, Any], required_prefix: str | None
         filename_filter=filename_filter,
         skip_hidden=True,
     )
-    return reader.read()
+    # The reader's filename_filter is not reliably applied to every path (e.g.
+    # exact root filenames slip through), so re-apply it to the returned files.
+    return [file for file in reader.read() if filename_filter(file.filename)]
 
 
 def github_url(repo: str, ref: str, path: str) -> str:

@@ -153,7 +153,13 @@ scope = "docs"
 repo = "DataTalksClub/docs"
 ref = "main"
 include = ["*.md", "**/*.md"]
-exclude = ["courses/**", "vendor/**", "node_modules/**", ".git/**"]
+# Keep only real published docs (general/**, activities/**, index.md); drop course
+# pages (ingested separately), work-in-progress drafts, and repo tooling/meta files.
+exclude = [
+  "courses/**", "drafts/**", ".claude/**", "_sass/**",
+  "vendor/**", "node_modules/**", ".git/**",
+  "AGENTS.md", "CLAUDE.md", "CONTRIBUTING.md", "README.md", "example-structure.md",
+]
 
 [sources.course_markdown]
 enabled = true
