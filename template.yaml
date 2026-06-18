@@ -85,7 +85,10 @@ Resources:
                   - cloudformation:DescribeChangeSet
                   - cloudformation:ExecuteChangeSet
                   - cloudformation:DeleteChangeSet
-                Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/faq-assistant/*"
+                Resource:
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/faq-assistant/*"
+                  # SAM's --resolve-s3 manages this stack to provision the deploy bucket.
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/aws-sam-cli-managed-default/*"
               - Sid: CloudFormationServerlessTransform
                 Effect: Allow
                 Action: cloudformation:CreateChangeSet
@@ -99,6 +102,13 @@ Resources:
               - Sid: SamDeployBucket
                 Effect: Allow
                 Action:
+                  - s3:CreateBucket
+                  - s3:GetBucketPolicy
+                  - s3:PutBucketPolicy
+                  - s3:PutBucketTagging
+                  - s3:PutBucketVersioning
+                  - s3:PutBucketPublicAccessBlock
+                  - s3:PutEncryptionConfiguration
                   - s3:GetObject
                   - s3:PutObject
                   - s3:GetBucketLocation
