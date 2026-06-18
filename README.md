@@ -129,9 +129,10 @@ init time.
 
 ### CI
 
-`.github/workflows/rebuild-index.yml` rebuilds the corpus + index daily and on demand, smoke-tests
-the handler, and runs `sam deploy`. It needs these repository secrets: `AWS_DEPLOY_ROLE_ARN`,
-`AWS_REGION`, `OPENAI_API_KEY`, `FAQ_ASSISTANT_SHARED_SECRET`.
+`.github/workflows/deploy.yml` runs on push to `main`, a daily cron, and on demand. Every run
+rebuilds the corpus + index from the live sources, smoke-tests the handler, and `sam deploy`s via
+GitHub OIDC. It needs these repository secrets: `AWS_DEPLOY_ROLE_ARN`, `AWS_REGION`,
+`OPENAI_API_KEY`, `FAQ_ASSISTANT_SHARED_SECRET`. See [docs/deployment.md](docs/deployment.md).
 
 ## Smoke-testing the deployed endpoint
 
