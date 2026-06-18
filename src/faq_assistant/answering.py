@@ -104,6 +104,15 @@ def answer_question(
         config, chat, question, rewritten_query, scope, course, results
     )
 
+    # When we couldn't answer, say so plainly, point at who to ask (instructors for
+    # a course channel, community managers elsewhere), and the resources that help.
+    if not found_answer:
+        if scope == "course":
+            answer = "I couldn't find this in the course materials — please ask the instructors."
+        else:
+            answer = "I couldn't find this in the docs — please ask the community managers."
+        sources = fallback_sources(config, scope, course)
+
     latency_ms = (time.time() - started) * 1000.0
     try:
         summary = record_usage(config, source, scope, course, usage, latency_ms, len(results))
@@ -131,8 +140,12 @@ def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str |
         {
             "role": "system",
             "content": (
-                "Rewrite the user's Slack message into one concise keyword search query. "
+                "Rewrite the user's Slack message into a concise keyword search query. "
                 "Fix typos, remove mentions and filler, preserve technical terms, and do not answer. "
+                "Expand common abbreviations to their full words (e.g. 'hw' -> 'homework', "
+                "'q' -> 'question', 'env' -> 'environment'). "
+                "Capture the user's intent in a few keywords - do not reduce the query to a single "
+                "vague token. "
                 "Preserve exact error messages, tool names, commands, and file names verbatim. "
                 "Do not include the course name or DataTalks.Club when they are already provided "
                 "as scope metadata. Keep only the words useful for keyword search. "
@@ -219,6 +232,24 @@ def generate_answer(
     rag_answer = RagAnswer.model_validate(parse_structured_response(response))
     sources = resolve_sources(config, rag_answer, results)
     return rag_answer.answer.strip(), bool(rag_answer.found_answer), sources
+
+
+def fallback_sources(config, scope: str, course: str | None) -> list[dict]:
+    """General resources to suggest when no specific answer was found."""
+    if scope == "course" and course:
+        links = [
+            {"source": "faq", "title": "Course FAQ", "url": f"https://datatalks.club/faq/{course}.html"},
+            {"source": "docs", "title": "Course page", "url": f"https://datatalks.club/docs/courses/{course}/"},
+        ]
+        repos = config.get("courses", {}).get(course, {}).get("github_repositories", [])
+        if repos:
+            links.append({
+                "source": "course-repo",
+                "title": "Course repository",
+                "url": f"https://github.com/{repos[0]['repo']}",
+            })
+        return links
+    return [{"source": "docs", "title": "DataTalks.Club docs", "url": "https://datatalks.club/docs/"}]
 
 
 def resolve_sources(config, rag_answer: RagAnswer, results: list[SearchResult]) -> list[dict]:

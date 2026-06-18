@@ -98,7 +98,7 @@ def load_general_docs_documents(config: dict[str, Any]) -> list[SourceDocument]:
                 section=section_from_path(file.filename),
                 title=title,
                 text=clean_text(file.content),
-                url=github_url(github_config["repo"], github_config["ref"], file.filename),
+                url=docs_site_url(file.filename),
                 repo=github_config["repo"],
                 path=file.filename,
                 source_id=file.filename,
@@ -129,7 +129,7 @@ def load_course_markdown_documents(config: dict[str, Any]) -> list[SourceDocumen
                     section=section_from_path(file.filename),
                     title=title,
                     text=clean_text(file.content),
-                    url=github_url(github_config["repo"], github_config["ref"], file.filename),
+                    url=docs_site_url(file.filename),
                     repo=github_config["repo"],
                     path=file.filename,
                     source_id=file.filename,
@@ -208,6 +208,25 @@ def read_github_files(github_config: dict[str, Any], required_prefix: str | None
 
 def github_url(repo: str, ref: str, path: str) -> str:
     return f"https://github.com/{repo}/blob/{ref}/{path}"
+
+
+DOCS_SITE_BASE = "https://datatalks.club/docs/"
+
+
+def docs_site_url(path: str) -> str:
+    """Map a DataTalksClub/docs repo path to its rendered site URL.
+
+    The site uses Jekyll pretty permalinks under /docs/, e.g.
+    ``general/slack.md`` -> ``https://datatalks.club/docs/general/slack/`` and
+    ``courses/de/getting-started.md`` -> ``.../docs/courses/de/getting-started/``.
+    """
+    slug = path[:-3] if path.endswith(".md") else path
+    if slug == "index":
+        slug = ""
+    elif slug.endswith("/index"):
+        slug = slug[: -len("/index")]
+    url = DOCS_SITE_BASE + slug
+    return url if url.endswith("/") else url + "/"
 
 
 def section_from_path(path: str) -> str:

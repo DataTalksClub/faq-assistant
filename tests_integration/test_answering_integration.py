@@ -80,6 +80,23 @@ def test_non_course_uses_docs_only(ask):
     assert source_labels(r) == {"docs"}, source_labels(r)
 
 
+def test_unanswerable_course_question_points_to_instructors(ask):
+    r = ask("what is the airspeed velocity of an unladen swallow?", "course", DE)
+    assert r["found_answer"] is False
+    assert "instructors" in r["answer"].lower()
+    labels = source_labels(r)
+    assert "faq" in labels
+    assert "docs" in labels
+    assert "course-repo" in labels
+
+
+def test_unanswerable_non_course_question_points_to_community_managers(ask):
+    r = ask("what is the airspeed velocity of an unladen swallow?", "docs")
+    assert r["found_answer"] is False
+    assert "community managers" in r["answer"].lower()
+    assert source_labels(r) == {"docs"}
+
+
 def test_answer_surfaces_concrete_links_not_vague_pointers(ask):
     # The Slack doc contains real links (invite page, the how-to video, channel
     # links); the answer must include one of them, not say "linked there".

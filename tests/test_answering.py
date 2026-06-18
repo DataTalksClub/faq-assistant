@@ -5,6 +5,7 @@ from conftest import mock_chat, mock_index, record
 from faq_assistant.answering import (
     SOURCE_LABELS,
     answer_question,
+    fallback_sources,
     generate_answer,
     resolve_sources,
     search,
@@ -70,6 +71,38 @@ def test_generate_answer_without_context_returns_not_found(cfg):
     assert found is False
     assert sources == []
     assert "couldn't find" in answer.lower()
+
+
+def test_fallback_sources_course_lists_faq_docs_repo(cfg):
+    out = fallback_sources(cfg, "course", "llm-zoomcamp")
+    labels = [s["source"] for s in out]
+    assert "faq" in labels
+    assert "docs" in labels
+    faq = next(s for s in out if s["source"] == "faq")
+    assert faq["url"] == "https://datatalks.club/faq/llm-zoomcamp.html"
+
+
+def test_fallback_sources_non_course_is_docs_home(cfg):
+    assert fallback_sources(cfg, "docs", None) == [
+        {"source": "docs", "title": "DataTalks.Club docs", "url": "https://datatalks.club/docs/"}
+    ]
+
+
+def test_answer_question_not_found_points_to_instructors(cfg):
+    chat = mock_chat(found_answer=False)
+    result = answer_question(cfg, mock_index([record(id="x")]), chat, "huh?", "course", "llm-zoomcamp")
+    assert result["found_answer"] is False
+    assert "ask the instructors" in result["answer"]
+    assert any(s["source"] == "faq" for s in result["sources"])
+
+
+def test_answer_question_not_found_non_course_points_to_community_managers(cfg):
+    chat = mock_chat(found_answer=False)
+    result = answer_question(cfg, mock_index([record(id="x")]), chat, "huh?", "docs", None)
+    assert "community managers" in result["answer"]
+    assert result["sources"] == [
+        {"source": "docs", "title": "DataTalks.Club docs", "url": "https://datatalks.club/docs/"}
+    ]
 
 
 def test_answer_question_returns_structured_payload(cfg):
