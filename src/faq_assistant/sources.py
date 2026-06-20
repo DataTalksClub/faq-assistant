@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-import html as html_lib
 import re
-from datetime import datetime, timedelta, timezone
 from typing import Any
 from urllib.parse import urljoin
 
@@ -31,9 +29,6 @@ def load_source_documents(config: dict[str, Any]) -> list[SourceDocument]:
 
     if config["sources"]["course_repositories"]["enabled"]:
         documents.extend(load_course_repository_documents(config))
-
-    if config["sources"].get("telegram", {}).get("enabled"):
-        documents.extend(load_telegram_documents(config))
 
     return documents
 
@@ -182,139 +177,6 @@ def load_course_repository_documents(config: dict[str, Any]) -> list[SourceDocum
                 )
 
     return documents
-
-
-TELEGRAM_PREVIEW_BASE = "https://t.me/s/"
-TELEGRAM_LINK_BASE = "https://t.me/"
-# Telegram serves an empty preview to some default user agents; use a browser-like one.
-TELEGRAM_USER_AGENT = "Mozilla/5.0 (compatible; faq-assistant-ingest/1.0)"
-
-
-def load_telegram_documents(config: dict[str, Any]) -> list[SourceDocument]:
-    """Index recent posts from each course's public Telegram broadcast channel.
-
-    Uses the keyless ``t.me/s/<channel>`` web preview (no bot token / API key),
-    walking backwards with ``?before=<id>`` until posts predate the lookback
-    window. Only public channels expose this preview.
-    """
-    source_config = config["sources"]["telegram"]
-    lookback_months = int(source_config.get("lookback_months", 12))
-    cutoff = datetime.now(timezone.utc) - timedelta(days=round(lookback_months * 30.44))
-
-    documents: list[SourceDocument] = []
-    for course, course_config in config["courses"].items():
-        channel = str(course_config.get("telegram_channel") or "").strip().lstrip("@")
-        if not channel:
-            continue
-        try:
-            posts = fetch_telegram_posts(channel, cutoff)
-        except Exception as e:
-            print(f"warning: failed to fetch telegram channel {channel}: {e}")
-            continue
-
-        for post in posts:
-            documents.append(
-                SourceDocument(
-                    source_type="telegram",
-                    scope="course",
-                    course=course,
-                    course_name=course_config["name"],
-                    section="Telegram announcements",
-                    title=telegram_title(post["text"]),
-                    text=post["text"],
-                    url=f"{TELEGRAM_LINK_BASE}{post['id']}",
-                    repo=None,
-                    path=None,
-                    source_id=f"telegram:{post['id']}",
-                )
-            )
-
-    return documents
-
-
-def fetch_telegram_posts(
-    channel: str, cutoff: datetime, max_pages: int = 200
-) -> list[dict[str, Any]]:
-    collected: dict[str, dict[str, Any]] = {}
-    before: int | None = None
-
-    for _ in range(max_pages):
-        params = {"before": before} if before else {}
-        response = requests.get(
-            f"{TELEGRAM_PREVIEW_BASE}{channel}",
-            params=params,
-            headers={"User-Agent": TELEGRAM_USER_AGENT},
-            timeout=60,
-        )
-        response.raise_for_status()
-
-        posts = parse_telegram_page(response.text, channel)
-        if not posts:
-            break
-
-        reached_cutoff = False
-        for post in posts:
-            if post["datetime"] < cutoff:
-                reached_cutoff = True
-                continue
-            collected[post["id"]] = post
-
-        if reached_cutoff:
-            break
-        before = min(post["seq"] for post in posts)
-
-    return sorted(collected.values(), key=lambda post: post["seq"], reverse=True)
-
-
-def parse_telegram_page(html_text: str, channel: str) -> list[dict[str, Any]]:
-    anchors = list(re.finditer(rf'data-post="{re.escape(channel)}/(\d+)"', html_text))
-    posts: list[dict[str, Any]] = []
-
-    for index, anchor in enumerate(anchors):
-        seq = int(anchor.group(1))
-        end = anchors[index + 1].start() if index + 1 < len(anchors) else len(html_text)
-        segment = html_text[anchor.end() : end]
-
-        time_match = re.search(r'<time datetime="([^"]+)"', segment)
-        if not time_match:
-            continue
-        posted_at = datetime.fromisoformat(time_match.group(1))
-
-        text_match = re.search(
-            r'tgme_widget_message_text[^>]*>(.*?)</div>', segment, re.DOTALL
-        )
-        text = telegram_html_to_text(text_match.group(1)) if text_match else ""
-        if not text:
-            continue  # media-only / empty post
-
-        posts.append(
-            {"id": f"{channel}/{seq}", "seq": seq, "datetime": posted_at, "text": text}
-        )
-
-    return posts
-
-
-def telegram_html_to_text(fragment: str) -> str:
-    fragment = re.sub(r"<br\s*/?>", "\n", fragment, flags=re.IGNORECASE)
-    # Preserve links as Markdown so the answer can cite the real URL.
-    fragment = re.sub(
-        r'<a\b[^>]*\bhref="([^"]+)"[^>]*>(.*?)</a>',
-        lambda m: f"[{strip_tags(m.group(2))}]({m.group(1)})",
-        fragment,
-        flags=re.DOTALL | re.IGNORECASE,
-    )
-    return clean_text(html_lib.unescape(strip_tags(fragment)))
-
-
-def telegram_title(text: str, limit: int = 80) -> str:
-    first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
-    if len(first_line) > limit:
-        first_line = first_line[: limit - 1].rstrip() + "…"
-    return first_line or "Telegram post"
-
-
-def strip_tags(value: str) -> str:
-    return re.sub(r"<[^>]+>", "", value)
 
 
 def read_github_files(github_config: dict[str, Any], required_prefix: str | None = None):
