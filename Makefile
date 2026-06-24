@@ -33,7 +33,7 @@ check:
 # Assemble the Lambda deployment package. Invoked by SAM (BuildMethod: makefile);
 # CWD is the repo root and ARTIFACTS_DIR is provided by `sam build`.
 build-FaqWorkerFunction:
-	uv pip install --target "$(ARTIFACTS_DIR)" zerosearch==0.3.0
+	uv pip install --target "$(ARTIFACTS_DIR)" zerosearch==0.4.0
 	cp -r src/faq_assistant "$(ARTIFACTS_DIR)/faq_assistant"
 	cp artifacts/search/search-index.zsx "$(ARTIFACTS_DIR)/search-index.zsx"
 

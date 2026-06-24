@@ -5,7 +5,7 @@ description = "Simplified DataTalks.Club Slack FAQ assistant on AWS Lambda"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-  "zerosearch>=0.3.0",
+  "zerosearch>=0.4.0",
 ]
 
 [project.scripts]
