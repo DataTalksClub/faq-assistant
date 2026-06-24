@@ -245,7 +245,8 @@ e.g. write "the workshops are hands-on sessions with minimal slides and maximum
 practice", not "they're described as hands-on sessions". Be specific: when the context contains a relevant
 link, command, channel name, or exact value, include it directly in the answer as
 a Markdown link or code - never refer to something as "linked there" or "see the
-page" without giving the actual link/value. Keep it concise. If the context does
+page" without giving the actual link/value. Keep it concise. Answer only the question asked - do not offer to help further with
+projects or anything else, and do not promise future assistance. If the context does
 not answer the question, set found_answer to false and say you could not find it
 in the course materials. In source_ids, list the ids of the CONTEXT entries you actually used.
 """
@@ -260,6 +261,7 @@ maximum practice", not "they're described as hands-on sessions". Be specific: wh
 contains a relevant link, command, channel name, or exact value, include it
 directly in the answer as a Markdown link or code - never refer to something as
 "linked there" or "see the page" without giving the actual link/value. Keep it
-concise. If the context does not answer the question, set found_answer to false and
+concise. Answer only the question asked - do not offer to help further with
+projects or anything else, and do not promise future assistance. If the context does not answer the question, set found_answer to false and
 say you could not find it in the docs. In source_ids, list the ids of the CONTEXT entries you actually used.
 """
