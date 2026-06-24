@@ -53,6 +53,27 @@ def test_resolve_sources_maps_labels_and_dedupes(cfg):
     ]
 
 
+def test_resolve_sources_collapses_chunks_sharing_a_url(cfg):
+    # Two different chunk ids of the same page share one URL -> one source line.
+    results = [
+        SearchResult(id="cd:1", source_type="course_docs", course="llm-zoomcamp", title="Project", url="u"),
+        SearchResult(id="cd:2", source_type="course_docs", course="llm-zoomcamp", title="Project", url="u"),
+    ]
+    rag = RagAnswer(answer="a", found_answer=True, source_ids=["cd:1", "cd:2"])
+    out = resolve_sources(cfg, rag, results)
+    assert len(out) == 1
+    assert out[0]["url"] == "u"
+
+
+def test_resolve_sources_course_docs_get_breadcrumb_title(cfg):
+    results = [
+        SearchResult(id="cd:1", source_type="course_docs", course="llm-zoomcamp", title="Project", url="u3"),
+    ]
+    rag = RagAnswer(answer="a", found_answer=True, source_ids=["cd:1"])
+    out = resolve_sources(cfg, rag, results)
+    assert out[0]["title"] == "Courses > LLM Zoomcamp > Project"
+
+
 def test_resolve_sources_empty_when_not_found(cfg):
     rag = RagAnswer(answer="no", found_answer=False, source_ids=["faq:1"])
     assert resolve_sources(cfg, rag, _results()) == []

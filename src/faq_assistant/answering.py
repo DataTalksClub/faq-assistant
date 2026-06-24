@@ -269,18 +269,36 @@ def resolve_sources(config, rag_answer: RagAnswer, results: list[SearchResult]) 
     sources: list[dict] = []
     for source_id in rag_answer.source_ids:
         result = by_id.get(source_id)
-        if result is None or result.id in seen:
+        if result is None:
             continue
-        seen.add(result.id)
+        # Collapse multiple cited chunks of the same page/entry: they share a URL,
+        # so without this the same doc shows up several times in the source list.
+        dedup_key = result.url or result.id
+        if dedup_key in seen:
+            continue
+        seen.add(dedup_key)
         sources.append(
             {
                 "id": result.id,
                 "source": SOURCE_LABELS.get(result.source_type, result.source_type),
-                "title": result.title,
+                "title": _source_title(config, result),
                 "url": result.url,
             }
         )
     return sources[: int(config["answering"]["max_sources"])]
+
+
+def _source_title(config, result: SearchResult) -> str:
+    """Display title for a cited source.
+
+    Course doc pages get a breadcrumb ("Courses > LLM Zoomcamp > Project") so the
+    reader can place the page in the course nav; other sources keep their own title.
+    """
+    if result.source_type == "course_docs":
+        course_name = config["courses"].get(result.course, {}).get("name") or result.course
+        parts = [part for part in ("Courses", course_name, result.title) if part]
+        return " > ".join(parts)
+    return result.title
 
 
 def build_context(results: list[SearchResult]) -> str:
