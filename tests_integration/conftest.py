@@ -53,5 +53,16 @@ def retrieve():
     return _retrieve
 
 
-def source_labels(response):
-    return {s["source"] for s in response["sources"]}
+@pytest.fixture
+def source_labels():
+    """Return ``labels(response) -> set`` of the cited source labels.
+
+    Exposed as a fixture (not a bare module function) so the test module never
+    has to ``from conftest import ...``; that bare import collides with the unit
+    suite's ``tests/conftest.py`` when a single ``pytest`` run collects both.
+    """
+
+    def _labels(response):
+        return {s["source"] for s in response["sources"]}
+
+    return _labels

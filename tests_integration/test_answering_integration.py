@@ -10,8 +10,6 @@ Scenarios:
   outside course: docs only
 """
 
-from conftest import source_labels
-
 LLM = "llm-zoomcamp"
 DE = "data-engineering-zoomcamp"
 
@@ -25,19 +23,19 @@ def _assert_answered(response):
 
 # --- llm-zoomcamp ----------------------------------------------------------
 
-def test_llm_answer_in_docs(ask):
+def test_llm_answer_in_docs(ask, source_labels):
     r = ask("What are the prerequisites for the LLM Zoomcamp?", "course", LLM)
     _assert_answered(r)
     assert "docs" in source_labels(r), source_labels(r)
 
 
-def test_llm_answer_in_lessons(ask):
+def test_llm_answer_in_lessons(ask, source_labels):
     r = ask("What topics and modules does the LLM Zoomcamp cover?", "course", LLM)
     _assert_answered(r)
     assert "course-repo" in source_labels(r), source_labels(r)
 
 
-def test_llm_answer_in_faq(ask):
+def test_llm_answer_in_faq(ask, source_labels):
     r = ask("How should I start the course and follow the weekly workflow?", "course", LLM)
     _assert_answered(r)
     assert "faq" in source_labels(r), source_labels(r)
@@ -45,19 +43,19 @@ def test_llm_answer_in_faq(ask):
 
 # --- data-engineering-zoomcamp ---------------------------------------------
 
-def test_de_answer_in_docs(ask):
+def test_de_answer_in_docs(ask, source_labels):
     r = ask("What are the prerequisites for the Data Engineering Zoomcamp?", "course", DE)
     _assert_answered(r)
     assert "docs" in source_labels(r), source_labels(r)
 
 
-def test_de_answer_in_lessons(ask):
+def test_de_answer_in_lessons(ask, source_labels):
     r = ask("What tools and technologies does the Data Engineering Zoomcamp use?", "course", DE)
     _assert_answered(r)
     assert "course-repo" in source_labels(r), source_labels(r)
 
 
-def test_de_answer_in_faq(ask):
+def test_de_answer_in_faq(ask, source_labels):
     r = ask("Course: Can I still join the course after the start date?", "course", DE)
     _assert_answered(r)
     assert "faq" in source_labels(r), source_labels(r)
@@ -74,13 +72,13 @@ def test_de_retrieval_spans_docs_and_course_repo(retrieve):
 
 # --- outside a course channel ----------------------------------------------
 
-def test_non_course_uses_docs_only(ask):
+def test_non_course_uses_docs_only(ask, source_labels):
     r = ask("How do I join the DataTalks.Club Slack community?", "docs")
     _assert_answered(r)
     assert source_labels(r) == {"docs"}, source_labels(r)
 
 
-def test_unanswerable_course_question_points_to_instructors(ask):
+def test_unanswerable_course_question_points_to_instructors(ask, source_labels):
     r = ask("what is the airspeed velocity of an unladen swallow?", "course", DE)
     assert r["found_answer"] is False
     assert "instructors" in r["answer"].lower()
@@ -90,7 +88,7 @@ def test_unanswerable_course_question_points_to_instructors(ask):
     assert "course-repo" in labels
 
 
-def test_unanswerable_non_course_question_points_to_community_managers(ask):
+def test_unanswerable_non_course_question_points_to_community_managers(ask, source_labels):
     r = ask("what is the airspeed velocity of an unladen swallow?", "docs")
     assert r["found_answer"] is False
     assert "community managers" in r["answer"].lower()
