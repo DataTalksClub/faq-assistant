@@ -93,6 +93,14 @@ uv run python scripts/check_handler.py
 `make check` runs the config compile, structured-parsing check, an index build, the handler
 smoke test, and `compileall`.
 
+The end-to-end integration tests in `tests_integration/` call the real OpenAI API. They are
+run separately from the unit suite and fail unless `OPENAI_API_KEY` is set:
+
+```bash
+# Put OPENAI_API_KEY=... in .env, or export it in the shell.
+make integration-test
+```
+
 To exercise the real handler locally with SAM (needs `OPENAI_API_KEY` in the environment):
 
 ```bash

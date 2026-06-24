@@ -20,11 +20,28 @@ INDEX_PATH = ROOT / "artifacts" / "search" / "search-index.zsx"
 CORPUS_PATH = ROOT / "artifacts" / "search" / "search-corpus.json"
 
 
+def _load_dotenv(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.removeprefix("export ").strip()
+        value = value.strip().strip("'\"")
+        os.environ.setdefault(key, value)
+
+
+_load_dotenv(ROOT / ".env")
+
+
 @pytest.fixture(scope="session")
 def ask():
     """Return ``ask(question, scope, course=None) -> response dict``."""
     if not os.environ.get(CONFIG["openai"]["api_key_env"]):
-        pytest.skip("OPENAI_API_KEY not set; skipping integration tests")
+        pytest.fail("OPENAI_API_KEY is required for integration tests", pytrace=False)
     if not INDEX_PATH.exists():
         build_search_index(corpus_artifact=CORPUS_PATH, index_artifact=INDEX_PATH)
     index = load_search_index(INDEX_PATH)

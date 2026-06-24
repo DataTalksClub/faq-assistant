@@ -1,8 +1,13 @@
-.PHONY: sync config corpus index test check deploy
+.PHONY: sync config corpus index test integration-test check deploy
 
 # Fast, offline unit tests (mocked OpenAI + index).
 test:
 	uv run --group test python -m pytest tests -q
+
+# Optional end-to-end tests against the real OpenAI API.
+# Requires OPENAI_API_KEY; tests that call the API fail without it.
+integration-test:
+	uv run --group test --group ingest python -m pytest tests_integration -q -rs
 
 sync:
 	uv sync
