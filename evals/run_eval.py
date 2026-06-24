@@ -61,17 +61,9 @@ VARIANTS: dict[str, str | None] = {
         "the course name when provided as metadata. Preserve exact error messages, tool names, "
         "commands, and file names verbatim. Return only the query."
     ),
-    # Mirrors the production rewrite prompt in faq_assistant/answering.py.
-    "production": (
-        "Rewrite the user's Slack message into a concise keyword search query. "
-        "Focus on the underlying problem or topic the user needs information about, and drop "
-        "conversational meta such as 'can someone help', 'any ideas', 'please help', or "
-        "'I'm stuck'. Fix typos, preserve technical terms, and do not answer. Expand common "
-        "abbreviations (e.g. 'hw' -> 'homework', 'q' -> 'question', 'env' -> 'environment'). "
-        "Capture the intent in a few keywords - do not reduce the query to a single vague token. "
-        "Preserve exact error messages, tool names, commands, and file names verbatim. Do not "
-        "include the course name when provided as metadata. Return only the query."
-    ),
+    # The actual production rewrite prompt, imported (not copied) so this variant
+    # always tracks what prod does.
+    "production": lib.answering.REWRITE_SYSTEM_PROMPT,
 }
 
 
@@ -108,7 +100,7 @@ def evaluate(index, gt: list[dict], system: str | None) -> dict:
     agg = {f"hit@{k}": 0.0 for k in K_VALUES}
     agg.update({f"mrr@{k}": 0.0 for k in K_VALUES})
     for item, q in zip(gt, rewritten):
-        results = lib.search(index, q, item["course"], num_results=max(K_VALUES))
+        results = lib.prod_search(index, q, item["course"])
         ranked = [r["id"] for r in results]
         relevant = set(item["relevant_ids"])
         for k in K_VALUES:

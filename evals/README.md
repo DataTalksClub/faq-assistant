@@ -88,9 +88,9 @@ Step by step:
     "channel": "course-data-engineering", "thread_ts": "..."}
    ```
 
-The documents being judged are the *exact* chunks the production Worker retrieves
-(`faq_assistant.search_corpus.SEARCH_CORPUS_B64`), so the ids in `relevant_ids`
-line up with what the Worker would return.
+The documents being judged are the *exact* chunks production retrieves
+(`artifacts/search/search-corpus.json`, built by `make corpus`), so the ids in
+`relevant_ids` line up with what production would return.
 
 ---
 

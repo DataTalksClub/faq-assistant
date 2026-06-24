@@ -131,6 +131,29 @@ def answer_question(
     }
 
 
+# The production query-rewrite instruction. Kept as a module constant so the
+# retrieval evals can rewrite with the *exact* prompt prod uses, instead of a
+# hand-copied paraphrase that silently drifts.
+REWRITE_SYSTEM_PROMPT = (
+    "Rewrite the user's Slack message into a concise keyword search query. "
+    "Focus on the underlying problem or topic the user needs information about, and "
+    "drop conversational meta such as 'can someone help', 'any ideas', 'please help', "
+    "or 'I'm stuck' - keep the words that describe what they actually want to find. "
+    "Fix typos, preserve technical terms, and do not answer. "
+    "Expand common abbreviations to their full words (e.g. 'hw' -> 'homework', "
+    "'q' -> 'question', 'env' -> 'environment'). "
+    "Capture the user's intent in a few keywords - do not reduce the query to a single "
+    "vague token. "
+    "When the user names a specific instance of something (a language, library, tool, "
+    "platform, or error), keep that exact term and also add the general category it "
+    "belongs to, so the query matches entries that are phrased generically as well as "
+    "ones that name the specific instance. "
+    "Preserve exact error messages, tool names, commands, and file names verbatim. "
+    "Do not include the course name or DataTalks.Club when they are already provided "
+    "as scope metadata. Keep only the words useful for keyword search."
+)
+
+
 def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str | None) -> str:
     if not config["retrieval"].get("rewrite_query", True):
         return question
@@ -139,25 +162,7 @@ def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str |
     messages = [
         {
             "role": "system",
-            "content": (
-                "Rewrite the user's Slack message into a concise keyword search query. "
-                "Focus on the underlying problem or topic the user needs information about, and "
-                "drop conversational meta such as 'can someone help', 'any ideas', 'please help', "
-                "or 'I'm stuck' - keep the words that describe what they actually want to find. "
-                "Fix typos, preserve technical terms, and do not answer. "
-                "Expand common abbreviations to their full words (e.g. 'hw' -> 'homework', "
-                "'q' -> 'question', 'env' -> 'environment'). "
-                "Capture the user's intent in a few keywords - do not reduce the query to a single "
-                "vague token. "
-                "When the user names a specific instance of something (a language, library, tool, "
-                "platform, or error), keep that exact term and also add the general category it "
-                "belongs to, so the query matches entries that are phrased generically as well as "
-                "ones that name the specific instance. "
-                "Preserve exact error messages, tool names, commands, and file names verbatim. "
-                "Do not include the course name or DataTalks.Club when they are already provided "
-                "as scope metadata. Keep only the words useful for keyword search. "
-                "Return structured JSON matching the requested schema."
-            ),
+            "content": REWRITE_SYSTEM_PROMPT + " Return structured JSON matching the requested schema.",
         },
         {"role": "user", "content": f"scope: {scope}\ncourse: {course_name}\nmessage: {question}"},
     ]

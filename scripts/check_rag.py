@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
-import base64
-import zlib
+from pathlib import Path
 from typing import Any
 
 from zerosearch import Index
@@ -11,7 +10,7 @@ from zerosearch import Index
 from faq_assistant.config import load_config
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.openai import OpenAIClient
-from faq_assistant.search_corpus import SEARCH_CORPUS_B64
+from faq_assistant.search_index import DEFAULT_INDEX_ARTIFACT, build_search_index, load_search_index
 from faq_assistant.structured import parse_structured_response
 
 
@@ -108,11 +107,11 @@ def rewrite_query(
 
 
 def build_index() -> Index:
-    records = json.loads(zlib.decompress(base64.b64decode(SEARCH_CORPUS_B64)).decode("utf-8"))
-    return Index(
-        text_fields=["title", "section", "text"],
-        keyword_fields=["id", "source_type", "scope", "course", "url", "repo", "path"],
-    ).fit(records)
+    # Use the same packed index prod ships, building it from the corpus artifact
+    # (make corpus) if it isn't present yet.
+    if not Path(DEFAULT_INDEX_ARTIFACT).exists():
+        build_search_index()
+    return load_search_index()
 
 
 def zerosearch_search(

@@ -27,16 +27,18 @@ def build_search_index(
 ) -> dict[str, Any]:
     """Fit the index from ``records`` and save it.
 
-    When ``records`` is omitted, read the corpus artifact if present, otherwise
-    fall back to the committed embedded corpus (so CI can build the index without
-    re-fetching the sources).
+    When ``records`` is omitted, read the corpus artifact, which
+    ``scripts/build_search_corpus.py`` (``make corpus``) produces from the live
+    sources.
     """
     if records is None:
         path = Path(corpus_artifact)
-        if path.exists():
-            records = json.loads(path.read_text(encoding="utf-8"))
-        else:
-            records = _load_embedded_corpus()
+        if not path.exists():
+            raise FileNotFoundError(
+                f"corpus artifact not found: {path}. Run `make corpus` "
+                "(uv run --group ingest python scripts/build_search_corpus.py) first."
+            )
+        records = json.loads(path.read_text(encoding="utf-8"))
 
     index = Index(text_fields=TEXT_FIELDS, keyword_fields=KEYWORD_FIELDS).fit(records)
 
@@ -54,13 +56,3 @@ def build_search_index(
 def load_search_index(index_artifact: str | Path = DEFAULT_INDEX_ARTIFACT) -> Index:
     """Load the prebuilt packed index."""
     return Index.load(index_artifact)
-
-
-def _load_embedded_corpus() -> list[dict[str, Any]]:
-    import base64
-    import zlib
-
-    from faq_assistant.search_corpus import SEARCH_CORPUS_B64
-
-    raw = zlib.decompress(base64.b64decode(SEARCH_CORPUS_B64)).decode("utf-8")
-    return json.loads(raw)

@@ -17,9 +17,9 @@ is never committed to git. Triggers:
 - **daily cron** (`0 8 * * *`) — pick up new FAQ/docs/repo content.
 - **manual** (`workflow_dispatch`) — on demand.
 
-The committed `src/faq_assistant/search_corpus.py` is the *frozen corpus the evals
-score against* (its chunk ids are referenced by the eval ground truth); it is not
-what production deploys.
+The corpus is not committed: `make corpus` rebuilds `artifacts/search/search-corpus.json`
+from the live sources, and both the deploy and the evals read that artifact, so the
+evals score against the same corpus production retrieves from.
 
 ## Prerequisites (one-time per AWS account)
 

@@ -77,7 +77,7 @@ GITHUB_TOKEN=...                  # only for corpus rebuilds (the `ingest` group
 See [How the index is created](#how-the-index-is-created) above for the design. The commands:
 
 ```bash
-make corpus   # build the corpus     -> artifacts/search/search-corpus.json (+ search_corpus.py)
+make corpus   # build the corpus     -> artifacts/search/search-corpus.json
 make index    # fit + save the index -> artifacts/search/search-index.zsx
 ```
 

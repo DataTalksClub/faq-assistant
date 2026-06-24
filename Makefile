@@ -30,7 +30,6 @@ check:
 build-FaqWorkerFunction:
 	uv pip install --target "$(ARTIFACTS_DIR)" zerosearch==0.3.0
 	cp -r src/faq_assistant "$(ARTIFACTS_DIR)/faq_assistant"
-	rm -f "$(ARTIFACTS_DIR)/faq_assistant/search_corpus.py"
 	cp artifacts/search/search-index.zsx "$(ARTIFACTS_DIR)/search-index.zsx"
 
 # Build the index, package, and deploy. First run: `uv run sam deploy --guided`.

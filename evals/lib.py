@@ -2,34 +2,36 @@
 
 Ground truth is built from *real* Slack questions asked in the DataTalksClub
 course channels (vendored under ../faq), judged for relevance against the same
-search corpus the production Worker uses.
+search corpus production uses (``artifacts/search/search-corpus.json``, built by
+``make corpus``). Retrieval definitions are imported from ``faq_assistant`` so
+the eval exercises the production code path, not a copy of it.
 """
 
 from __future__ import annotations
 
-import base64
 import json
 import os
 import re
 import sys
 import urllib.error
 import urllib.request
-import zlib
 from pathlib import Path
 from typing import Any, Iterable
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from faq_assistant.search_corpus import SEARCH_CORPUS_B64  # noqa: E402
+# Reuse the production retrieval definitions so the eval can't silently drift.
+from faq_assistant import answering  # noqa: E402
+from faq_assistant.generated_config import CONFIG  # noqa: E402
+from faq_assistant.search_index import KEYWORD_FIELDS, TEXT_FIELDS  # noqa: E402
 
 FAQ_REPO = Path(os.environ.get("FAQ_REPO", ROOT.parent / "faq"))
 DATA_DIR = Path(__file__).resolve().parent / "data"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
+CORPUS_ARTIFACT = ROOT / "artifacts" / "search" / "search-corpus.json"
 
-TEXT_FIELDS = ["title", "section", "text"]
-KEYWORD_FIELDS = ["id", "source_type", "scope", "course", "url", "repo", "path"]
-BOOSTS = {"title": 3.0, "section": 1.5, "text": 1.0}
+BOOSTS = dict(CONFIG["retrieval"].get("boosts", {}))
 
 # Slack channel (file stem in ../faq/.tmp/slack) -> corpus course id.
 CHANNEL_TO_COURSE = {
@@ -48,8 +50,13 @@ OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 # Corpus + index
 # --------------------------------------------------------------------------- #
 def load_corpus() -> list[dict[str, Any]]:
-    raw = zlib.decompress(base64.b64decode(SEARCH_CORPUS_B64)).decode("utf-8")
-    return json.loads(raw)
+    """Load the production corpus artifact (built by ``make corpus``)."""
+    if not CORPUS_ARTIFACT.exists():
+        raise FileNotFoundError(
+            f"corpus artifact not found: {CORPUS_ARTIFACT}. Run `make corpus` "
+            "(uv run --group ingest python scripts/build_search_corpus.py) first."
+        )
+    return json.loads(CORPUS_ARTIFACT.read_text(encoding="utf-8"))
 
 
 def build_index(records: list[dict[str, Any]], engine: str = "zerosearch"):
@@ -63,13 +70,27 @@ def build_index(records: list[dict[str, Any]], engine: str = "zerosearch"):
 
 
 def search(index, query: str, course: str, num_results: int = 10) -> list[dict[str, Any]]:
-    """Course-scoped FAQ-style retrieval, mirroring the Worker's filter."""
+    """Wide course-scoped retrieval used for *pooling* candidates in build_dataset.
+
+    Recall-oriented (no min_score floor, caller picks num_results); for measuring
+    production behaviour use :func:`prod_search` instead.
+    """
     return index.search(
         query,
         filter_dict={"scope": "course", "course": course},
         boost_dict=BOOSTS,
         num_results=num_results,
     )
+
+
+def prod_search(index, query: str, course: str) -> list[dict[str, Any]]:
+    """Exactly the production retrieval path: prod scope filter, boosts, min_score
+    and result limit from config. Returns plain dicts with at least ``id``."""
+    results = answering.search(CONFIG, index, query, "course", course)
+    return [
+        {"id": r.id, "score": r.score, "source_type": r.source_type, "title": r.title, "url": r.url}
+        for r in results
+    ]
 
 
 # --------------------------------------------------------------------------- #
