@@ -74,6 +74,38 @@ def test_resolve_sources_course_docs_get_breadcrumb_title(cfg):
     assert out[0]["title"] == "Courses > LLM Zoomcamp > Project"
 
 
+def test_resolve_sources_llm_repo_gets_module_lesson_title(cfg):
+    results = [
+        SearchResult(
+            id="gh:1",
+            source_type="github",
+            course="llm-zoomcamp",
+            title="Multi-Agent Systems",
+            url="u",
+            path="03-orchestration/lessons/07-multi-agent.md",
+        ),
+    ]
+    rag = RagAnswer(answer="a", found_answer=True, source_ids=["gh:1"])
+    out = resolve_sources(cfg, rag, results)
+    assert out[0]["title"] == "03. Orchestration > 07. Multi-Agent Systems"
+
+
+def test_resolve_sources_other_repos_keep_title_without_adapter(cfg):
+    results = [
+        SearchResult(
+            id="gh:1",
+            source_type="github",
+            course="data-engineering-zoomcamp",
+            title="Docker Compose",
+            url="u",
+            path="01-docker-terraform/docker-sql/09-docker-compose.md",
+        ),
+    ]
+    rag = RagAnswer(answer="a", found_answer=True, source_ids=["gh:1"])
+    out = resolve_sources(cfg, rag, results)
+    assert out[0]["title"] == "Docker Compose"
+
+
 def test_resolve_sources_empty_when_not_found(cfg):
     rag = RagAnswer(answer="no", found_answer=False, source_ids=["faq:1"])
     assert resolve_sources(cfg, rag, _results()) == []

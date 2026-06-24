@@ -7,6 +7,7 @@ access; the default implementation posts to the OpenAI API with ``urllib``.
 
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -297,13 +298,89 @@ def _source_title(config, result: SearchResult) -> str:
     """Display title for a cited source.
 
     Course doc pages get a breadcrumb ("Courses > LLM Zoomcamp > Project") so the
-    reader can place the page in the course nav; other sources keep their own title.
+    reader can place the page in the course nav. Course repository pages keep
+    their title unless the course opts into a path adapter.
     """
     if result.source_type == "course_docs":
         course_name = config["courses"].get(result.course, {}).get("name") or result.course
         parts = [part for part in ("Courses", course_name, result.title) if part]
         return " > ".join(parts)
+    if result.source_type == "github":
+        adapter = REPO_TITLE_ADAPTERS.get(result.course)
+        if adapter:
+            return adapter(result.path, result.title)
     return result.title
+
+
+REPO_TITLE_ADAPTERS = {
+    "llm-zoomcamp": lambda path, title: _llm_zoomcamp_repo_source_title(path, title),
+}
+
+
+def _llm_zoomcamp_repo_source_title(path: str, title: str) -> str:
+    raw_parts = _path_parts(path)
+    if len(raw_parts) == 3 and raw_parts[1].lower() == "lessons":
+        return _join_title_parts([
+            _humanize_path_part(raw_parts[0]),
+            _title_with_file_number(raw_parts[2], title.strip()),
+        ], title)
+    return _generic_repo_source_title(path, title)
+
+
+def _generic_repo_source_title(path: str, title: str) -> str:
+    normalized_path = path.strip("/")
+    title = title.strip()
+    if not normalized_path:
+        return title
+
+    raw_parts = _path_parts(normalized_path)
+    if not raw_parts:
+        return title
+
+    filename = raw_parts[-1]
+    directory_parts = raw_parts[:-1]
+    if filename.lower() in {"readme.md", "index.md"}:
+        path_parts = [_humanize_path_part(part) for part in directory_parts]
+        page_title = title
+    else:
+        path_parts = [_humanize_path_part(part) for part in directory_parts]
+        page_title = _title_with_file_number(filename, title)
+
+    return _join_title_parts([*path_parts, page_title], title)
+
+
+def _path_parts(path: str) -> list[str]:
+    return [part for part in path.strip("/").split("/") if part]
+
+
+def _join_title_parts(parts: list[str], fallback: str) -> str:
+    return " > ".join(part for part in parts if part) or fallback
+
+
+def _title_with_file_number(filename: str, title: str) -> str:
+    match = re.match(r"^(\d+)[-_](.+)$", _strip_markdown_extension(filename))
+    if not match:
+        return title or _humanize_path_part(filename)
+    number, _ = match.groups()
+    return f"{number}. {title}" if title else _humanize_path_part(filename)
+
+
+def _humanize_path_part(part: str) -> str:
+    stem = _strip_markdown_extension(part)
+    match = re.match(r"^(\d+)[-_](.+)$", stem)
+    if match:
+        number, name = match.groups()
+        return f"{number}. {_humanize_words(name)}"
+    return _humanize_words(stem)
+
+
+def _strip_markdown_extension(value: str) -> str:
+    return value[:-3] if value.lower().endswith(".md") else value
+
+
+def _humanize_words(value: str) -> str:
+    text = re.sub(r"[-_]+", " ", value).strip()
+    return text.title() if text else ""
 
 
 def build_context(results: list[SearchResult]) -> str:
