@@ -126,8 +126,20 @@ cd <faq-assistant> && git add evals/data/answer_gaps.jsonl scripts/ evals/README
   && git commit -m "Track answer gaps + curation tooling" && git push
 ```
 
-Then rebuild + ship the index to the Lambda when ready: `make corpus && make deploy`
-(deploy is a separate, heavier step — only if the user wants the live bot updated now).
+**Deploy is automatic — no `make deploy` needed.** Both pushes trigger CI:
+- `faq` push → `build-website.yml` rebuilds the FAQ site to GitHub Pages, so
+  `datatalks.club/faq/` republishes with the new entries.
+- `faq-assistant` push → `deploy.yml` runs **when changed paths match its filter**
+  (`src/**`, `config.toml`, `scripts/**`, `Makefile`, … — note `evals/**` and
+  `.claude/**` do **not** match, so an evals-only commit won't deploy by itself). It
+  reruns tests, rebuilds the corpus from the *live* FAQ, refits the index, and
+  SAM-deploys the Lambda. A daily 08:00 UTC cron in `deploy.yml` does the same
+  regardless of pushes.
+
+Ordering caveat: the faq-assistant deploy rebuilds from the *published* FAQ, so if it
+runs before GitHub Pages finishes republishing, that build sees the old FAQ. The
+daily cron (or any later deploy / `workflow_dispatch`) reconciles it — to force it
+sooner, re-run the Deploy workflow once the site is live.
 
 ## Notes
 
