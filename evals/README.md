@@ -124,6 +124,36 @@ Both scripts call OpenAI and need `OPENAI_API_KEY` (loaded from the repo `.env`)
 
 ---
 
+## 4. Answer gaps (end-to-end failures)
+
+`data/answer_gaps.jsonl` is a hand-curated regression set of **real questions the
+bot got wrong** in Slack — surfaced by `scripts/slack_faq_review.py`, which scans
+the course channels for threads where the bot was triggered (`@mention` or `faq`
+reaction) and either replied that it couldn't find an answer, or was corrected
+afterwards by an instructor. Each row records what the bot said and the
+instructor's correct answer:
+
+```json
+{"query": "...", "course": "llm-zoomcamp", "scope": "course", "channel": "course-llm",
+ "thread_ts": "...", "trigger": "faq-reaction", "failure": "no_answer|incorrect|incomplete",
+ "bot_answer": "...", "expected_answer": "...", "answer_source": "alexey-grigorev",
+ "permalink": "..."}
+```
+
+Unlike `ground_truth.jsonl`, these are **not** pooled retrieval targets: most are
+FAQ *content* gaps (the correct answer isn't in the corpus yet — e.g. the
+"no late homework submissions" policy), so they fail the pooled-judgment filter by
+design. They're kept as a checklist of what to add to the FAQ source and to
+sanity-check end-to-end answer quality after corpus/prompt changes.
+
+Refresh the candidates with:
+
+```bash
+python scripts/slack_faq_review.py --days 60 --json .tmp/slack-faq-review.json
+```
+
+---
+
 ## Results (128 real Slack queries)
 
 ### Query-rewrite variants — zerosearch
