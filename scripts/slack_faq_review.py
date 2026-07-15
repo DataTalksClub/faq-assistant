@@ -105,7 +105,11 @@ class Slack:
     def history(self, channel: str, oldest: float) -> list[dict]:
         out, cursor = [], ""
         while True:
-            p = self.call("conversations.history", channel=channel, oldest=oldest,
+            # Slack message timestamps have exactly six fractional digits. Passing
+            # Python's default float representation can occasionally produce a
+            # seventh digit, which makes conversations.history silently return an
+            # empty result even though the request itself succeeds.
+            p = self.call("conversations.history", channel=channel, oldest=f"{oldest:.6f}",
                           limit=200, cursor=cursor)
             out.extend(p.get("messages", []))
             cursor = p.get("response_metadata", {}).get("next_cursor", "")
