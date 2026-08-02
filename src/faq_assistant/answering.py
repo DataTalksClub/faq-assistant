@@ -297,14 +297,18 @@ def resolve_sources(config, rag_answer: RagAnswer, results: list[SearchResult]) 
 def _source_title(config, result: SearchResult) -> str:
     """Display title for a cited source.
 
-    Course doc pages get a breadcrumb ("Courses > LLM Zoomcamp > Project") so the
+    Course doc pages get a breadcrumb ("Courses › LLM Zoomcamp › Project") so the
     reader can place the page in the course nav. Course repository pages keep
     their title unless the course opts into a path adapter.
+
+    The breadcrumb uses a Unicode separator instead of ``>`` because source
+    titles are embedded in Slack's ``<url|label>`` links. A literal ``>`` ends
+    the link early and leaves the rest of the title as plain text.
     """
     if result.source_type == "course_docs":
         course_name = config["courses"].get(result.course, {}).get("name") or result.course
         parts = [part for part in ("Courses", course_name, result.title) if part]
-        return " > ".join(parts)
+        return " › ".join(parts)
     if result.source_type == "github":
         adapter = REPO_TITLE_ADAPTERS.get(result.course)
         if adapter:
@@ -354,7 +358,7 @@ def _path_parts(path: str) -> list[str]:
 
 
 def _join_title_parts(parts: list[str], fallback: str) -> str:
-    return " > ".join(part for part in parts if part) or fallback
+    return " › ".join(part for part in parts if part) or fallback
 
 
 def _title_with_file_number(filename: str, title: str) -> str:

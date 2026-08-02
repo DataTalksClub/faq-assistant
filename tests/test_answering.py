@@ -71,7 +71,8 @@ def test_resolve_sources_course_docs_get_breadcrumb_title(cfg):
     ]
     rag = RagAnswer(answer="a", found_answer=True, source_ids=["cd:1"])
     out = resolve_sources(cfg, rag, results)
-    assert out[0]["title"] == "Courses > LLM Zoomcamp > Project"
+    assert out[0]["title"] == "Courses › LLM Zoomcamp › Project"
+    assert ">" not in out[0]["title"]
 
 
 def test_resolve_sources_llm_repo_gets_module_lesson_title(cfg):
@@ -87,7 +88,8 @@ def test_resolve_sources_llm_repo_gets_module_lesson_title(cfg):
     ]
     rag = RagAnswer(answer="a", found_answer=True, source_ids=["gh:1"])
     out = resolve_sources(cfg, rag, results)
-    assert out[0]["title"] == "03. Orchestration > 07. Multi-Agent Systems"
+    assert out[0]["title"] == "03. Orchestration › 07. Multi-Agent Systems"
+    assert ">" not in out[0]["title"]
 
 
 def test_resolve_sources_other_repos_keep_title_without_adapter(cfg):
