@@ -21,6 +21,15 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+# The eval commands are normally run from the repository and document `.env`
+# support. Load it without adding a dotenv dependency.
+_env_path = ROOT / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text(encoding="utf-8").splitlines():
+        if "=" in _line and not _line.lstrip().startswith("#"):
+            _key, _value = _line.split("=", 1)
+            os.environ.setdefault(_key.strip(), _value.strip().strip("'\""))
+
 # Reuse the production retrieval definitions so the eval can't silently drift.
 from faq_assistant import answering  # noqa: E402
 from faq_assistant.generated_config import CONFIG  # noqa: E402
@@ -83,10 +92,14 @@ def search(index, query: str, course: str, num_results: int = 10) -> list[dict[s
     )
 
 
-def prod_search(index, query: str, course: str) -> list[dict[str, Any]]:
+def prod_search(
+    index, query: str, course: str, *, original_question: str | None = None
+) -> list[dict[str, Any]]:
     """Exactly the production retrieval path: prod scope filter, boosts, min_score
     and result limit from config. Returns plain dicts with at least ``id``."""
-    results = answering.search(CONFIG, index, query, "course", course)
+    results = answering.search(
+        CONFIG, index, query, "course", course, original_question=original_question
+    )
     return [
         {"id": r.id, "score": r.score, "source_type": r.source_type, "title": r.title, "url": r.url}
         for r in results

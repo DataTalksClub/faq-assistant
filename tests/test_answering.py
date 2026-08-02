@@ -5,9 +5,12 @@ from conftest import mock_chat, mock_index, record
 from faq_assistant.answering import (
     SOURCE_LABELS,
     answer_question,
+    build_context,
+    detect_query_intent,
     fallback_sources,
     generate_answer,
     resolve_sources,
+    retrieve,
     search,
 )
 from faq_assistant.models import RagAnswer, SearchResult
@@ -32,6 +35,62 @@ def test_search_drops_results_below_min_score(cfg):
     index = mock_index([record(id="keep", score=0.9), record(id="drop", score=0.1)])
     results = search(cfg, index, "q", "docs", None)
     assert [r.id for r in results] == ["keep"]
+
+
+def test_unqualified_temporal_query_excludes_historical_cohorts(cfg):
+    index = mock_index([
+        record(id="current", source_id="status", cohort="2026", current=True,
+               authority="canonical", score=0.5),
+        record(id="old", source_id="old", cohort="2025", authority="historical", score=2.0),
+        record(id="evergreen", source_id="faq", score=0.8),
+    ])
+    outcome = retrieve(cfg, index, "project submission link", "course", "llm-zoomcamp",
+                       original_question="Where do I submit my project?")
+    assert [result.id for result in outcome.results] == ["evergreen", "current"]
+    assert outcome.filtered_historical == 1
+
+
+def test_explicit_cohort_query_keeps_requested_historical_cohort(cfg):
+    index = mock_index([
+        record(id="current", cohort="2026", current=True, authority="canonical"),
+        record(id="requested", cohort="2025", authority="historical"),
+    ])
+    results = search(cfg, index, "2025 project", "course", "llm-zoomcamp",
+                     original_question="Where was the 2025 project submitted?")
+    assert [result.id for result in results] == ["requested"]
+
+
+def test_non_temporal_technical_query_can_retrieve_historical_material(cfg):
+    index = mock_index([record(id="historical", cohort="2025", authority="historical")])
+    results = search(cfg, index, "docker compose error", "course", "llm-zoomcamp",
+                     original_question="How do I fix this Docker Compose error?")
+    assert [result.id for result in results] == ["historical"]
+
+
+def test_project_policy_question_is_not_implicitly_temporal(cfg):
+    intent = detect_query_intent(
+        cfg, "Is it allowed to use LLMs for code generation in the project?", "llm-zoomcamp"
+    )
+    assert intent.temporal is False
+
+
+def test_retrieval_deduplicates_chunks_by_source_id(cfg):
+    cfg["retrieval"]["max_chunks_per_source"] = 1
+    index = mock_index([
+        record(id="a:1", source_id="a", score=2.0),
+        record(id="a:2", source_id="a", score=1.9),
+        record(id="b:1", source_id="b", score=1.0),
+    ])
+    outcome = retrieve(cfg, index, "technical topic", "course", "llm-zoomcamp")
+    assert [result.id for result in outcome.results] == ["a:1", "b:1"]
+    assert outcome.deduplicated == 1
+
+
+def test_detect_query_intent_uses_configured_current_cohort(cfg):
+    intent = detect_query_intent(cfg, "What is the current project deadline?", "llm-zoomcamp")
+    assert intent.temporal is True
+    assert intent.current_cohort == "2026"
+    assert intent.requested_cohort == ""
 
 
 # --- source resolution -----------------------------------------------------
@@ -128,6 +187,27 @@ def test_generate_answer_without_context_returns_not_found(cfg):
     assert "couldn't find" in answer.lower()
 
 
+def test_generate_answer_includes_current_cohort_guardrails(cfg):
+    chat = mock_chat(answer="Use the platform.", source_ids=["status"])
+    result = SearchResult(id="status", source_type="course_status", title="Current", text="Platform")
+    generate_answer(cfg, chat, "Where do I submit?", "project submission", "course",
+                    "llm-zoomcamp", [result])
+    messages = chat.call_args.args[0]
+    assert "configured current cohort for this course is 2026" in messages[0]["content"]
+    assert "CURRENT_PLATFORM: https://courses.datatalks.club/llm-zoomcamp-2026/" in messages[1]["content"]
+
+
+def test_build_context_exposes_freshness_metadata():
+    context = build_context([SearchResult(
+        id="x", source_id="page", cohort="2026", current=True,
+        authority="canonical", path="cohorts/2026/project.md",
+    )])
+    assert "source_id: page" in context
+    assert "cohort: 2026" in context
+    assert "current: true" in context
+    assert "authority: canonical" in context
+
+
 def test_fallback_sources_course_lists_faq_docs_repo(cfg):
     out = fallback_sources(cfg, "course", "llm-zoomcamp")
     labels = [s["source"] for s in out]
@@ -135,6 +215,7 @@ def test_fallback_sources_course_lists_faq_docs_repo(cfg):
     assert "docs" in labels
     faq = next(s for s in out if s["source"] == "faq")
     assert faq["url"] == "https://datatalks.club/faq/llm-zoomcamp.html"
+    assert any(s["url"] == "https://courses.datatalks.club/llm-zoomcamp-2026/" for s in out)
 
 
 def test_fallback_sources_non_course_is_docs_home(cfg):
@@ -149,6 +230,16 @@ def test_answer_question_not_found_points_to_instructors(cfg):
     assert result["found_answer"] is False
     assert "ask the instructors" in result["answer"]
     assert any(s["source"] == "faq" for s in result["sources"])
+
+
+def test_answer_question_temporal_fallback_points_to_current_platform(cfg):
+    chat = mock_chat(found_answer=False)
+    result = answer_question(
+        cfg, mock_index([record(id="x")]), chat,
+        "When is the project deadline?", "course", "llm-zoomcamp",
+    )
+    assert "courses.datatalks.club/llm-zoomcamp-2026" in result["answer"]
+    assert "ask the instructors" in result["answer"]
 
 
 def test_answer_question_not_found_non_course_points_to_community_managers(cfg):

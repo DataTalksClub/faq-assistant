@@ -11,6 +11,7 @@ import re
 import time
 import urllib.error
 import urllib.request
+from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
@@ -18,6 +19,22 @@ from faq_assistant.structured import parse_structured_response
 
 # A chat call: (messages, output_model, max_tokens, temperature, model) -> response dict.
 ChatFn = Callable[..., dict]
+
+
+@dataclass(frozen=True)
+class QueryIntent:
+    requested_cohort: str = ""
+    current_cohort: str = ""
+    temporal: bool = False
+
+
+@dataclass
+class RetrievalOutcome:
+    results: list[SearchResult] = field(default_factory=list)
+    intent: QueryIntent = field(default_factory=QueryIntent)
+    candidate_count: int = 0
+    filtered_historical: int = 0
+    deduplicated: int = 0
 
 
 def make_openai_chat(config: dict[str, Any], usage: list[dict] | None = None) -> ChatFn:
@@ -100,7 +117,8 @@ def answer_question(
     usage = [] if usage is None else usage
 
     rewritten_query = rewrite_query(config, chat, question, scope, course)
-    results = search(config, index, rewritten_query, scope, course)
+    retrieval = retrieve(config, index, rewritten_query, scope, course, original_question=question)
+    results = retrieval.results
     answer, found_answer, sources = generate_answer(
         config, chat, question, rewritten_query, scope, course, results
     )
@@ -108,7 +126,16 @@ def answer_question(
     # When we couldn't answer, say so plainly, point at who to ask (instructors for
     # a course channel, community managers elsewhere), and the resources that help.
     if not found_answer:
-        if scope == "course":
+        platform_url = (
+            config.get("courses", {}).get(course, {}).get("platform_url") if course else None
+        )
+        if scope == "course" and retrieval.intent.temporal and platform_url:
+            answer = (
+                "I couldn't find a current value in the course materials. "
+                f"Check the [current course-management platform]({platform_url}); "
+                "if it isn't listed there, ask the instructors."
+            )
+        elif scope == "course":
             answer = "I couldn't find this in the course materials — please ask the instructors."
         else:
             answer = "I couldn't find this in the docs — please ask the community managers."
@@ -116,7 +143,10 @@ def answer_question(
 
     latency_ms = (time.time() - started) * 1000.0
     try:
-        summary = record_usage(config, source, scope, course, usage, latency_ms, len(results))
+        summary = record_usage(
+            config, source, scope, course, usage, latency_ms, len(results),
+            retrieval=retrieval,
+        )
     except Exception:  # observability must never break answering
         summary = {}
 
@@ -184,10 +214,44 @@ SOURCE_LABELS = {
     "github": "course-repo",
     "course_docs": "docs",  # course-specific pages, served from the docs repo
     "docs": "docs",
+    "course_status": "docs",
 }
 
 
-def search(config, index, query: str, scope: str, course: str | None) -> list[SearchResult]:
+_COHORT_YEAR_RE = re.compile(r"\b(20\d{2})\b")
+_TEMPORAL_RE = re.compile(
+    r"\b(?:cohort|current|latest|start|join|register|registration|enroll|enrollment|"
+    r"deadline|due|submit|submission|peer review|review assignments?|"
+    r"certificate|workshop|leaderboard|dashboard|course management|platform)\b|"
+    r"\b(?:where|what|which)\b.{0,30}\blink\b",
+    re.IGNORECASE,
+)
+
+
+def detect_query_intent(config: dict[str, Any], question: str, course: str | None) -> QueryIntent:
+    cohort_match = _COHORT_YEAR_RE.search(question)
+    requested = cohort_match.group(1) if cohort_match else ""
+    current = ""
+    if course:
+        current = str(config.get("courses", {}).get(course, {}).get("current_cohort") or "")
+    return QueryIntent(
+        requested_cohort=requested,
+        current_cohort=current,
+        temporal=bool(requested or _TEMPORAL_RE.search(question)),
+    )
+
+
+def search(
+    config, index, query: str, scope: str, course: str | None, *, original_question: str | None = None
+) -> list[SearchResult]:
+    return retrieve(
+        config, index, query, scope, course, original_question=original_question
+    ).results
+
+
+def retrieve(
+    config, index, query: str, scope: str, course: str | None, *, original_question: str | None = None
+) -> RetrievalOutcome:
     retrieval = config["retrieval"]
     # Course channel: the course's own materials (course == X) plus the
     # course-agnostic general docs (course == ""). Elsewhere: general docs only.
@@ -196,14 +260,90 @@ def search(config, index, query: str, scope: str, course: str | None) -> list[Se
     else:
         filter_data = {"course": ""}
 
+    rerank_enabled = bool(retrieval.get("freshness_rerank", False))
+    result_limit = int(retrieval["default_limit"])
+    candidate_limit = int(retrieval.get("candidate_limit", result_limit)) if rerank_enabled else result_limit
+    intent = detect_query_intent(config, original_question or query, course)
+    search_query = query
+    if rerank_enabled and intent.temporal and not intent.requested_cohort and intent.current_cohort:
+        # Stable authority terms ensure the canonical course-status record enters
+        # the pool while preserving every term from the rewritten user query.
+        search_query += f" current course management platform {intent.current_cohort}"
     records = index.search(
-        query=query,
+        query=search_query,
         filter_dict=filter_data,
         boost_dict=retrieval.get("boosts", {}),
-        num_results=int(retrieval["default_limit"]),
+        num_results=candidate_limit,
     )
     min_score = float(retrieval.get("min_score", 0))
-    return [_format_record(record) for record in records if float(record.get("score", 0)) >= min_score]
+    candidates = [
+        _format_record(record) for record in records
+        if float(record.get("score", 0)) >= min_score
+    ]
+    if not rerank_enabled:
+        return RetrievalOutcome(
+            results=candidates[:result_limit], intent=intent, candidate_count=len(candidates)
+        )
+
+    has_current_canonical = any(
+        result.current and result.authority == "canonical" for result in candidates
+    )
+    filtered: list[SearchResult] = []
+    filtered_historical = 0
+    for result in candidates:
+        if intent.requested_cohort and result.cohort and result.cohort != intent.requested_cohort:
+            filtered_historical += 1
+            continue
+        if (
+            not intent.requested_cohort
+            and intent.temporal
+            and has_current_canonical
+            and result.cohort
+            and result.cohort != intent.current_cohort
+        ):
+            filtered_historical += 1
+            continue
+        filtered.append(result)
+
+    current_boost = float(retrieval.get("current_cohort_boost", 1.0))
+    canonical_boost = float(retrieval.get("canonical_boost", 1.0))
+    historical_boost = float(retrieval.get("historical_boost", 1.0))
+
+    def rank_score(result: SearchResult) -> float:
+        multiplier = 1.0
+        target = intent.requested_cohort or (intent.current_cohort if intent.temporal else "")
+        if target and result.cohort == target:
+            multiplier *= current_boost
+        if intent.temporal and result.authority == "canonical":
+            multiplier *= canonical_boost
+        elif intent.temporal and result.authority == "historical":
+            multiplier *= historical_boost
+        return result.score * multiplier
+
+    filtered.sort(key=lambda result: (-rank_score(result), result.id))
+
+    max_per_source = max(1, int(retrieval.get("max_chunks_per_source", 2)))
+    per_source: dict[str, int] = {}
+    selected: list[SearchResult] = []
+    deduplicated = 0
+    for result in filtered:
+        source_key = result.source_id or result.url or result.path or result.id
+        count = per_source.get(source_key, 0)
+        if count >= max_per_source:
+            deduplicated += 1
+            continue
+        per_source[source_key] = count + 1
+        selected.append(result)
+        if len(selected) >= result_limit:
+            break
+
+    return RetrievalOutcome(
+        results=selected,
+        intent=intent,
+        candidate_count=len(candidates),
+        filtered_historical=filtered_historical,
+        deduplicated=deduplicated,
+    )
 
 
 def generate_answer(
@@ -212,6 +352,22 @@ def generate_answer(
     """Return (answer_text, found_answer, structured_sources)."""
     prompt_key = "course" if scope == "course" else "docs"
     instructions = config["answering"]["prompts"][prompt_key].strip()
+    course_config = config.get("courses", {}).get(course, {}) if course else {}
+    current_cohort = str(course_config.get("current_cohort") or "")
+    platform_url = str(course_config.get("platform_url") or "")
+    if scope == "course" and current_cohort:
+        instructions += (
+            f"\n\nThe configured current cohort for this course is {current_cohort}. "
+            "For an unqualified question about enrollment, deadlines, submissions, "
+            "projects, peer review, certificates, or other live course state, use only "
+            "current canonical context. Use historical cohort facts only when the user "
+            "explicitly asks about that cohort. Never combine conflicting cohorts. "
+            "If a live date or state is not present in current canonical context, direct "
+            "the user to the current course-management platform and include its exact URL "
+            "instead of inferring it "
+            "from historical material. If the available context conflicts and cannot be "
+            "resolved by current/canonical metadata, set found_answer to false."
+        )
 
     context = build_context(results)
     if not context:
@@ -231,6 +387,8 @@ def generate_answer(
                 f"SEARCH QUERY: {rewritten_query}\n\n"
                 f"SCOPE: {scope}\n"
                 f"COURSE: {course or ''}\n\n"
+                f"CURRENT_COHORT: {current_cohort}\n"
+                f"CURRENT_PLATFORM: {platform_url}\n\n"
                 f"CONTEXT:\n{context}"
             ),
         },
@@ -255,6 +413,13 @@ def fallback_sources(config, scope: str, course: str | None) -> list[dict]:
             {"source": "docs", "title": "Course page", "url": f"https://datatalks.club/docs/courses/{course}/"},
         ]
         repos = config.get("courses", {}).get(course, {}).get("github_repositories", [])
+        platform_url = config.get("courses", {}).get(course, {}).get("platform_url")
+        if platform_url:
+            links.append({
+                "source": "docs",
+                "title": "Current course-management platform",
+                "url": platform_url,
+            })
         if repos:
             links.append({
                 "source": "course-repo",
@@ -393,6 +558,11 @@ def build_context(results: list[SearchResult]) -> str:
         lines.append(f"[{position}]")
         lines.append(f"id: {result.id}")
         lines.append(f"source_type: {result.source_type}")
+        lines.append(f"source_id: {result.source_id}")
+        lines.append(f"cohort: {result.cohort}")
+        lines.append(f"current: {str(result.current).lower()}")
+        lines.append(f"authority: {result.authority}")
+        lines.append(f"path: {result.path}")
         lines.append(f"url: {result.url}")
         lines.append(f"section: {result.section}")
         lines.append(f"title: {result.title}")
@@ -412,7 +582,9 @@ def call_cost(config, call: dict) -> float:
     ) / 1_000_000.0
 
 
-def record_usage(config, source, scope, course, usage, latency_ms, num_results) -> dict:
+def record_usage(
+    config, source, scope, course, usage, latency_ms, num_results, *, retrieval=None
+) -> dict:
     """Aggregate token usage + cost for one request and emit a structured log line."""
     prompt_tokens = sum(c["prompt_tokens"] for c in usage)
     completion_tokens = sum(c["completion_tokens"] for c in usage)
@@ -431,10 +603,23 @@ def record_usage(config, source, scope, course, usage, latency_ms, num_results) 
     models = ",".join(sorted({c["model"] for c in usage}))
     # Structured log line, captured by CloudWatch Logs (query with Logs Insights).
     try:
+        retrieval_fields = {}
+        if retrieval is not None:
+            retrieval_fields = {
+                "candidate_count": retrieval.candidate_count,
+                "filtered_historical": retrieval.filtered_historical,
+                "deduplicated": retrieval.deduplicated,
+                "requested_cohort": retrieval.intent.requested_cohort,
+                "current_cohort": retrieval.intent.current_cohort,
+                "temporal": retrieval.intent.temporal,
+                "selected_source_ids": [result.source_id or result.id for result in retrieval.results],
+                "selected_cohorts": [result.cohort for result in retrieval.results],
+                "selected_authorities": [result.authority for result in retrieval.results],
+            }
         print(json.dumps({
             "type": "usage", "source": source, "scope": scope, "course": course or "",
             "models": models, "calls": len(usage), "num_results": num_results,
-            "latency_ms": round(latency_ms, 1), **summary,
+            "latency_ms": round(latency_ms, 1), **retrieval_fields, **summary,
         }))
     except Exception:
         pass
@@ -455,4 +640,8 @@ def _format_record(record: dict[str, Any]) -> SearchResult:
         url=str(record.get("url", "")),
         repo=str(record.get("repo", "")),
         path=str(record.get("path", "")),
+        source_id=str(record.get("source_id", "")),
+        cohort=str(record.get("cohort", "")),
+        current=bool(record.get("current", False)),
+        authority=str(record.get("authority", "reference")),
     )

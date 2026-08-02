@@ -16,7 +16,7 @@ FAQ_BASE_URL = "https://datatalks.club/faq/"
 
 
 def load_source_documents(config: dict[str, Any]) -> list[SourceDocument]:
-    documents: list[SourceDocument] = []
+    documents: list[SourceDocument] = load_course_status_documents(config)
 
     if config["sources"]["faq"]["enabled"]:
         documents.extend(load_faq_documents(config))
@@ -26,6 +26,9 @@ def load_source_documents(config: dict[str, Any]) -> list[SourceDocument]:
 
     if config["sources"]["course_markdown"]["enabled"]:
         documents.extend(load_course_markdown_documents(config))
+
+    if config["sources"].get("shared_course_docs", {}).get("enabled", False):
+        documents.extend(load_shared_course_docs_documents(config))
 
     if config["sources"]["course_repositories"]["enabled"]:
         documents.extend(load_course_repository_documents(config))
@@ -75,6 +78,7 @@ def load_faq_documents(config: dict[str, Any]) -> list[SourceDocument]:
                     repo=None,
                     path=None,
                     source_id=source_id,
+                    authority="reference",
                 )
             )
 
@@ -102,6 +106,7 @@ def load_general_docs_documents(config: dict[str, Any]) -> list[SourceDocument]:
                 repo=github_config["repo"],
                 path=file.filename,
                 source_id=file.filename,
+                authority="canonical",
             )
         )
     return documents
@@ -133,6 +138,7 @@ def load_course_markdown_documents(config: dict[str, Any]) -> list[SourceDocumen
                     repo=github_config["repo"],
                     path=file.filename,
                     source_id=file.filename,
+                    authority="canonical",
                 )
             )
 
@@ -160,6 +166,9 @@ def load_course_repository_documents(config: dict[str, Any]) -> list[SourceDocum
 
             for file in files:
                 title = extract_title(file.content) or file.filename
+                cohort = cohort_from_locator(file.filename)
+                current_cohort = str(course_config.get("current_cohort") or "")
+                is_current = bool(cohort and cohort == current_cohort)
                 documents.append(
                     SourceDocument(
                         source_type="github",
@@ -173,10 +182,97 @@ def load_course_repository_documents(config: dict[str, Any]) -> list[SourceDocum
                         repo=github_config["repo"],
                         path=file.filename,
                         source_id=f"{github_config['repo']}:{file.filename}",
+                        cohort=cohort,
+                        current=is_current,
+                        authority=(
+                            "canonical" if is_current else "historical" if cohort else "reference"
+                        ),
                     )
                 )
 
     return documents
+
+
+def load_shared_course_docs_documents(config: dict[str, Any]) -> list[SourceDocument]:
+    """Load course-agnostic logistics pages shared by every Zoomcamp."""
+    source_config = config["sources"]["shared_course_docs"]
+    github_config = source_config["github"]
+    documents: list[SourceDocument] = []
+    seen: set[str] = set()
+
+    for prefix in source_config.get("prefixes", []):
+        for file in read_github_files(github_config, required_prefix=str(prefix)):
+            if file.filename in seen:
+                continue
+            seen.add(file.filename)
+            documents.append(
+                SourceDocument(
+                    source_type="docs",
+                    scope=str(source_config.get("scope", "docs")),
+                    course=None,
+                    course_name=None,
+                    section=section_from_path(file.filename),
+                    title=extract_title(file.content) or file.filename,
+                    text=clean_text(file.content),
+                    url=docs_site_url(file.filename),
+                    repo=github_config["repo"],
+                    path=file.filename,
+                    source_id=file.filename,
+                    authority="canonical",
+                )
+            )
+    return documents
+
+
+def load_course_status_documents(config: dict[str, Any]) -> list[SourceDocument]:
+    """Build one canonical, searchable current-course record per configured course."""
+    documents: list[SourceDocument] = []
+    for course, course_config in config.get("courses", {}).items():
+        cohort = str(course_config.get("current_cohort") or "")
+        platform_url = str(course_config.get("platform_url") or "")
+        if not cohort or not platform_url:
+            raise ValueError(f"course {course!r} needs current_cohort and platform_url")
+        name = str(course_config.get("name") or course)
+        text = (
+            f"{name} current cohort: {cohort}.\n"
+            f"Current course management platform: {platform_url}\n"
+            "Use the course management platform for current enrollment, homework and project "
+            "deadlines, project submission, peer-review assignments, leaderboard, dashboard, "
+            "certificate details, and other live cohort status. Dates can change; check the "
+            "platform for the current value instead of relying on historical cohort pages."
+        )
+        documents.append(
+            SourceDocument(
+                source_type="course_status",
+                scope="course",
+                course=course,
+                course_name=name,
+                section="Current course information",
+                title=f"{name} {cohort} course management platform",
+                text=text,
+                url=platform_url,
+                repo=None,
+                path="",
+                source_id=f"course-status:{course}:{cohort}",
+                cohort=cohort,
+                current=True,
+                authority="canonical",
+            )
+        )
+    return documents
+
+
+_COHORT_RE = re.compile(r"(?:^|/)cohorts/(20\d{2})(?:/|$)")
+_PLATFORM_COHORT_RE = re.compile(r"(?:^|[-/])(20\d{2})(?:/|$)")
+
+
+def cohort_from_locator(path: str | None = None, url: str | None = None) -> str:
+    """Extract a four-digit cohort from a repository path or platform URL."""
+    path_match = _COHORT_RE.search(str(path or ""))
+    if path_match:
+        return path_match.group(1)
+    url_match = _PLATFORM_COHORT_RE.search(str(url or ""))
+    return url_match.group(1) if url_match else ""
 
 
 def read_github_files(github_config: dict[str, Any], required_prefix: str | None = None):

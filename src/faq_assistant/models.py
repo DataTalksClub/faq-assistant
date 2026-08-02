@@ -17,6 +17,9 @@ class SourceDocument:
     repo: str | None
     path: str | None
     source_id: str
+    cohort: str = ""
+    current: bool = False
+    authority: str = "reference"
 
 
 @dataclass(frozen=True)
@@ -84,6 +87,10 @@ class SearchResult(StructuredModel):
     url: str = ""
     repo: str = ""
     path: str = ""
+    source_id: str = ""
+    cohort: str = ""
+    current: bool = False
+    authority: str = "reference"
 
 
 @dataclass

@@ -32,6 +32,10 @@ def build_search_corpus(
                 "url": str(metadata.get("url", "")),
                 "repo": str(metadata.get("repo", "")),
                 "path": str(metadata.get("path", "")),
+                "source_id": str(metadata.get("source_id", "")),
+                "cohort": str(metadata.get("cohort", "")),
+                "current": bool(metadata.get("current", False)),
+                "authority": str(metadata.get("authority", "reference")),
             }
         )
 

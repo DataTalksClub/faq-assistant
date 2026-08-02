@@ -84,6 +84,8 @@ name = "Data Engineering Zoomcamp"
 slack_channels = ["C01FABYF2RG"]
 faq_enabled = true
 docs_prefix = "courses/data-engineering-zoomcamp/"
+current_cohort = "2026"
+platform_url = "https://courses.datatalks.club/de-zoomcamp-2026/"
 
 [[courses."data-engineering-zoomcamp".github_repositories]]
 repo = "DataTalksClub/data-engineering-zoomcamp"
@@ -94,6 +96,8 @@ name = "MLOps Zoomcamp"
 slack_channels = ["C02R98X7DS9"]
 faq_enabled = true
 docs_prefix = "courses/mlops-zoomcamp/"
+current_cohort = "2025"
+platform_url = "https://courses.datatalks.club/mlops-zoomcamp-2025/"
 
 [[courses."mlops-zoomcamp".github_repositories]]
 repo = "DataTalksClub/mlops-zoomcamp"
@@ -104,6 +108,8 @@ name = "LLM Zoomcamp"
 slack_channels = ["C06TEGTGM3J"]
 faq_enabled = true
 docs_prefix = "courses/llm-zoomcamp/"
+current_cohort = "2026"
+platform_url = "https://courses.datatalks.club/llm-zoomcamp-2026/"
 
 [[courses."llm-zoomcamp".github_repositories]]
 repo = "DataTalksClub/llm-zoomcamp"
@@ -114,6 +120,8 @@ name = "Machine Learning Zoomcamp"
 slack_channels = ["C0288NJ5XSA"]
 faq_enabled = true
 docs_prefix = "courses/ml-zoomcamp/"
+current_cohort = "2026"
+platform_url = "https://courses.datatalks.club/ml-zoomcamp-2026/"
 
 [[courses."machine-learning-zoomcamp".github_repositories]]
 repo = "DataTalksClub/machine-learning-zoomcamp"
@@ -124,6 +132,8 @@ name = "AI Dev Tools Zoomcamp"
 slack_channels = ["C09HWT76L95"]
 faq_enabled = true
 docs_prefix = "courses/ai-dev-tools-zoomcamp/"
+current_cohort = "2026"
+platform_url = "https://courses.datatalks.club/ai-dev-tools-2026/"
 
 [[courses."ai-dev-tools-zoomcamp".github_repositories]]
 repo = "DataTalksClub/ai-dev-tools-zoomcamp"
@@ -134,6 +144,8 @@ name = "Stock Markets Analytics Zoomcamp"
 slack_channels = ["C06L1RTF10F"]
 faq_enabled = true
 docs_prefix = "courses/stock-markets-analytics-zoomcamp/"
+current_cohort = "2025"
+platform_url = "https://courses.datatalks.club/sma-zoomcamp-2025/"
 
 [[courses."stock-markets-analytics-zoomcamp".github_repositories]]
 repo = "DataTalksClub/stock-markets-analytics-zoomcamp"
@@ -171,6 +183,17 @@ course_definitions = "courses"
 repo = "DataTalksClub/docs"
 ref = "main"
 include_from_course_docs_prefix = true
+include = ["*.md", "**/*.md"]
+exclude = ["vendor/**", "node_modules/**", ".git/**"]
+
+[sources.shared_course_docs]
+enabled = true
+scope = "docs"
+prefixes = ["courses/zoomcamp-logistics/"]
+
+[sources.shared_course_docs.github]
+repo = "DataTalksClub/docs"
+ref = "main"
 include = ["*.md", "**/*.md"]
 exclude = ["vendor/**", "node_modules/**", ".git/**"]
 
@@ -215,11 +238,18 @@ default_limit = 6
 max_limit = 10
 min_score = 0.2
 rewrite_query = true
+candidate_limit = 30
+freshness_rerank = true
+current_cohort_boost = 1.30
+canonical_boost = 1.15
+historical_boost = 0.60
+max_chunks_per_source = 2
 
 [retrieval.boosts]
 title = 3.0
 section = 1.5
 text = 1.0
+path = 2.0
 
 [retrieval.scopes.course.filter_fields]
 scope = "course"

@@ -132,8 +132,12 @@ def main() -> None:
         rewritten = lib.chat("gpt-4o-mini", [
             {"role": "system", "content": prod_prompt},
             {"role": "user", "content": f"course: {course}\nmessage: {q}"}], max_tokens=60).strip()
-        before = rank_of(lib.prod_search(idx_before, rewritten, course), target_id)
-        after = rank_of(lib.prod_search(idx_after, rewritten, course), target_id)
+        before = rank_of(
+            lib.prod_search(idx_before, rewritten, course, original_question=q), target_id
+        )
+        after = rank_of(
+            lib.prod_search(idx_after, rewritten, course, original_question=q), target_id
+        )
         pool = {}
         for c in (lib.search(idx_after, q, course, POOL_K) + lib.search(idx_after, rewritten, course, POOL_K)):
             pool.setdefault(c["id"], c)

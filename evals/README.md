@@ -126,25 +126,60 @@ Both scripts call OpenAI and need `OPENAI_API_KEY` (loaded from the repo `.env`)
 
 ## 4. Answer gaps (end-to-end failures)
 
-`data/answer_gaps.jsonl` is a hand-curated regression set of **real questions the
-bot got wrong** in Slack — surfaced by `scripts/slack_faq_review.py`, which scans
-the course channels for threads where the bot was triggered (`@mention` or `faq`
-reaction) and either replied that it couldn't find an answer, or was corrected
-afterwards by an instructor. Each row records what the bot said and the
-instructor's correct answer:
+`data/answer_gaps.jsonl` is a hand-curated regression set of **real questions a
+course bot got wrong** in Slack. It includes Au-Tomator failures surfaced by
+`scripts/slack_faq_review.py` and manually reviewed ZoomcampQABot failures from
+the same recent window. We include a case only when an instructor directly
+supplies or changes the answer, an exact answerable resource was missed, or the
+bot demonstrably selected the wrong cohort. Each row records which bot replied,
+what it said, and the authoritative expected behavior:
 
 ```json
-{"query": "...", "course": "llm-zoomcamp", "scope": "course", "channel": "course-llm",
+{"query": "...", "course": "llm-zoomcamp", "scope": "course",
+ "observed_bot": "au-tomator|zoomcamp-qa-bot", "channel": "course-llm",
  "thread_ts": "...", "trigger": "faq-reaction", "failure": "no_answer|incorrect|incomplete",
  "bot_answer": "...", "expected_answer": "...", "answer_source": "alexey-grigorev",
  "permalink": "..."}
 ```
 
+Failure classes are:
+
+- `no_answer` — the bot abstained even though the answer is available.
+- `incorrect` — the answer contains a claim directly contradicted by the
+  authoritative answer.
+- `incomplete` — the answer is directionally useful but misses a necessary
+  constraint, link, or detail.
+- `stale_source` — the answer uses historical cohort material for a current or
+  unqualified question.
+- `inconsistent` — repeated answers in one thread contradict one another.
+
+For dates and other live cohort state, `expected_answer` records the authority
+the bot must use (usually the current course-management platform) instead of
+freezing a date that will immediately become stale.
+
 Unlike `ground_truth.jsonl`, these are **not** pooled retrieval targets: most are
 FAQ *content* gaps (the correct answer isn't in the corpus yet — e.g. the
 "no late homework submissions" policy), so they fail the pooled-judgment filter by
-design. They're kept as a checklist of what to add to the FAQ source and to
-sanity-check end-to-end answer quality after corpus/prompt changes.
+design. The instructor-backed cases now carry machine-checkable source and answer
+constraints, so the focused regressions can fail in CI instead of relying only on
+a human checklist.
+
+Run the deterministic retrieval checks (no API key required):
+
+```bash
+uv run python evals/run_answer_gaps.py
+```
+
+By default, unpublished entries from the sibling `../faq` repository are spliced
+into the corpus, matching their eventual production representation. Use
+`--no-local-drafts` to test only the published corpus. Add `--answers` to run the
+full rewrite/retrieval/generation pipeline and check answer constraints; that mode
+requires `OPENAI_API_KEY`. Both modes exit nonzero on a failed assertion, while
+`--report-only` is useful for taking a baseline without gating a build.
+
+A row can include `retrieval_query` when the production rewrite must add a
+general category (for example, mapping “LLMs” to “AI tools”). This makes the
+no-API check stable; `--answers` still exercises the real production rewrite.
 
 Refresh the candidates with:
 
@@ -154,7 +189,14 @@ python scripts/slack_faq_review.py --days 60 --json .tmp/slack-faq-review.json
 
 ---
 
-## Results (128 real Slack queries)
+## Results (130 real Slack queries)
+
+The variant table below is the earlier benchmark snapshot. On the live corpus
+rebuilt on 2026-08-02, the production rewrite plus freshness-aware retrieval
+scored hit@5 = 0.462. Replaying those exact rewrites with reranking disabled
+scored 0.469 (61 rather than 60 hits), while the focused recent answer-gap suite
+improved to 12/12. Source drift also removed every labeled relevant chunk for 4
+of the 130 older queries, so compare retrieval changes on the same corpus build.
 
 ### Query-rewrite variants — zerosearch
 

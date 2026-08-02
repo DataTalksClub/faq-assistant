@@ -12,8 +12,11 @@ from typing import Any
 from zerosearch import Index
 
 # Canonical retrieval schema (kept in sync with the eval harness).
-TEXT_FIELDS = ["title", "section", "text"]
-KEYWORD_FIELDS = ["id", "source_type", "scope", "course", "url", "repo", "path"]
+TEXT_FIELDS = ["title", "section", "text", "path"]
+KEYWORD_FIELDS = [
+    "id", "source_type", "scope", "course", "url", "repo", "path",
+    "source_id", "cohort", "current", "authority",
+]
 
 DEFAULT_CORPUS_ARTIFACT = "artifacts/search/search-corpus.json"
 DEFAULT_INDEX_ARTIFACT = "artifacts/search/search-index.zsx"

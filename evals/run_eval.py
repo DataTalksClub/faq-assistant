@@ -100,7 +100,9 @@ def evaluate(index, gt: list[dict], system: str | None) -> dict:
     agg = {f"hit@{k}": 0.0 for k in K_VALUES}
     agg.update({f"mrr@{k}": 0.0 for k in K_VALUES})
     for item, q in zip(gt, rewritten):
-        results = lib.prod_search(index, q, item["course"])
+        results = lib.prod_search(
+            index, q, item["course"], original_question=item["query"]
+        )
         ranked = [r["id"] for r in results]
         relevant = set(item["relevant_ids"])
         for k in K_VALUES:
@@ -128,20 +130,26 @@ def main() -> None:
     print(f"engine={args.engine}  ground-truth queries={len(gt)}\n")
     header = f"{'variant':<11}" + "".join(f"hit@{k:<5}" for k in K_VALUES) + "".join(f"mrr@{k:<5}" for k in K_VALUES)
     print(header); print("-" * len(header))
-    summary = {}
+    summary_path = lib.RESULTS_DIR / f"summary__{args.engine}.json"
+    if summary_path.exists():
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    else:
+        summary = {}
+    measured = {}
     for name in names:
         result = evaluate(index, gt, VARIANTS[name])
         m = result["metrics"]
         summary[name] = m
+        measured[name] = m
         line = f"{name:<11}" + "".join(f"{m[f'hit@{k}']:<9.3f}" for k in K_VALUES) + "".join(f"{m[f'mrr@{k}']:<9.3f}" for k in K_VALUES)
         print(line)
         lib.RESULTS_DIR.mkdir(parents=True, exist_ok=True)
         (lib.RESULTS_DIR / f"{args.engine}__{name}.json").write_text(
             json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    best = max(summary, key=lambda nm: (summary[nm][f"hit@{MAIN_K}"], summary[nm][f"mrr@{MAIN_K}"]))
-    print(f"\nbest variant by hit@{MAIN_K}: {best}  -> {summary[best]}")
-    (lib.RESULTS_DIR / f"summary__{args.engine}.json").write_text(
+    best = max(measured, key=lambda nm: (measured[nm][f"hit@{MAIN_K}"], measured[nm][f"mrr@{MAIN_K}"]))
+    print(f"\nbest measured variant by hit@{MAIN_K}: {best}  -> {measured[best]}")
+    summary_path.write_text(
         json.dumps(summary, indent=2), encoding="utf-8")
 
 

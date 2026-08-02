@@ -44,6 +44,7 @@ def record(**overrides):
     base = {
         "id": "", "score": 1.0, "source_type": "faq", "scope": "course", "course": "",
         "section": "", "title": "", "text": "", "url": "", "repo": "", "path": "",
+        "source_id": "", "cohort": "", "current": False, "authority": "reference",
     }
     base.update(overrides)
     return base

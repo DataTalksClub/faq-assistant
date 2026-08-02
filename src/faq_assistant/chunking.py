@@ -45,6 +45,9 @@ def chunk_documents(documents: list[SourceDocument], config: dict[str, Any]) -> 
                 "path": doc.path or "",
                 "source_id": doc.source_id,
                 "chunk_index": index,
+                "cohort": doc.cohort,
+                "current": doc.current,
+                "authority": doc.authority,
             }
             chunks.append(Chunk(id=chunk_id, text=text, metadata=metadata))
     return chunks
