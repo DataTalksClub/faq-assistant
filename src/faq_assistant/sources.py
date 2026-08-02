@@ -5,9 +5,6 @@ import re
 from typing import Any
 from urllib.parse import urljoin
 
-import requests
-from gitsource import GithubRepositoryDataReader
-
 from faq_assistant.matching import matches_any
 from faq_assistant.models import SourceDocument
 
@@ -37,6 +34,8 @@ def load_source_documents(config: dict[str, Any]) -> list[SourceDocument]:
 
 
 def load_faq_documents(config: dict[str, Any]) -> list[SourceDocument]:
+    import requests
+
     source_config = config["sources"]["faq"]
     response = requests.get(source_config["courses_url"], timeout=60)
     response.raise_for_status()
@@ -276,6 +275,8 @@ def cohort_from_locator(path: str | None = None, url: str | None = None) -> str:
 
 
 def read_github_files(github_config: dict[str, Any], required_prefix: str | None = None):
+    from gitsource import GithubRepositoryDataReader
+
     owner, repo_name = github_config["repo"].split("/", 1)
     include = list(github_config.get("include", []))
     exclude = list(github_config.get("exclude", []))
