@@ -5,9 +5,10 @@ Best-effort: never raises. Disabled unless OPIK_ENABLED=true.
 
 Env:
   OPIK_ENABLED=true
-  OPIK_URL_OVERRIDE=http://localhost:5173/api (default)
+  OPIK_URL_OVERRIDE=http://localhost:5173/api (default; cloud: https://www.comet.com/opik/api)
   OPIK_PROJECT_NAME=faq-assistant (default)
-  OPIK_API_KEY=... (optional, for cloud; local needs none)
+  OPIK_WORKSPACE=default (sent as Comet-Workspace; required by cloud, ignored locally)
+  OPIK_API_KEY=... (optional locally; required by cloud)
 """
 
 from __future__ import annotations
@@ -70,6 +71,8 @@ def send_trace(name: str, input: dict, output: dict, metadata: dict | None = Non
             ]
         }
         headers = {"content-type": "application/json"}
+        if os.environ.get("OPIK_WORKSPACE"):
+            headers["Comet-Workspace"] = os.environ["OPIK_WORKSPACE"]
         if os.environ.get("OPIK_API_KEY"):
             headers["authorization"] = os.environ["OPIK_API_KEY"]
         req = urllib.request.Request(
