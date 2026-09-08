@@ -18,14 +18,10 @@ from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.structured import parse_structured_response
 
 try:
-    from faq_assistant.opik_tracing import track as _track
-except Exception:  # Lambda without opik installed: no-op decorator
-
-    def _track(_fn=None, **kwargs):
-        def decorator(fn):
-            return fn
-
-        return decorator(_fn) if _fn else decorator
+    from opik import track
+except ImportError:  # Lambda has no opik: no-op
+    def track(fn=None, **_):
+        return (lambda f: f)(fn) if callable(fn) else lambda f: f
 
 # A chat call: (messages, output_model, max_tokens, temperature, model) -> response dict.
 ChatFn = Callable[..., dict]
@@ -111,7 +107,7 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: float) -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
-@_track(project="faq-assistant")
+@track
 def answer_question(
     config: dict[str, Any],
     index,
@@ -196,7 +192,6 @@ REWRITE_SYSTEM_PROMPT = (
 )
 
 
-@_track(project="faq-assistant")
 def rewrite_query(config, chat: ChatFn, question: str, scope: str, course: str | None) -> str:
     if not config["retrieval"].get("rewrite_query", True):
         return question
@@ -261,7 +256,6 @@ def search(
     ).results
 
 
-@_track(project="faq-assistant")
 def retrieve(
     config, index, query: str, scope: str, course: str | None, *, original_question: str | None = None
 ) -> RetrievalOutcome:
@@ -359,7 +353,6 @@ def retrieve(
     )
 
 
-@_track(project="faq-assistant")
 def generate_answer(
     config, chat: ChatFn, question, rewritten_query, scope, course, results
 ) -> tuple[str, bool, list[dict]]:
