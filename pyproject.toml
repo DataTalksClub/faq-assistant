@@ -28,7 +28,6 @@ ingest = [
 ]
 test = [
   "pytest>=8",
-  "opik>=1.0.0",
 ]
 
 [tool.ruff]

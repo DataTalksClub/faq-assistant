@@ -1,7 +1,7 @@
-"""One trace to local Opik. UI: http://localhost:5173, project faq-assistant.
+"""One trace to local Opik, zero dependencies. UI: http://localhost:5173.
 
-  export OPIK_URL_OVERRIDE=http://localhost:5173/api OPIK_PROJECT_NAME=faq-assistant
-  uv run --group test python scripts/trace_demo_opik.py
+  OPIK_ENABLED=true OPIK_URL_OVERRIDE=http://localhost:5173/api \\
+    OPIK_PROJECT_NAME=faq-assistant uv run python scripts/trace_demo_opik.py
 """
 
 import json
@@ -11,6 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
+os.environ.setdefault("OPIK_ENABLED", "true")
 os.environ.setdefault("OPIK_URL_OVERRIDE", "http://localhost:5173/api")
 os.environ.setdefault("OPIK_PROJECT_NAME", "faq-assistant")
 
@@ -36,9 +37,6 @@ class Index:
 
 
 if __name__ == "__main__":
-    import opik
-
     r = answer_question(CONFIG, Index(), chat, "how do I start docker compose", "docs", None)
-    opik.flush_tracker()
     print("answer:", r["answer"])
     print("view at http://localhost:5173, project faq-assistant")
