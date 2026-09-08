@@ -16,6 +16,7 @@ from typing import Any, Callable
 
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.structured import parse_structured_response
+from faq_assistant.opik_lite import track
 
 # A chat call: (messages, output_model, max_tokens, temperature, model) -> response dict.
 ChatFn = Callable[..., dict]
@@ -101,6 +102,7 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: float) -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
+@track
 def answer_question(
     config: dict[str, Any],
     index,
