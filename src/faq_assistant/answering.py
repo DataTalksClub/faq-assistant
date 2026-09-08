@@ -16,7 +16,7 @@ from typing import Any, Callable
 
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.structured import parse_structured_response
-from faq_assistant import opik_lite
+from faq_assistant.opik_lite import track
 
 # A chat call: (messages, output_model, max_tokens, temperature, model) -> response dict.
 ChatFn = Callable[..., dict]
@@ -102,6 +102,7 @@ def _post_json(url: str, payload: dict, headers: dict, timeout: float) -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
+@track
 def answer_question(
     config: dict[str, Any],
     index,
@@ -151,7 +152,7 @@ def answer_question(
     except Exception:  # observability must never break answering
         summary = {}
 
-    result = {
+    return {
         "question": question,
         "rewritten_query": rewritten_query,
         "scope": scope,
@@ -161,19 +162,6 @@ def answer_question(
         "sources": sources,
         "usage": summary,
     }
-    try:
-        opik_lite.send_trace(
-            "answer_question",
-            {"question": question, "scope": scope, "course": course},
-            {"answer": answer, "found_answer": found_answer,
-             "rewritten_query": rewritten_query, "usage": summary,
-             "latency_ms": round(latency_ms, 1)},
-            {"source": source, "scope": scope, "course": course or "",
-             "num_results": len(results)},
-        )
-    except Exception:
-        pass
-    return result
 
 
 # The production query-rewrite instruction. Kept as a module constant so the
