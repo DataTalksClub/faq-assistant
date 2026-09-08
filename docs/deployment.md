@@ -75,6 +75,7 @@ variables → Actions**):
 | `AWS_DEPLOY_ROLE_ARN` | the `DeployRoleArn` stack output |
 | `OPENAI_API_KEY` | OpenAI API key |
 | `FAQ_ASSISTANT_SHARED_SECRET` | shared secret callers send in `x-faq-assistant-secret` |
+| `OPIK_API_KEY` | Opik Cloud API key for trace export (`faq-assistant-lambda` project) |
 
 ```bash
 aws cloudformation describe-stacks --stack-name faq-assistant --region eu-west-1 \
@@ -105,7 +106,7 @@ Its trust policy only allows `repo:DataTalksClub/faq-assistant:*` (via the
 1. Ensure the GitHub OIDC provider exists (step 1).
 2. Bootstrap deploy once with elevated credentials (step 2) — this creates the
    function **and** the scoped deploy role.
-3. Set the four secrets, pointing `AWS_DEPLOY_ROLE_ARN` at the new stack's output
+3. Set the five secrets, pointing `AWS_DEPLOY_ROLE_ARN` at the new stack's output
    (and override `GitHubRepo` if the repo differs).
 
 No template changes and no privilege escalation — the role is identical across

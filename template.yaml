@@ -14,6 +14,11 @@ Parameters:
     Description: >-
       Shared secret callers send in the x-faq-assistant-secret header.
       Empty leaves the endpoint open (not recommended).
+  OpikApiKey:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: Opik Cloud API key for trace export, exposed as OPIK_API_KEY. Empty keeps tracing inert.
   GitHubRepo:
     Type: String
     Default: "DataTalksClub/faq-assistant"
@@ -41,6 +46,11 @@ Resources:
           OPENAI_API_KEY: !Ref OpenAIApiKey
           FAQ_ASSISTANT_SHARED_SECRET: !Ref SharedSecret
           SEARCH_INDEX_PATH: search-index.zsx
+          OPIK_ENABLED: "true"
+          OPIK_URL_OVERRIDE: https://www.comet.com/opik/api
+          OPIK_WORKSPACE: default
+          OPIK_PROJECT_NAME: faq-assistant-lambda
+          OPIK_API_KEY: !Ref OpikApiKey
       FunctionUrlConfig:
         AuthType: NONE
 

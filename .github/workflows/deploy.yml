@@ -70,4 +70,5 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --parameter-overrides \
               OpenAIApiKey=${{ secrets.OPENAI_API_KEY }} \
-              SharedSecret=${{ secrets.FAQ_ASSISTANT_SHARED_SECRET }}
+              SharedSecret=${{ secrets.FAQ_ASSISTANT_SHARED_SECRET }} \
+              OpikApiKey=${{ secrets.OPIK_API_KEY }}
