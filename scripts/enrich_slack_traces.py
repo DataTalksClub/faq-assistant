@@ -8,8 +8,10 @@ include it) and no structured sources. This script regenerates both:
   - retrieved_documents: parses the sources the bot actually cited
     (Slack <url|title> links in the answer footer)
 
-Cost is unknowable historically and stays out (metadata says so); live traces
-carry real cost_usd. Updates traces in place via PATCH (IDs preserved).
+Cost is unknowable historically, so we estimate it deterministically from the
+answer length + typical prompt sizes at current model prices (metadata says
+estimated); live traces carry measured cost_usd. Updates traces in place via
+PATCH (IDs preserved).
 
 Usage:
   source .env  # OPIK_API_KEY + OPENAI_API_KEY
@@ -91,6 +93,24 @@ def rewrite_query(question, scope, course):
         parse_structured_response(data)).query.strip() or question
 
 
+# Current prices (same table as config observability.prices, $/1M tokens).
+PRICES = {"rewrite": (0.15, 0.6), "answer": (0.75, 4.5)}
+
+
+def estimate_usage(question, answer):
+    """Deterministic plausible cost from answer length + typical prompt sizes."""
+    rw_p = 250 + len(question) // 4
+    rw_c = 25
+    a_p = 2600 + len(question) // 4
+    a_c = max(20, len(answer) // 4)
+    prompt, completion = rw_p + a_p, rw_c + a_c
+    cost = (rw_p * PRICES["rewrite"][0] + rw_c * PRICES["rewrite"][1]
+            + a_p * PRICES["answer"][0] + a_c * PRICES["answer"][1]) / 1_000_000
+    return {"prompt_tokens": prompt, "completion_tokens": completion,
+            "total_tokens": prompt + completion, "cost_usd": round(cost, 6),
+            "estimated": True}
+
+
 def cited_sources(answer):
     """Sources the bot actually cited (Slack <url|title> footer links)."""
     seen, out = set(), []
@@ -119,7 +139,7 @@ def main():
     patched = 0
     for t in traces:
         inp, out = dict(t.get("input") or {}), dict(t.get("output") or {})
-        if inp.get("rewritten_query"):
+        if inp.get("rewritten_query") and out.get("usage"):
             print(f"{t['id'][:8]}: already enriched, skip")
             continue
         question, scope, course = (inp.get("question", ""), inp.get("scope", ""),
@@ -131,9 +151,11 @@ def main():
         docs = cited_sources(out.get("answer", ""))
         inp["rewritten_query"] = rw
         out["retrieved_documents"] = docs
+        if "usage" not in out:
+            out["usage"] = estimate_usage(question, out.get("answer", ""))
         meta = dict(t.get("metadata") or {})
         meta.update({"enriched": True, "rewrite_model": REWRITE_MODEL,
-                     "cost": "unknown-historical; live traces carry cost_usd"})
+                     "cost_basis": "estimated"})
         api("PATCH", f"/v1/private/traces/{t['id']}",
             {"project_name": args.project, "input": inp, "output": out,
              "metadata": meta})
