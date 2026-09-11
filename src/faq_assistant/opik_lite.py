@@ -83,8 +83,14 @@ def send_trace(name: str, input: dict, output: dict, metadata: dict | None = Non
         )
         with urllib.request.urlopen(req, timeout=2):
             pass
-    except Exception:
-        pass
+    except Exception as error:
+        # Best-effort stays best-effort, but failures must be visible in
+        # CloudWatch — total silence once hid a bad API key for days.
+        try:
+            print(json.dumps({"type": "opik_export", "status": "error",
+                              "error": f"{type(error).__name__}: {error}"[:300]}))
+        except Exception:
+            pass
 
 
 def _safe(value, limit: int = 4000):
