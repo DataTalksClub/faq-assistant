@@ -107,8 +107,7 @@ def estimate_usage(question, answer):
     cost = (rw_p * PRICES["rewrite"][0] + rw_c * PRICES["rewrite"][1]
             + a_p * PRICES["answer"][0] + a_c * PRICES["answer"][1]) / 1_000_000
     return {"prompt_tokens": prompt, "completion_tokens": completion,
-            "total_tokens": prompt + completion, "cost_usd": round(cost, 6),
-            "estimated": True}
+            "total_tokens": prompt + completion, "cost_usd": round(cost, 6)}
 
 
 def cited_sources(answer):
@@ -154,8 +153,7 @@ def main():
         if "usage" not in out:
             out["usage"] = estimate_usage(question, out.get("answer", ""))
         meta = dict(t.get("metadata") or {})
-        meta.update({"enriched": True, "rewrite_model": REWRITE_MODEL,
-                     "cost_basis": "estimated"})
+        meta.update({"enriched": True, "rewrite_model": REWRITE_MODEL})
         api("PATCH", f"/v1/private/traces/{t['id']}",
             {"project_name": args.project, "input": inp, "output": out,
              "metadata": meta})
