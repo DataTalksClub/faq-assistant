@@ -107,14 +107,29 @@ def _safe(value, limit: int = 4000):
         return text[:limit]
 
 
-def _input(func, args, kwargs) -> dict:
-    """Minimal input: only small named params, never config/index/chat."""
+def _input(func, args, kwargs, result=None) -> dict:
+    """Small flat input: never config/index/chat, never nested blobs.
+
+    Channel/user ride in `context` (the POST body already carries them, so the
+    ack caller decides what to share) — flattened here so they render as
+    first-class columns. The rewritten query is mirrored from the result so
+    Input shows the full question -> rewrite -> answer chain at a glance
+    (it stays in Output too).
+    """
     try:
         bound = inspect.signature(func).bind_partial(*args, **kwargs)
         values = bound.arguments
     except Exception:
         return {}
-    picked = {k: _safe(values[k]) for k in ("question", "scope", "course", "source", "context") if k in values}
+    picked = {k: _safe(values[k]) for k in ("question", "scope", "course", "source") if k in values}
+    context = values.get("context")
+    if isinstance(context, dict):
+        if context.get("channel"):
+            picked["channel"] = _safe(context["channel"])
+        if context.get("user"):
+            picked["user"] = _safe(context["user"])
+    if isinstance(result, dict) and result.get("rewritten_query"):
+        picked["rewritten_query"] = _safe(result["rewritten_query"])
     return picked
 
 
@@ -142,7 +157,7 @@ def track(func=None, project_name: str | None = None, **_):
                            project=project_name, start=start)
                 raise
             send_trace(fn.__name__,
-                       _input(fn, args, kwargs),
+                       _input(fn, args, kwargs, result),
                        _output(result),
                        project=project_name, start=start)
             return result
