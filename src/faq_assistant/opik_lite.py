@@ -135,8 +135,12 @@ def _input(func, args, kwargs, result=None) -> dict:
 
 def _output(result) -> dict:
     if isinstance(result, dict):
-        return {k: _safe(result[k]) for k in (
-            "answer", "found_answer", "rewritten_query", "usage", "sources") if k in result}
+        out = {k: _safe(result[k]) for k in (
+            "answer", "found_answer", "rewritten_query", "usage") if k in result}
+        # Same key as backfilled traces: every row shows retrieved_documents.
+        if "sources" in result:
+            out["retrieved_documents"] = _safe(result["sources"])
+        return out
     return {"result": _safe(result)}
 
 
