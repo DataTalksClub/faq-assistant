@@ -22,6 +22,9 @@ packages = ["src/faq_assistant"]
 dev = [
     "aws-sam-cli>=1.162.1",
 ]
+evals = [
+    "opik>=2.2.49",
+]
 ingest = [
   "gitsource>=0.0.5",
   "requests>=2.32.0",

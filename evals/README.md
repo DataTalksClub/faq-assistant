@@ -187,6 +187,29 @@ Refresh the candidates with:
 python scripts/slack_faq_review.py --days 60 --json .tmp/slack-faq-review.json
 ```
 
+### Opik-tracked version
+
+`opik_answer_gaps.py` runs the same checks as `run_answer_gaps.py --answers`
+(retrieval sources + generated-answer text against the instructor-backed
+constraints) but uploads `answer_gaps.jsonl` as an Opik Dataset
+(`faq-assistant-answer-gaps`) and scores it through `opik.evaluate()`, so each
+run lands as a comparable **Experiment** in the `faq-assistant` project on
+[Comet Opik Cloud](https://www.comet.com/opik) instead of only a terminal
+report. Two metrics, mirroring `check_sources`/`check_answer`:
+
+- `source_constraints` — retrieval includes a required source, excludes forbidden ones.
+- `answer_constraints` — the generated answer contains required text, avoids forbidden text.
+
+```bash
+uv run --group evals python evals/opik_answer_gaps.py
+```
+
+Needs `OPENAI_API_KEY` and `OPIK_API_KEY` (`.env`; also `OPIK_URL_OVERRIDE`,
+`OPIK_WORKSPACE`, `OPIK_PROJECT_NAME` — same Comet Cloud target as production,
+see `template.yaml`). Same `--gaps` / `--corpus` / `--faq-repo` /
+`--no-local-drafts` flags as `run_answer_gaps.py`; always calls OpenAI (no
+retrieval-only mode, since the point is to compare full pipeline runs over time).
+
 ---
 
 ## Results (130 real Slack queries)

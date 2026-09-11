@@ -173,6 +173,12 @@ Response shape:
 }
 ```
 
+## Evals
+
+See [docs/evals.md](docs/evals.md) for terminal commands (retrieval hit-rate/MRR
+sweep, and the answer-gap end-to-end regression — plain or Opik-tracked) and
+[evals/README.md](evals/README.md) for the methodology.
+
 ## Structured-output and RAG checks
 
 ```bash
