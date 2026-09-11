@@ -114,14 +114,14 @@ def _input(func, args, kwargs) -> dict:
         values = bound.arguments
     except Exception:
         return {}
-    picked = {k: _safe(values[k]) for k in ("question", "scope", "course", "source") if k in values}
+    picked = {k: _safe(values[k]) for k in ("question", "scope", "course", "source", "context") if k in values}
     return picked
 
 
 def _output(result) -> dict:
     if isinstance(result, dict):
         return {k: _safe(result[k]) for k in (
-            "answer", "found_answer", "rewritten_query", "usage") if k in result}
+            "answer", "found_answer", "rewritten_query", "usage", "sources") if k in result}
     return {"result": _safe(result)}
 
 

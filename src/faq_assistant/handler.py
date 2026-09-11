@@ -56,12 +56,14 @@ def lambda_handler(event, context=None):
 
     scope = str(body.get("scope") or "docs")
     course = body.get("course")
+    context = {k: v for k, v in {"channel": body.get("channel"), "user": body.get("user")}.items() if v}
 
     usage: list[dict] = []
     chat = make_openai_chat(CONFIG, usage)
     try:
         result = answer_question(
-            CONFIG, _index(), chat, question, scope, course, source="api", usage=usage
+            CONFIG, _index(), chat, question, scope, course, source="api", usage=usage,
+            context=context or None,
         )
     except Exception as error:  # noqa: BLE001 - return the error to the caller
         return _response(500, {"error": str(error) or "Unknown error"})

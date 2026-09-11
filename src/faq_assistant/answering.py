@@ -113,6 +113,7 @@ def answer_question(
     *,
     source: str = "api",
     usage: list[dict] | None = None,
+    context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run the full pipeline and return the response payload."""
     started = time.time()

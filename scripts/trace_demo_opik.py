@@ -37,6 +37,7 @@ class Index:
 
 
 if __name__ == "__main__":
-    r = answer_question(CONFIG, Index(), chat, "how do I start docker compose", "docs", None)
+    r = answer_question(CONFIG, Index(), chat, "how do I start docker compose", "docs", None,
+                        context={"channel": "#course-llm-zoomcamp", "user": "U12345"})
     print("answer:", r["answer"])
     print("view at http://localhost:5173, project faq-assistant")
