@@ -33,7 +33,7 @@ if _env_path.exists():
 # Reuse the production retrieval definitions so the eval can't silently drift.
 from faq_assistant import answering  # noqa: E402
 from faq_assistant.generated_config import CONFIG  # noqa: E402
-from faq_assistant.search_index import KEYWORD_FIELDS, TEXT_FIELDS  # noqa: E402
+from faq_assistant.search_index import KEYWORD_FIELDS, TEXT_FIELDS, search_tokenizer  # noqa: E402
 
 FAQ_REPO = Path(os.environ.get("FAQ_REPO", ROOT.parent / "faq"))
 DATA_DIR = Path(__file__).resolve().parent / "data"
@@ -71,6 +71,9 @@ def load_corpus() -> list[dict[str, Any]]:
 def build_index(records: list[dict[str, Any]], engine: str = "zerosearch"):
     if engine == "zerosearch":
         from zerosearch import Index
+        # Same tokenizer production builds/loads with (plural folding included).
+        return Index(text_fields=TEXT_FIELDS, keyword_fields=KEYWORD_FIELDS,
+                     tokenizer=search_tokenizer).fit(records)
     elif engine == "minsearch":
         from minsearch import Index  # type: ignore
     else:

@@ -174,6 +174,10 @@ REWRITE_SYSTEM_PROMPT = (
     "drop conversational meta such as 'can someone help', 'any ideas', 'please help', "
     "or 'I'm stuck' - keep the words that describe what they actually want to find. "
     "Fix typos, preserve technical terms, and do not answer. "
+    "Reuse the user's own words instead of paraphrasing them into synonyms: keyword "
+    "search matches exact words, so 'see my certificate' stays 'see certificate' "
+    "(never 'certificate availability') and 'submit' stays 'submit' (never "
+    "'submission'). "
     "Expand common abbreviations to their full words (e.g. 'hw' -> 'homework', "
     "'q' -> 'question', 'env' -> 'environment'). "
     "Capture the user's intent in a few keywords - do not reduce the query to a single "
@@ -311,6 +315,7 @@ def retrieve(
     current_boost = float(retrieval.get("current_cohort_boost", 1.0))
     canonical_boost = float(retrieval.get("canonical_boost", 1.0))
     historical_boost = float(retrieval.get("historical_boost", 1.0))
+    faq_boost = float(retrieval.get("faq_boost", 1.0))
 
     def rank_score(result: SearchResult) -> float:
         multiplier = 1.0
@@ -321,6 +326,13 @@ def retrieve(
             multiplier *= canonical_boost
         elif intent.temporal and result.authority == "historical":
             multiplier *= historical_boost
+        if result.source_type == "faq":
+            # Curated FAQ entries answer student questions almost verbatim.
+            # Keep them from being crowded out by generic pinned/boosted
+            # sources (course-status record, cohort READMEs) when the query
+            # matches an FAQ well; the raw keyword score still decides
+            # *which* FAQ wins.
+            multiplier *= faq_boost
         return result.score * multiplier
 
     filtered.sort(key=lambda result: (-rank_score(result), result.id))

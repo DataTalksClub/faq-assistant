@@ -214,6 +214,8 @@ include = [
 ]
 exclude = [
   ".git/**",
+  ".tmp/**",
+  "tmp/**",
   "data/**",
   "images/**",
   "notebooks/**",
@@ -238,11 +240,15 @@ default_limit = 6
 max_limit = 10
 min_score = 0.2
 rewrite_query = true
-candidate_limit = 30
+candidate_limit = 50
 freshness_rerank = true
 current_cohort_boost = 1.30
 canonical_boost = 1.15
 historical_boost = 0.60
+# Curated FAQ entries answer student questions almost verbatim; keep them from
+# being crowded out by generic boosted sources (course-status record, cohort
+# READMEs) when the query matches an FAQ well.
+faq_boost = 2.00
 max_chunks_per_source = 2
 
 [retrieval.boosts]

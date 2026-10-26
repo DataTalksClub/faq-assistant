@@ -112,7 +112,8 @@ def main() -> None:
     draft_count = 0
     if not args.no_local_drafts:
         corpus, draft_count = gaps.splice_local_faq_drafts(corpus, rows, args.faq_repo.expanduser())
-    index = gaps.Index(text_fields=gaps.TEXT_FIELDS, keyword_fields=gaps.KEYWORD_FIELDS).fit(corpus)
+    index = gaps.Index(text_fields=gaps.TEXT_FIELDS, keyword_fields=gaps.KEYWORD_FIELDS,
+                       tokenizer=gaps.search_tokenizer).fit(corpus)
     chat = gaps.make_openai_chat(gaps.CONFIG)
 
     dataset = build_dataset(rows)

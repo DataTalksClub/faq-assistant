@@ -23,7 +23,7 @@ from faq_assistant.answering import answer_question, make_openai_chat, search  #
 from faq_assistant.chunking import chunk_documents  # noqa: E402
 from faq_assistant.generated_config import CONFIG  # noqa: E402
 from faq_assistant.models import SourceDocument  # noqa: E402
-from faq_assistant.search_index import KEYWORD_FIELDS, TEXT_FIELDS  # noqa: E402
+from faq_assistant.search_index import KEYWORD_FIELDS, TEXT_FIELDS, search_tokenizer  # noqa: E402
 from zerosearch import Index  # noqa: E402
 
 DEFAULT_GAPS = ROOT / "evals" / "data" / "answer_gaps.jsonl"
@@ -140,7 +140,9 @@ def main() -> None:
     draft_count = 0
     if not args.no_local_drafts:
         corpus, draft_count = splice_local_faq_drafts(corpus, rows, args.faq_repo.expanduser())
-    index = Index(text_fields=TEXT_FIELDS, keyword_fields=KEYWORD_FIELDS).fit(corpus)
+    # Same tokenizer production builds/loads with (plural folding included).
+    index = Index(text_fields=TEXT_FIELDS, keyword_fields=KEYWORD_FIELDS,
+                  tokenizer=search_tokenizer).fit(corpus)
 
     chat = None
     if args.answers:
