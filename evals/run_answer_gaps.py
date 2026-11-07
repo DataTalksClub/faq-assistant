@@ -96,6 +96,17 @@ def check_sources(row: dict, results) -> list[str]:
     forbidden = list(row.get("forbidden_source_any") or [])
     if required and not contains_any(texts, required):
         failures.append("missing required source: " + " OR ".join(required))
+    rank_limit = row.get("required_source_rank_max")
+    if required and rank_limit is not None:
+        matching_ranks = [
+            rank for rank, text in enumerate(texts, start=1)
+            if any(pattern.lower() in text for pattern in required)
+        ]
+        if matching_ranks and min(matching_ranks) > int(rank_limit):
+            failures.append(
+                f"required source ranked {min(matching_ranks)}, expected <= {rank_limit}: "
+                + " OR ".join(required)
+            )
     found_forbidden = [pattern for pattern in forbidden if contains_any(texts, [pattern])]
     if found_forbidden:
         failures.append("forbidden source: " + ", ".join(found_forbidden))
