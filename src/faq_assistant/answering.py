@@ -256,6 +256,64 @@ def search(
     ).results
 
 
+def augment_retrieval_query(query: str, question: str, course: str | None) -> str:
+    """Add stable search terms for intents the model rewrite often paraphrases away."""
+    normalized = " ".join((question or query).split()).casefold()
+    expansions: list[str] = []
+
+    if course == "machine-learning-zoomcamp":
+        if re.search(r"\b(?:repo|repository)\b", normalized) and re.search(
+            r"\b(?:assignment|homework)s?\b", normalized
+        ):
+            expansions.append(
+                "projects/how-to.md How to Submit and Review Projects project submission "
+                "GitHub repo URL separate repo or subfolder in your course repo"
+            )
+
+        asks_for_midterm_link = (
+            re.search(r"\bmid[\s-]?term\b", normalized)
+            and re.search(r"\b(?:link|page|requirements|instructions)\b", normalized)
+        )
+        if asks_for_midterm_link:
+            expansions.append(
+                "projects/how-to.md How to Submit and Review Projects project requirements"
+            )
+
+        asks_which_projects = (
+            re.search(r"\b(?:skip|skipping|only)\b", normalized)
+            and re.search(r"\b(?:2|two|3|three)\b", normalized)
+            and re.search(r"\b(?:projects?|mid[\s-]?term|capstones?)\b", normalized)
+        )
+        if asks_which_projects:
+            expansions.append(
+                "certificate required two out of three passing projects choose Midterm "
+                "Capstone 1 Capstone 2"
+            )
+
+    asks_about_ai_peer_review = (
+        re.search(r"\b(?:ai|llm|chatgpt|claude|gemini)\b", normalized)
+        and re.search(r"\b(?:peer|peers|review|reviews|evaluate|evaluating)\b", normalized)
+        and re.search(r"\bprojects?\b", normalized)
+    )
+    if asks_about_ai_peer_review:
+        expansions.append(
+            "AI usage policy use ChatGPT AI tools for peer reviews allowed draft review "
+            "look at the project"
+        )
+
+    asks_about_certificate_steps = (
+        re.search(r"\bcertificate\b", normalized)
+        and re.search(r"\b(?:project|projects|submission|submitted)\b", normalized)
+    )
+    if asks_about_certificate_steps:
+        expansions.append(
+            "certificate requirements project peer reviews required review assignments "
+            "appear automatically after project submissions close"
+        )
+
+    return " ".join([query.strip(), *expansions]).strip()
+
+
 def retrieve(
     config, index, query: str, scope: str, course: str | None, *, original_question: str | None = None
 ) -> RetrievalOutcome:
@@ -271,7 +329,7 @@ def retrieve(
     result_limit = int(retrieval["default_limit"])
     candidate_limit = int(retrieval.get("candidate_limit", result_limit)) if rerank_enabled else result_limit
     intent = detect_query_intent(config, original_question or query, course)
-    search_query = query
+    search_query = augment_retrieval_query(query, original_question or query, course)
     if rerank_enabled and intent.temporal and not intent.requested_cohort and intent.current_cohort:
         # Stable authority terms ensure the canonical course-status record enters
         # the pool while preserving every term from the rewritten user query.
@@ -416,8 +474,24 @@ def generate_answer(
         None,
     )
     rag_answer = RagAnswer.model_validate(parse_structured_response(response))
+    answer = rag_answer.answer.strip()
+    if rag_answer.found_answer:
+        project_guide = next(
+            (result for result in results if github_directory_url(result)), None
+        )
+        if project_guide and _asks_for_project_requirements(question):
+            directory_url = github_directory_url(project_guide)
+            if directory_url and directory_url not in answer:
+                answer += f"\n\nProject requirements: [project folder]({directory_url})"
+            if project_guide.id not in rag_answer.source_ids:
+                rag_answer.source_ids.append(project_guide.id)
+        answer, automation_source_id = _append_peer_review_automation_detail(
+            question, answer, results, platform_url
+        )
+        if automation_source_id and automation_source_id not in rag_answer.source_ids:
+            rag_answer.source_ids.append(automation_source_id)
     sources = resolve_sources(config, rag_answer, results)
-    return rag_answer.answer.strip(), bool(rag_answer.found_answer), sources
+    return answer, bool(rag_answer.found_answer), sources
 
 
 def fallback_sources(config, scope: str, course: str | None) -> list[dict]:
@@ -579,11 +653,72 @@ def build_context(results: list[SearchResult]) -> str:
         lines.append(f"authority: {result.authority}")
         lines.append(f"path: {result.path}")
         lines.append(f"url: {result.url}")
+        directory_url = github_directory_url(result)
+        if directory_url:
+            lines.append(f"directory_url: {directory_url}")
         lines.append(f"section: {result.section}")
         lines.append(f"title: {result.title}")
         lines.append(f"text: {result.text}")
         lines.append("")
     return "\n".join(lines).strip()
+
+
+def github_directory_url(result: SearchResult) -> str | None:
+    """Return the parent GitHub folder URL for a project-repository document."""
+    if result.source_type != "github" or not result.path:
+        return None
+    if result.path.split("/", 1)[0].casefold() not in {"project", "projects"}:
+        return None
+
+    repo_url, marker, resource = result.url.partition("/blob/")
+    suffix = "/" + result.path.lstrip("/")
+    if not marker or not resource.endswith(suffix):
+        return None
+
+    ref = resource[: -len(suffix)]
+    directory = result.path.rsplit("/", 1)[0]
+    if not ref or not directory:
+        return None
+    return f"{repo_url}/tree/{ref}/{directory}"
+
+
+def _asks_for_project_requirements(question: str) -> bool:
+    mentions_project = re.search(r"\b(?:project|projects|mid[\s-]?term|capstone)\b", question, re.I)
+    asks_for_materials = re.search(
+        r"\b(?:requirements|instructions|folder|directory|materials)\b", question, re.I
+    )
+    return bool(mentions_project and asks_for_materials)
+
+
+def _append_peer_review_automation_detail(
+    question: str, answer: str, results: list[SearchResult], platform_url: str
+) -> tuple[str, str | None]:
+    normalized_question = question.casefold()
+    asks_about_certificate_steps = (
+        "certificate" in normalized_question
+        and re.search(r"\b(?:project|projects|submission|submitted)\b", normalized_question)
+    )
+    if not asks_about_certificate_steps or re.search(r"\bautomatically\b", answer, re.I):
+        return answer, None
+
+    source = next(
+        (
+            result for result in results
+            if "review assignments appear automatically" in result.text.casefold()
+            and "request anything or sign up" in result.text.casefold()
+        ),
+        None,
+    )
+    if source is None:
+        return answer, None
+
+    detail = (
+        "Review assignments appear automatically after project submissions close; "
+        "you do not need to request them or sign up."
+    )
+    if platform_url:
+        detail = detail[:-1] + f" on the [course platform]({platform_url})."
+    return f"{answer.rstrip()}\n\n{detail}", source.id
 
 
 def call_cost(config, call: dict) -> float:

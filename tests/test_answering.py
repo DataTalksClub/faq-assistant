@@ -4,11 +4,13 @@ from conftest import mock_chat, mock_index, record
 
 from faq_assistant.answering import (
     SOURCE_LABELS,
+    augment_retrieval_query,
     answer_question,
     build_context,
     detect_query_intent,
     fallback_sources,
     generate_answer,
+    github_directory_url,
     resolve_sources,
     retrieve,
     search,
@@ -72,6 +74,55 @@ def test_project_policy_question_is_not_implicitly_temporal(cfg):
         cfg, "Is it allowed to use LLMs for code generation in the project?", "llm-zoomcamp"
     )
     assert intent.temporal is False
+
+
+def test_project_repo_question_adds_submission_guide_terms():
+    query = augment_retrieval_query(
+        "midterm repo assignments",
+        "For the mid-term project, are we putting it in the same repo where assignments are submitted?",
+        "machine-learning-zoomcamp",
+    )
+    assert "projects/how-to.md" in query
+    assert "separate repo or subfolder" in query
+
+
+def test_ai_peer_review_question_adds_shared_policy_terms():
+    query = augment_retrieval_query(
+        "ChatGPT peers projects",
+        "Can we use ChatGPT to evaluate our peers' projects?",
+        "ai-dev-tools-zoomcamp",
+    )
+    assert "AI usage policy" in query
+    assert "allowed draft review" in query
+
+
+def test_project_selection_question_adds_certificate_terms():
+    query = augment_retrieval_query(
+        "skip midterm only two final projects",
+        "Is it okay if I don't do the midterm project and do only the 2 final projects?",
+        "machine-learning-zoomcamp",
+    )
+    assert "certificate required two out of three" in query
+
+
+def test_certificate_steps_question_adds_peer_review_assignment_terms():
+    query = augment_retrieval_query(
+        "submitted project certificate",
+        "I submitted my project today. Do I need to complete any other steps to get the certificate?",
+        "llm-zoomcamp",
+    )
+    assert "review assignments appear automatically" in query
+
+
+def test_github_directory_url_for_project_file():
+    result = SearchResult(
+        source_type="github",
+        path="projects/how-to.md",
+        url="https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/projects/how-to.md",
+    )
+    assert github_directory_url(result) == (
+        "https://github.com/DataTalksClub/machine-learning-zoomcamp/tree/main/projects"
+    )
 
 
 def test_retrieval_deduplicates_chunks_by_source_id(cfg):
@@ -195,6 +246,47 @@ def test_generate_answer_includes_current_cohort_guardrails(cfg):
     messages = chat.call_args.args[0]
     assert "configured current cohort for this course is 2026" in messages[0]["content"]
     assert "CURRENT_PLATFORM: https://courses.datatalks.club/llm-zoomcamp-2026/" in messages[1]["content"]
+    assert "timing and automation" in messages[0]["content"]
+
+
+def test_generate_answer_includes_project_directory_link_when_asked(cfg):
+    guide = SearchResult(
+        id="project-guide", source_type="github", course="machine-learning-zoomcamp",
+        title="How to Submit and Review Projects", path="projects/how-to.md",
+        url="https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/projects/how-to.md",
+    )
+    status = SearchResult(id="status", source_type="course_status", title="Current", text="Platform")
+    chat = mock_chat(answer="Use the cohort page.", source_ids=["status"])
+    answer, found, sources = generate_answer(
+        cfg, chat,
+        "Please share the midterm project requirements and submission page.",
+        "midterm project requirements submission page", "course",
+        "machine-learning-zoomcamp", [status, guide],
+    )
+    folder_url = "https://github.com/DataTalksClub/machine-learning-zoomcamp/tree/main/projects"
+    assert found is True
+    assert folder_url in answer
+    assert any(source["id"] == "project-guide" for source in sources)
+
+
+def test_generate_answer_preserves_automatic_peer_review_step(cfg):
+    faq = SearchResult(
+        id="certificate-faq", source_type="faq", course="llm-zoomcamp",
+        title="Certificate and feedback", url="https://datatalks.club/faq/llm-zoomcamp.html#faq",
+        text=(
+            "You don't need to request anything or sign up. Once project submissions close, "
+            "your review assignments appear automatically on the course management platform."
+        ),
+    )
+    chat = mock_chat(answer="Complete the peer reviews.")
+    answer, found, sources = generate_answer(
+        cfg, chat,
+        "I submitted my project today. Do I need to complete any other steps to get the certificate?",
+        "project submitted certificate requirements", "course", "llm-zoomcamp", [faq],
+    )
+    assert found is True
+    assert "review assignments appear automatically" in answer.casefold()
+    assert any(source["id"] == "certificate-faq" for source in sources)
 
 
 def test_build_context_exposes_freshness_metadata():
@@ -206,6 +298,17 @@ def test_build_context_exposes_freshness_metadata():
     assert "cohort: 2026" in context
     assert "current: true" in context
     assert "authority: canonical" in context
+
+
+def test_build_context_exposes_project_directory_url():
+    context = build_context([SearchResult(
+        id="project-guide", source_type="github", path="projects/how-to.md",
+        url="https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/projects/how-to.md",
+    )])
+    assert (
+        "directory_url: https://github.com/DataTalksClub/machine-learning-zoomcamp/tree/main/projects"
+        in context
+    )
 
 
 def test_fallback_sources_course_lists_faq_docs_repo(cfg):

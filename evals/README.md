@@ -164,6 +164,12 @@ design. The instructor-backed cases now carry machine-checkable source and answe
 constraints, so the focused regressions can fail in CI instead of relying only on
 a human checklist.
 
+Rows may set `required_source_rank_max` to ensure a directly relevant source
+appears near the top of retrieval results. A `content_gap` note records missing
+or incomplete published guidance for the FAQ content owner; the retrieval check
+still requires the worker to return the best current entry, while answer
+constraints are added only when the current corpus supports them.
+
 Run the deterministic retrieval checks (no API key required):
 
 ```bash
