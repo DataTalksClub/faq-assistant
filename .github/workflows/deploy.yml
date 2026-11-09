@@ -17,7 +17,7 @@ on:
       - "scripts/**"
       - ".github/workflows/deploy.yml"
   schedule:
-    - cron: "0 8 * * *"   # daily: pick up new FAQ/docs/repo content
+    - cron: "17 8 * * *"  # daily, off the hour to reduce schedule queue delays
   workflow_dispatch:
 
 jobs:
@@ -72,3 +72,16 @@ jobs:
               OpenAIApiKey=${{ secrets.OPENAI_API_KEY }} \
               SharedSecret=${{ secrets.FAQ_ASSISTANT_SHARED_SECRET }} \
               OpikApiKey=${{ secrets.OPIK_API_KEY }}
+
+      - name: Verify deployed endpoint
+        run: |
+          endpoint="$(aws cloudformation describe-stacks \
+            --stack-name faq-assistant \
+            --query "Stacks[0].Outputs[?OutputKey=='FunctionUrl'].OutputValue" \
+            --output text)"
+          if [[ -z "$endpoint" || "$endpoint" == "None" ]]; then
+            echo "CloudFormation did not return the FunctionUrl output"
+            exit 1
+          fi
+          endpoint="${endpoint%/}"
+          curl --fail --silent --show-error "$endpoint/health"
