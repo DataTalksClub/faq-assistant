@@ -116,3 +116,25 @@ def test_current_state_source_survives_omitted_model_citation(cfg, snapshot):
                              "Have peer review items been assigned?", "course",
                              "machine-learning-zoomcamp", course_state=snapshot)
     assert result["sources"][0]["id"] == "cmp:course-state"
+
+
+def test_supplied_current_cohort_overrides_stale_index_config(cfg, snapshot):
+    cfg["courses"]["machine-learning-zoomcamp"]["current_cohort"] = "2025"
+    cfg["courses"]["machine-learning-zoomcamp"]["platform_url"] = "https://courses.datatalks.club/ml-2025/"
+    chat = mock_chat(source_ids=["cmp:course-state"])
+    result = answer_question(cfg, mock_index([]), chat, "Have peer reviews been assigned for 2026?",
+                             "course", "machine-learning-zoomcamp", course_state=snapshot)
+    assert result["found_answer"] is True
+    messages = chat.call_args_list[-1].args[0]
+    assert "current cohort for this course is 2026" in messages[0]["content"]
+    assert "CURRENT_PLATFORM: https://courses.datatalks.club/ml-2026/" in messages[1]["content"]
+    assert result["sources"][0]["id"] == "cmp:course-state"
+    assert cfg["courses"]["machine-learning-zoomcamp"]["current_cohort"] == "2025"
+
+
+def test_historical_question_excludes_live_state_when_index_current_is_stale(cfg, snapshot):
+    cfg["courses"]["machine-learning-zoomcamp"]["current_cohort"] = "2025"
+    chat = mock_chat()
+    answer_question(cfg, mock_index([]), chat, "When did peer review open in 2025?", "course",
+                    "machine-learning-zoomcamp", course_state=snapshot)
+    assert len(chat.call_args_list) == 1

@@ -5,6 +5,7 @@ The caller must authenticate the snapshot separately from ordinary questions.
 """
 
 import json
+import re
 from datetime import date, datetime
 from urllib.parse import urlsplit
 
@@ -93,6 +94,24 @@ def validate_course_state(value, config, scope, course):
                 else:
                     _date(item[name])
     return value
+
+
+def snapshot_config(config, value, course):
+    """Use the fetched cohort and platform for retrieval and answer precedence."""
+    courses = config.get("courses", {})
+    current = courses.get(course, {})
+    year = re.search(r"(?:^|-)(20\d{2})$", value["course"]["slug"])
+    return {
+        **config,
+        "courses": {
+            **courses,
+            course: {
+                **current,
+                "current_cohort": year.group(1) if year else current.get("current_cohort", ""),
+                "platform_url": value["course"]["source_url"],
+            },
+        },
+    }
 
 
 def course_state_result(value, course):

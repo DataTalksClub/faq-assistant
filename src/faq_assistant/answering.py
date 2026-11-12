@@ -14,7 +14,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from faq_assistant.course_state import course_state_result
+from faq_assistant.course_state import course_state_result, snapshot_config
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.structured import parse_structured_response
 from faq_assistant.opik_lite import track
@@ -120,6 +120,8 @@ def answer_question(
     """Run the full pipeline and return the response payload."""
     started = time.time()
     usage = [] if usage is None else usage
+    if course_state is not None:
+        config = snapshot_config(config, course_state, course)
 
     rewritten_query = rewrite_query(config, chat, question, scope, course)
     retrieval = retrieve(config, index, rewritten_query, scope, course, original_question=question)
