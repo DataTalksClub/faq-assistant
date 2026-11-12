@@ -14,6 +14,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
+from faq_assistant.course_state import course_state_result
 from faq_assistant.models import QueryRewrite, RagAnswer, SearchResult
 from faq_assistant.structured import parse_structured_response
 from faq_assistant.opik_lite import track
@@ -114,6 +115,7 @@ def answer_question(
     source: str = "api",
     usage: list[dict] | None = None,
     context: dict[str, Any] | None = None,
+    course_state: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run the full pipeline and return the response payload."""
     started = time.time()
@@ -122,6 +124,12 @@ def answer_question(
     rewritten_query = rewrite_query(config, chat, question, scope, course)
     retrieval = retrieve(config, index, rewritten_query, scope, course, original_question=question)
     results = retrieval.results
+    if course_state is not None and (
+        not retrieval.intent.requested_cohort
+        or retrieval.intent.requested_cohort == retrieval.intent.current_cohort
+    ):
+        # Fixed caller-supplied snapshot; never selected or fetched by the model.
+        results = [course_state_result(course_state, course), *results]
     answer, found_answer, sources = generate_answer(
         config, chat, question, rewritten_query, scope, course, results
     )
@@ -442,6 +450,17 @@ def generate_answer(
             "resolved by current/canonical metadata, set found_answer to false."
         )
 
+    if any(result.source_type == "cmp" for result in results):
+        instructions += (
+            "\n\nThe cmp:course-state entry is a freshly fetched, read-only CMP snapshot. "
+            "For current deadlines, project states and peer-review assignment availability, "
+            "prefer it over indexed documents. Cite cmp:course-state when relying on it. "
+            "Null dates mean no date is stored; never invent a peer-review opening date. "
+            "assignments_created describes course-wide availability, not whether this "
+            "student has any assignments. This public snapshot contains no personal data. "
+            "Do not claim to know an individual's assignments or infer them from aggregate state."
+        )
+
     context = build_context(results)
     if not context:
         message = (
@@ -490,6 +509,10 @@ def generate_answer(
         )
         if automation_source_id and automation_source_id not in rag_answer.source_ids:
             rag_answer.source_ids.append(automation_source_id)
+    if rag_answer.found_answer and detect_query_intent(config, question, course).temporal:
+        if any(result.id == "cmp:course-state" for result in results):
+            # Keep the live authority visible even if the model omits its citation.
+            rag_answer.source_ids = ["cmp:course-state", *rag_answer.source_ids]
     sources = resolve_sources(config, rag_answer, results)
     return answer, bool(rag_answer.found_answer), sources
 
