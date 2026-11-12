@@ -14,6 +14,7 @@ import re
 
 from faq_assistant.answering import answer_question, make_openai_chat
 from faq_assistant.generated_config import CONFIG
+from faq_assistant.course_state import validate_course_state
 from faq_assistant.search_index import load_search_index
 
 _INDEX = None
@@ -58,12 +59,22 @@ def lambda_handler(event, context=None):
     course = body.get("course")
     context = {k: v for k, v in {"channel": body.get("channel"), "user": body.get("user")}.items() if v}
 
+    course_state = body.get("course_state")
+    if course_state is not None:
+        secret_env = CONFIG.get("api", {}).get("shared_secret_env", "")
+        if not secret_env or not os.environ.get(secret_env):
+            return _response(401, {"error": "course_state requires shared-secret authentication"})
+        try:
+            course_state = validate_course_state(course_state, CONFIG, scope, course)
+        except (ValueError, TypeError, AttributeError) as error:
+            return _response(400, {"error": str(error)})
+
     usage: list[dict] = []
     chat = make_openai_chat(CONFIG, usage)
     try:
         result = answer_question(
             CONFIG, _index(), chat, question, scope, course, source="api", usage=usage,
-            context=context or None,
+            context=context or None, course_state=course_state,
         )
     except Exception as error:  # noqa: BLE001 - return the error to the caller
         return _response(500, {"error": str(error) or "Unknown error"})
