@@ -199,3 +199,4 @@ The ack Lambda maps these channels to `scope`/`course`:
 | LLM Zoomcamp | `#course-llm-zoomcamp` | `C06TEGTGM3J` |
 | AI Dev Tools Zoomcamp | `#course-ai-dev-tools-zoomcamp` | `C09HWT76L95` |
 | Stock Markets Analytics Zoomcamp | `#course-stocks-analytics-zoomcamp` | `C06L1RTF10F` |
+| Production AI Agents for Generative Media | `#course-ai-mediagen` | `C0CEG1BUDKL` |

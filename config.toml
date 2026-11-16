@@ -79,6 +79,11 @@ name = "course-stocks-analytics"
 scope = "course"
 course = "stock-markets-analytics-zoomcamp"
 
+[slack.channels.C0CEG1BUDKL]
+name = "course-ai-mediagen"
+scope = "course"
+course = "production-ai-agents-generative-media"
+
 [courses."data-engineering-zoomcamp"]
 name = "Data Engineering Zoomcamp"
 slack_channels = ["C01FABYF2RG"]
@@ -149,6 +154,18 @@ platform_url = "https://courses.datatalks.club/sma-zoomcamp-2025/"
 
 [[courses."stock-markets-analytics-zoomcamp".github_repositories]]
 repo = "DataTalksClub/stock-markets-analytics-zoomcamp"
+ref = "main"
+
+[courses."production-ai-agents-generative-media"]
+name = "Production AI Agents for Generative Media"
+slack_channels = ["C0CEG1BUDKL"]
+faq_enabled = true
+docs_prefix = "courses/production-ai-agents-generative-media/"
+current_cohort = "2026"
+platform_url = "https://courses.datatalks.club/production-ai-agents-generative-media/"
+
+[[courses."production-ai-agents-generative-media".github_repositories]]
+repo = "DataTalksClub/production-ai-agents-for-media-generation"
 ref = "main"
 
 [sources.faq]
