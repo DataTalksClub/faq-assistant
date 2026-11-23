@@ -38,6 +38,25 @@ def test_health_ok():
     assert json.loads(resp["body"])["ok"] is True
 
 
+def test_ready_ok_when_index_loads():
+    resp = handler.lambda_handler(event("GET", "/ready"))
+    assert resp["statusCode"] == 200
+    assert json.loads(resp["body"]) == {"ok": True}
+
+
+def test_ready_503_when_index_fails(monkeypatch):
+    def broken(_path):
+        raise RuntimeError("zerosearch index was built on Python 3.13, but this is Python 3.14")
+
+    monkeypatch.setattr(handler, "_INDEX", None)
+    monkeypatch.setattr(handler, "load_search_index", broken)
+    resp = handler.lambda_handler(event("GET", "/ready"))
+    assert resp["statusCode"] == 503
+    body = json.loads(resp["body"])
+    assert body["ok"] is False
+    assert "Python 3.13" in body["error"]
+
+
 def test_options_preflight():
     assert handler.lambda_handler(event("OPTIONS"))["statusCode"] == 204
 

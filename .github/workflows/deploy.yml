@@ -85,3 +85,13 @@ jobs:
           fi
           endpoint="${endpoint%/}"
           curl --fail --silent --show-error "$endpoint/health"
+          # /health only proves the code imports; /ready loads the shipped
+          # index, which fails when it was built on another Python version.
+          for attempt in 1 2 3 4 5; do
+            status="$(curl --silent --show-error -o ready.json -w '%{http_code}' "$endpoint/ready" || true)"
+            echo "ready attempt $attempt: HTTP $status $(cat ready.json 2>/dev/null)"
+            [[ "$status" == "200" ]] && exit 0
+            sleep 10
+          done
+          echo "::error::deployed faq-assistant is not ready (index failed to load)"
+          exit 1
