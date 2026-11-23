@@ -44,6 +44,16 @@ def lambda_handler(event, context=None):
     if method == "GET" and path.rstrip("/") in ("", "/health"):
         return _response(200, {"ok": True, "app": CONFIG["app"]["name"]})
 
+    if method == "GET" and path.rstrip("/") == "/ready":
+        # Deep check for the post-deploy gate: /health only proves the code
+        # imports, while a broken index (e.g. built on another Python version)
+        # fails every /ask. Loading is cached, so repeat probes are cheap.
+        try:
+            _index()
+        except Exception as error:  # noqa: BLE001 - report, don't crash
+            return _response(503, {"ok": False, "error": f"index: {error}"})
+        return _response(200, {"ok": True})
+
     if method != "POST":
         return _response(404, {"error": "Not found"})
 
